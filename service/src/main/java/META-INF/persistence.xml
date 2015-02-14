@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.1"
+	xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+	<persistence-unit name="SMARTCAMPUS">
+		<class>model.TAdmin</class>
+		<class>model.TCategory</class>
+		<class>model.TEvent</class>
+		<class>model.TGroup</class>
+		<class>model.TLocation</class>
+		<class>model.TMessage</class>
+		<class>model.TUser</class>
+		<properties>
+			<property name="javax.persistence.jdbc.driver" value="oracle.jdbc.OracleDriver" />
+			<property name="javax.persistence.jdbc.url"
+				value="jdbc:oracle:thin:@db.inf.unideb.hu:1521:ora11g" />
+			<property name="javax.persistence.jdbc.user" value="kisssandoradam" />
+			<property name="javax.persistence.jdbc.password" value="passwordhere" />
+		</properties>
+	</persistence-unit>
+</persistence>
