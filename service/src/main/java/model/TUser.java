@@ -19,8 +19,8 @@ public class TUser implements Serializable {
 	private String loginName;
 	private String smartPassword;
 	private TAdmin TAdmin;
-	private List<TMessage> TMessages;
 	private List<TEvent> TEvents;
+	private List<TMessage> TMessages;
 
 	public TUser() {
 	}
@@ -78,6 +78,26 @@ public class TUser implements Serializable {
 	}
 
 
+	//bi-directional many-to-many association to TEvent
+	@ManyToMany
+	@JoinTable(
+		name="T_EVENT_PROVIDER"
+		, joinColumns={
+			@JoinColumn(name="USER_ID", nullable=false)
+			}
+		, inverseJoinColumns={
+			@JoinColumn(name="EVENT_ID", nullable=false)
+			}
+		)
+	public List<TEvent> getTEvents() {
+		return this.TEvents;
+	}
+
+	public void setTEvents(List<TEvent> TEvents) {
+		this.TEvents = TEvents;
+	}
+
+
 	//bi-directional many-to-one association to TMessage
 	@OneToMany(mappedBy="TUser")
 	public List<TMessage> getTMessages() {
@@ -100,26 +120,6 @@ public class TUser implements Serializable {
 		TMessage.setTUser(null);
 
 		return TMessage;
-	}
-
-
-	//bi-directional many-to-many association to TEvent
-	@ManyToMany
-	@JoinTable(
-		name="T_EVENT_PROVIDER"
-		, joinColumns={
-			@JoinColumn(name="USER_ID", nullable=false)
-			}
-		, inverseJoinColumns={
-			@JoinColumn(name="EVENT_ID", nullable=false)
-			}
-		)
-	public List<TEvent> getTEvents() {
-		return this.TEvents;
-	}
-
-	public void setTEvents(List<TEvent> TEvents) {
-		this.TEvents = TEvents;
 	}
 
 }

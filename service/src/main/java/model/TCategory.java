@@ -17,9 +17,9 @@ public class TCategory implements Serializable {
 	private long categoryId;
 	private String description;
 	private String title;
+	private List<TEvent> TEvents;
 	private List<TCategory> TCategories1;
 	private List<TCategory> TCategories2;
-	private List<TEvent> TEvents;
 
 	public TCategory() {
 	}
@@ -56,6 +56,17 @@ public class TCategory implements Serializable {
 	}
 
 
+	//bi-directional many-to-many association to TEvent
+	@ManyToMany(mappedBy="TCategories")
+	public List<TEvent> getTEvents() {
+		return this.TEvents;
+	}
+
+	public void setTEvents(List<TEvent> TEvents) {
+		this.TEvents = TEvents;
+	}
+
+
 	//bi-directional many-to-many association to TCategory
 	@ManyToMany
 	@JoinTable(
@@ -84,17 +95,6 @@ public class TCategory implements Serializable {
 
 	public void setTCategories2(List<TCategory> TCategories2) {
 		this.TCategories2 = TCategories2;
-	}
-
-
-	//bi-directional many-to-many association to TEvent
-	@ManyToMany(mappedBy="TCategories")
-	public List<TEvent> getTEvents() {
-		return this.TEvents;
-	}
-
-	public void setTEvents(List<TEvent> TEvents) {
-		this.TEvents = TEvents;
 	}
 
 }

@@ -20,11 +20,11 @@ public class TEvent implements Serializable {
 	private Timestamp eventEnd;
 	private Timestamp eventStart;
 	private String title;
-	private List<TAdmin> TAdmins;
 	private List<TCategory> TCategories;
+	private List<TAdmin> TAdmins;
 	private List<TLocation> TLocations;
-	private List<TMessage> TMessages;
 	private List<TUser> TUsers;
+	private List<TMessage> TMessages;
 
 	public TEvent() {
 	}
@@ -81,26 +81,6 @@ public class TEvent implements Serializable {
 	}
 
 
-	//bi-directional many-to-many association to TAdmin
-	@ManyToMany
-	@JoinTable(
-		name="T_EVENT_EDITOR"
-		, joinColumns={
-			@JoinColumn(name="EVENT_ID", nullable=false)
-			}
-		, inverseJoinColumns={
-			@JoinColumn(name="USER_ID", nullable=false)
-			}
-		)
-	public List<TAdmin> getTAdmins() {
-		return this.TAdmins;
-	}
-
-	public void setTAdmins(List<TAdmin> TAdmins) {
-		this.TAdmins = TAdmins;
-	}
-
-
 	//bi-directional many-to-many association to TCategory
 	@ManyToMany
 	@JoinTable(
@@ -121,6 +101,26 @@ public class TEvent implements Serializable {
 	}
 
 
+	//bi-directional many-to-many association to TAdmin
+	@ManyToMany
+	@JoinTable(
+		name="T_EVENT_EDITOR"
+		, joinColumns={
+			@JoinColumn(name="EVENT_ID", nullable=false)
+			}
+		, inverseJoinColumns={
+			@JoinColumn(name="USER_ID", nullable=false)
+			}
+		)
+	public List<TAdmin> getTAdmins() {
+		return this.TAdmins;
+	}
+
+	public void setTAdmins(List<TAdmin> TAdmins) {
+		this.TAdmins = TAdmins;
+	}
+
+
 	//bi-directional many-to-many association to TLocation
 	@ManyToMany(mappedBy="TEvents")
 	public List<TLocation> getTLocations() {
@@ -129,6 +129,17 @@ public class TEvent implements Serializable {
 
 	public void setTLocations(List<TLocation> TLocations) {
 		this.TLocations = TLocations;
+	}
+
+
+	//bi-directional many-to-many association to TUser
+	@ManyToMany(mappedBy="TEvents")
+	public List<TUser> getTUsers() {
+		return this.TUsers;
+	}
+
+	public void setTUsers(List<TUser> TUsers) {
+		this.TUsers = TUsers;
 	}
 
 
@@ -154,17 +165,6 @@ public class TEvent implements Serializable {
 		TMessage.setTEvent(null);
 
 		return TMessage;
-	}
-
-
-	//bi-directional many-to-many association to TUser
-	@ManyToMany(mappedBy="TEvents")
-	public List<TUser> getTUsers() {
-		return this.TUsers;
-	}
-
-	public void setTUsers(List<TUser> TUsers) {
-		this.TUsers = TUsers;
 	}
 
 }
