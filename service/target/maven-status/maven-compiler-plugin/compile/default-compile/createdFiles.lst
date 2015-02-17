@@ -1,8 +1,0 @@
-model/TAdmin.class
-model/TGroup.class
-model/TLocation.class
-model/TEvent.class
-model/TUser.class
-service/jpa/JpaTest.class
-model/TCategory.class
-model/TMessage.class
