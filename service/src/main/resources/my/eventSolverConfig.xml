@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<solver>
+	<!--<environmentMode>FAST_ASSERT</environmentMode> -->
+	<solutionClass>my.domain.EventSchedule</solutionClass>
+	<entityClass>my.domain.MyEvent</entityClass>
+	
+	<scoreDirectorFactory>
+		<scoreDefinitionType>HARD_SOFT</scoreDefinitionType>
+		<easyScoreCalculatorClass>my.solver.score.EventScheduleSimpleScoreCalculator</easyScoreCalculatorClass>
+		<!-- <scoreDrl>my/eventScoreRules.drl</scoreDrl> -->
+	</scoreDirectorFactory>
+
+	<termination>
+		<terminationCompositionStyle>OR</terminationCompositionStyle>
+		<bestScoreLimit>0hard/0soft</bestScoreLimit>
+		<secondsSpentLimit>10</secondsSpentLimit>
+	</termination>
+	<constructionHeuristic>
+		<constructionHeuristicType>FIRST_FIT_DECREASING</constructionHeuristicType>
+	</constructionHeuristic>
+	<localSearch>
+		<acceptor>
+			<!-- Az entityTabuSize-os vackok hashCode-ot hasznalnak, de valami hashcode 
+				violation miatt elszall az egesz program. -->
+			<!-- <entityTabuSize>7</entityTabuSize> -->
+			<lateAcceptanceSize>500</lateAcceptanceSize>
+		</acceptor>
+		<forager>
+			<acceptedCountLimit>1000</acceptedCountLimit>
+		</forager>
+	</localSearch>
+</solver>

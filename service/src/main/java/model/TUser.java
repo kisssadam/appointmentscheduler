@@ -1,17 +1,18 @@
 package model;
 
 import java.io.Serializable;
-import javax.persistence.*;
-import java.util.List;
 
+import javax.persistence.*;
+
+import java.util.List;
 
 /**
  * The persistent class for the T_USER database table.
  * 
  */
 @Entity
-@Table(name="T_USER")
-@NamedQuery(name="TUser.findAll", query="SELECT t FROM TUser t")
+@Table(name = "T_USER")
+@NamedQuery(name = "TUser.findAll", query = "SELECT t FROM TUser t")
 public class TUser implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private long userId;
@@ -25,9 +26,8 @@ public class TUser implements Serializable {
 	public TUser() {
 	}
 
-
 	@Id
-	@Column(name="USER_ID", unique=true, nullable=false, precision=10)
+	@Column(name = "USER_ID", unique = true, nullable = false, precision = 10)
 	public long getUserId() {
 		return this.userId;
 	}
@@ -36,8 +36,7 @@ public class TUser implements Serializable {
 		this.userId = userId;
 	}
 
-
-	@Column(name="DISPLAY_NAME", nullable=false, length=256)
+	@Column(name = "DISPLAY_NAME", nullable = false, length = 256)
 	public String getDisplayName() {
 		return this.displayName;
 	}
@@ -46,8 +45,7 @@ public class TUser implements Serializable {
 		this.displayName = displayName;
 	}
 
-
-	@Column(name="LOGIN_NAME", nullable=false, length=256)
+	@Column(name = "LOGIN_NAME", nullable = false, length = 256)
 	public String getLoginName() {
 		return this.loginName;
 	}
@@ -56,8 +54,7 @@ public class TUser implements Serializable {
 		this.loginName = loginName;
 	}
 
-
-	@Column(name="SMART_PASSWORD", length=64)
+	@Column(name = "SMART_PASSWORD", length = 64)
 	public String getSmartPassword() {
 		return this.smartPassword;
 	}
@@ -66,9 +63,8 @@ public class TUser implements Serializable {
 		this.smartPassword = smartPassword;
 	}
 
-
-	//bi-directional one-to-one association to TAdmin
-	@OneToOne(mappedBy="TUser")
+	// bi-directional one-to-one association to TAdmin
+	@OneToOne(mappedBy = "TUser")
 	public TAdmin getTAdmin() {
 		return this.TAdmin;
 	}
@@ -77,18 +73,9 @@ public class TUser implements Serializable {
 		this.TAdmin = TAdmin;
 	}
 
-
-	//bi-directional many-to-many association to TEvent
+	// bi-directional many-to-many association to TEvent
 	@ManyToMany
-	@JoinTable(
-		name="T_EVENT_PROVIDER"
-		, joinColumns={
-			@JoinColumn(name="USER_ID", nullable=false)
-			}
-		, inverseJoinColumns={
-			@JoinColumn(name="EVENT_ID", nullable=false)
-			}
-		)
+	@JoinTable(name = "T_EVENT_PROVIDER", joinColumns = { @JoinColumn(name = "USER_ID", nullable = false) }, inverseJoinColumns = { @JoinColumn(name = "EVENT_ID", nullable = false) })
 	public List<TEvent> getTEvents() {
 		return this.TEvents;
 	}
@@ -97,9 +84,8 @@ public class TUser implements Serializable {
 		this.TEvents = TEvents;
 	}
 
-
-	//bi-directional many-to-one association to TMessage
-	@OneToMany(mappedBy="TUser")
+	// bi-directional many-to-one association to TMessage
+	@OneToMany(mappedBy = "TUser")
 	public List<TMessage> getTMessages() {
 		return this.TMessages;
 	}
@@ -121,5 +107,78 @@ public class TUser implements Serializable {
 
 		return TMessage;
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime
+				* result
+				+ ((this.displayName == null) ? 0 : this.displayName.hashCode());
+		result = prime * result
+				+ ((this.loginName == null) ? 0 : this.loginName.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof TUser)) {
+			return false;
+		}
+		TUser other = (TUser) obj;
+		if (this.displayName == null) {
+			if (other.displayName != null) {
+				return false;
+			}
+		} else if (!this.displayName.equals(other.displayName)) {
+			return false;
+		}
+		if (this.loginName == null) {
+			if (other.loginName != null) {
+				return false;
+			}
+		} else if (!this.loginName.equals(other.loginName)) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("TUser [displayName=");
+		builder.append(this.displayName);
+		builder.append(", loginName=");
+		builder.append(this.loginName);
+		builder.append("]");
+		return builder.toString();
+	}
+
+//	@Override
+//	public String toString() {
+//		StringBuilder builder = new StringBuilder();
+//		builder.append("TUser [userId=");
+//		builder.append(this.userId);
+//		builder.append(", displayName=");
+//		builder.append(this.displayName);
+//		builder.append(", loginName=");
+//		builder.append(this.loginName);
+//		builder.append(", smartPassword=");
+//		builder.append(this.smartPassword);
+//		builder.append(", TAdmin=");
+//		builder.append(this.TAdmin);
+//		builder.append(", TEvents=");
+//		builder.append(this.TEvents);
+//		builder.append(", TMessages=");
+//		builder.append(this.TMessages);
+//		builder.append("]");
+//		return builder.toString();
+//	}
 
 }
