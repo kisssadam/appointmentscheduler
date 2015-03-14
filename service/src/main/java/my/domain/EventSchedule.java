@@ -9,6 +9,7 @@ import java.util.Set;
 import org.optaplanner.core.api.domain.solution.PlanningEntityCollectionProperty;
 import org.optaplanner.core.api.domain.solution.PlanningSolution;
 import org.optaplanner.core.api.domain.solution.Solution;
+import org.optaplanner.core.api.domain.valuerange.ValueRangeProvider;
 import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
 import org.optaplanner.core.impl.score.buildin.hardsoft.HardSoftScoreDefinition;
 import org.optaplanner.persistence.xstream.impl.score.XStreamScoreConverter;
@@ -24,10 +25,27 @@ public class EventSchedule implements Solution<HardSoftScore> {
 	
 	private static final Logger logger = LoggerFactory.getLogger(EventSchedule.class);
 	
-	private static List<User> users;	// ez lett setrol list-re cserelve
+	private static List<User> users;	// ne legyen static!
 	private List<MyPeriod> periods;
-	private List<MyUnavailablePeriodPenalty> myUnavailablePeriodPenaltyList;
 	private List<MyEvent> events;
+	private List<MyDay> requiredDays;
+	
+	@ValueRangeProvider(id = "periodRange")
+	public List<MyPeriod> getPossiblePeriods() {
+		final int numOfDays = requiredDays.size();
+		final int numOfPossibleTimeslots = MyTimeslot.getPossibleTimeslots().size();
+		
+		List<MyPeriod> possiblePeriods = new ArrayList<>(numOfDays*numOfPossibleTimeslots);
+		
+		for (MyDay currentDay : requiredDays) {
+			for (MyTimeslot timeslot: MyTimeslot.getPossibleTimeslots()) {
+				MyPeriod period = new MyPeriod(currentDay, timeslot);
+				possiblePeriods.add(period);
+			}
+		}
+		
+		return possiblePeriods;
+	}
 	
 	@XStreamConverter(value = XStreamScoreConverter.class, types = {HardSoftScoreDefinition.class})
 	private HardSoftScore score;
@@ -71,12 +89,12 @@ public class EventSchedule implements Solution<HardSoftScore> {
 		this.periods = periods;
 	}
 
-	public List<MyUnavailablePeriodPenalty> getMyUnavailablePeriodPenaltyList() {
-		return this.myUnavailablePeriodPenaltyList;
+	public List<MyDay> getRequiredDays() {
+		return requiredDays;
 	}
 
-	public void setMyUnavailablePeriodPenaltyList(List<MyUnavailablePeriodPenalty> myUnavailablePeriodPenaltyList) {
-		this.myUnavailablePeriodPenaltyList = myUnavailablePeriodPenaltyList;
+	public void setRequiredDays(List<MyDay> requiredDays) {
+		this.requiredDays = requiredDays;
 	}
 
 	/**
@@ -105,8 +123,7 @@ public class EventSchedule implements Solution<HardSoftScore> {
 		EventSchedule eventSchedule = new EventSchedule();
 		
 //		EventSchedule.users = new ArrayList<>();
-		eventSchedule.periods = new ArrayList<>();
-		eventSchedule.myUnavailablePeriodPenaltyList = new ArrayList<>();		
+		eventSchedule.periods = new ArrayList<>();		
 		eventSchedule.events = new ArrayList<>();
 		
 		// creating users
@@ -130,13 +147,6 @@ public class EventSchedule implements Solution<HardSoftScore> {
 		eventSchedule.events.add(new MyEvent("mozgathato event", new MyPeriod(MyDay.Monday, new MyTimeslot(9)), new ArrayList<>(EventSchedule.users), false));
 		eventSchedule.events.add(new MyEvent("mozgathato event", new MyPeriod(MyDay.Monday, new MyTimeslot(10)), new ArrayList<>(EventSchedule.users), false));
 		eventSchedule.events.add(new MyEvent("mozgathato event", new MyPeriod(MyDay.Monday, new MyTimeslot(11)), new ArrayList<>(EventSchedule.users), false));
-		
-		// adding elements to myUnavailablePeriodList
-		User firstUser = EventSchedule.users.get(0);
-		for (int i = 0; i < EventSchedule.users.size()/4; i++) {
-			MyPeriod period = eventSchedule.periods.get(i);
-			eventSchedule.myUnavailablePeriodPenaltyList.add(new MyUnavailablePeriodPenalty(firstUser, period));
-		}
 		
 		return eventSchedule;
 	}

@@ -1,7 +1,6 @@
 package my.domain;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 import my.domain.solver.EventDifficultyComparator;
@@ -9,7 +8,6 @@ import my.domain.solver.MovableEventSelectionFilter;
 
 import org.apache.commons.lang.builder.CompareToBuilder;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
-import org.optaplanner.core.api.domain.valuerange.ValueRangeProvider;
 import org.optaplanner.core.api.domain.variable.PlanningVariable;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -24,8 +22,6 @@ public class MyEvent implements Serializable, Comparable<MyEvent>, Cloneable {
 	private MyPeriod period;
 	private List<User> users;
 	private boolean locked;
-	
-	private List<Integer> calculatedHashCodes = new ArrayList<>();
 
 	public MyEvent() {
 		super();
@@ -78,14 +74,6 @@ public class MyEvent implements Serializable, Comparable<MyEvent>, Cloneable {
 		int result = 1;
 		result = prime * result + ((this.period == null) ? 0 : this.period.hashCode());
 		result = prime * result + ((this.title == null) ? 0 : this.title.hashCode());
-		
-		if (!calculatedHashCodes.contains(result)) {
-			calculatedHashCodes.add(result);
-		}
-		for (Integer hc : calculatedHashCodes) {
-			System.out.println(title + " " + hc);
-		}
-		
 		return result;
 	}
 
@@ -132,25 +120,8 @@ public class MyEvent implements Serializable, Comparable<MyEvent>, Cloneable {
 	}
 
 	@Override
-	public int compareTo(MyEvent o) {
-		return new CompareToBuilder().append(this, o).toComparison();
-	}
-	
-	@ValueRangeProvider(id = "periodRange")
-	public static List<MyPeriod> getPossiblePeriods() {
-		final int numOfDays = MyDay.values().length;
-		final int numOfPossibleTimeslots = MyTimeslot.getPossibleTimeslots().size();
-		
-		List<MyPeriod> possiblePeriods = new ArrayList<>(numOfDays*numOfPossibleTimeslots);
-		
-		for (MyDay currentDay : MyDay.values()) {
-			for (MyTimeslot timeslot: MyTimeslot.getPossibleTimeslots()) {
-				MyPeriod period = new MyPeriod(currentDay, timeslot);
-				possiblePeriods.add(period);
-			}
-		}
-		
-		return possiblePeriods;
+	public int compareTo(MyEvent otherEvent) {
+		return new CompareToBuilder().append(this, otherEvent).toComparison();
 	}
 
 	@Override

@@ -4,7 +4,6 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -23,7 +22,6 @@ import my.domain.MyDay;
 import my.domain.MyEvent;
 import my.domain.MyPeriod;
 import my.domain.MyTimeslot;
-import my.domain.MyUnavailablePeriodPenalty;
 import my.domain.User;
 
 import org.optaplanner.core.api.solver.Solver;
@@ -35,7 +33,7 @@ public class HelloOptaPlanner {
 
 	private static final String SOLVER_CONFIG = "my/eventSolverConfig.xml";
 	private static final Logger logger = LoggerFactory.getLogger(HelloOptaPlanner.class);
-	private static final TimeZone budapestTimeZone;
+	private static final TimeZone budapestTimeZone = TimeZone.getTimeZone("Europe/Budapest");
 	private static final SimpleDateFormat dayDateFormat;
 	private static final SimpleDateFormat weekDateFormat;
 	private static final SimpleDateFormat yearDateFormat;
@@ -43,8 +41,6 @@ public class HelloOptaPlanner {
 	private static final SimpleDateFormat minuteDateFormat;
 	
 	static {
-		budapestTimeZone = TimeZone.getTimeZone("Europe/Budapest");
-		
 		dayDateFormat = new SimpleDateFormat("EEEE");
 		dayDateFormat.setTimeZone(budapestTimeZone);
 		
@@ -76,8 +72,13 @@ public class HelloOptaPlanner {
 //		int currentWeek = Calendar.getInstance(budapestTimeZone).get(Calendar.WEEK_OF_YEAR);
 		int currentYear = 2015;
 		int currentWeek = 12;
+		MyDay[] requiredDays = {MyDay.Monday, MyDay.Tuesday};
 		
-		EventSchedule unsolvedEventSchedule = createEventSchedule(new String[] {"KOLLARL", "KISSSANDORADAM", "MKOSA", "VAGNERA"}, currentYear, currentWeek);
+		EventSchedule unsolvedEventSchedule = createEventSchedule(
+				new String[] {"KOLLARL", "KISSSANDORADAM", "MKOSA", "VAGNERA"},
+				currentYear,
+				currentWeek,
+				requiredDays);
 		
 		System.out.println("EVENTS");
 		for (MyEvent event : unsolvedEventSchedule.getEvents()) {
@@ -108,7 +109,7 @@ public class HelloOptaPlanner {
 	}
 	
 	// TODO implement this
-	public static EventSchedule createEventSchedule(String[] loginNames, int year, int weekOfYear) {
+	public static EventSchedule createEventSchedule(String[] loginNames, int year, int weekOfYear, MyDay[] days) {
 		EventSchedule eventSchedule = new EventSchedule();
 		
 		List<TUser> queriedTUsers = queryTUsers(loginNames);
@@ -117,26 +118,26 @@ public class HelloOptaPlanner {
 		List<User> users = createUsersFromTUsers(queriedTUsers);
 		EventSchedule.getUsers().addAll(users);
 		
-		List<MyEvent> events = createEventsFromTEvents(everyTEvent, loginNames, year, weekOfYear);
+		List<MyDay> requiredDays = Arrays.asList(days);
+		eventSchedule.setRequiredDays(requiredDays);
+		
+		List<MyEvent> events = createEventsFromTEvents(everyTEvent, loginNames, year, weekOfYear, requiredDays);
 		eventSchedule.setEvents(events);
 		
-		// TODO add penalties: get users and events to create myUnavailablePeriodPenalties
-		List<MyUnavailablePeriodPenalty> myUnavailablePeriodPenalties = new ArrayList<>();
-		eventSchedule.setMyUnavailablePeriodPenaltyList(myUnavailablePeriodPenalties);
-		
-		
-		// trying to add manually some event that conflicts with locked events.
+		// TODO trying to add manually some event that conflicts with locked events.
 		events.add(new MyEvent("sajat", new MyPeriod(MyDay.Friday, new MyTimeslot(10)), users, false));
 		
 		return eventSchedule;
 	}
 	
-	private static List<MyEvent> createEventsFromTEvents(List<TEvent> everyTEvent, String[] loginNames, int year, int weekOfYear) {
+	private static List<MyEvent> createEventsFromTEvents(
+			List<TEvent> everyTEvent, String[] loginNames, int year, int weekOfYear, List<MyDay> requiredDays) {
 		Set<MyEvent> events = new HashSet<>();
 		
 		everyTEvent.stream()
 				   .filter(tEvent -> Integer.parseInt(yearDateFormat.format(tEvent.getEventStart())) == year)
 				   .filter(tEvent -> Integer.parseInt(weekDateFormat.format(tEvent.getEventStart())) == weekOfYear)
+				   .filter(tEvent -> requiredDays.contains(MyDay.valueOf(dayDateFormat.format(tEvent.getEventStart()))))
 				   .forEach(tEvent -> {
 					   Timestamp eventStart = tEvent.getEventStart();
 					   Timestamp eventEnd = tEvent.getEventEnd();
