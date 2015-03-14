@@ -4,14 +4,16 @@ public class User implements Cloneable {
 
 	private String displayName;
 	private String loginName;
-
+	private boolean skippable;
+	
 	public User() {
 	}
 
-	public User(String displayName, String loginName) {
+	public User(String displayName, String loginName, boolean skippable) {
 		super();
 		this.displayName = displayName;
 		this.loginName = loginName;
+		this.skippable = skippable;
 	}
 
 	public String getDisplayName() {
@@ -29,7 +31,15 @@ public class User implements Cloneable {
 	public void setLoginName(String loginName) {
 		this.loginName = loginName;
 	}
+	
+	public boolean isSkippable() {
+		return this.skippable;
+	}
 
+	public void setSkippable(boolean skippable) {
+		this.skippable = skippable;
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -81,7 +91,7 @@ public class User implements Cloneable {
 
 	@Override
 	protected User clone() {
-		return new User(this.displayName, this.loginName);
+		return new User(this.displayName, this.loginName, this.skippable);
 	}
 
 }

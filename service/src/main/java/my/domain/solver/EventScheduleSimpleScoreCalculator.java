@@ -30,7 +30,11 @@ public class EventScheduleSimpleScoreCalculator implements EasyScoreCalculator<E
 				if (outerEvent.getPeriod().equals(innerEvent.getPeriod())) {
 					for (User user : innerEvent.getUsers()) {
 						if (outerEvent.getUsers().contains(user)) {
-							--hardScore;
+							if (user.isSkippable()) {
+								--softScore;
+							} else {
+								--hardScore;
+							}
 						}
 					}
 				}

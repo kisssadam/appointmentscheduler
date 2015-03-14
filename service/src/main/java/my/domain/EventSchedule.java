@@ -27,10 +27,6 @@ public class EventSchedule implements Solution<HardSoftScore> {
 	public static List<User> getUsers() {
 		return EventSchedule.users;
 	}
-
-	public static void setUsers(List<User> users) {
-		EventSchedule.users = users;
-	}
 	
 	@Override
 	public HardSoftScore getScore() {
@@ -115,9 +111,10 @@ public class EventSchedule implements Solution<HardSoftScore> {
 		eventSchedule.requiredDays = Arrays.asList(new MyDay[] {MyDay.Monday, MyDay.Tuesday});
 		
 		// creating users
-		EventSchedule.users.add(new User("Adam", "kisssandoradam"));
-		EventSchedule.users.add(new User("Peter", "kisspeti2000"));
-		EventSchedule.users.add(new User("David", "apagyidavid"));
+		boolean notSkippable = false;
+		EventSchedule.users.add(new User("Adam", "kisssandoradam", notSkippable));
+		EventSchedule.users.add(new User("Peter", "kisspeti2000", notSkippable));
+		EventSchedule.users.add(new User("David", "apagyidavid", notSkippable));
 		
 		// adding non movable events
 		for (int hour = MyTimeslot.getMinHour()+1; hour < MyTimeslot.getMaxHour(); hour++) {

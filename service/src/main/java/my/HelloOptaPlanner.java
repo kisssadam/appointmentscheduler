@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -25,6 +26,7 @@ import my.domain.MyPeriod;
 import my.domain.MyTimeslot;
 import my.domain.User;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.optaplanner.core.api.solver.Solver;
 import org.optaplanner.core.api.solver.SolverFactory;
 import org.slf4j.Logger;
@@ -69,9 +71,10 @@ public class HelloOptaPlanner {
 		int currentYear = 2015;
 		int currentWeek = 12;
 		MyDay[] requiredDays = {MyDay.Monday, MyDay.Tuesday, MyDay.Friday};
-		String[] loginNames = new String[] {"KOLLARL", "KISSSANDORADAM", "MKOSA", "VAGNERA"}; 
+		String[] loginNames = new String[] {"KOLLARL", "KISSSANDORADAM", "MKOSA"}; 
 		
-		EventSchedule unsolvedEventSchedule = createEventSchedule(loginNames, currentYear, currentWeek, requiredDays);
+		EventSchedule unsolvedEventSchedule = createEventSchedule(loginNames, new String[] {"VAGNERA"},currentYear, currentWeek, requiredDays);
+//		EventSchedule unsolvedEventSchedule = createEventSchedule(loginNames, currentYear, currentWeek, requiredDays);
 //		EventSchedule unsolvedEventSchedule = EventSchedule.createEventSchedule();
 		
 		System.out.println("EVENTS");
@@ -94,8 +97,42 @@ public class HelloOptaPlanner {
 		System.out.println("Goodbye Opta Planner!");
 	}
 	
+	// TODO implement this
+	public static EventSchedule createEventSchedule(String[] requiredLoginNames, String[] skippableLoginNames,
+													int year, int weekOfYear, MyDay[] days) {
+		EventSchedule eventSchedule = new EventSchedule();
+		
+		String[] loginNames = Stream.concat(Arrays.stream(requiredLoginNames), Arrays.stream(skippableLoginNames))
+									.toArray(String[]::new);
+		
+		List<TUser> queriedTUsers = queryTUsers(loginNames);
+		List<TEvent> everyTEvent = getDistinctTEventsFromTUsers(queriedTUsers);
+		
+		List<User> users = createUsersFromTUsers(queriedTUsers, requiredLoginNames);
+		
+		List<User> synchronizedEventScheduleUsers = Collections.synchronizedList(EventSchedule.getUsers());
+		for (User user : users) {
+			synchronized (synchronizedEventScheduleUsers) {
+				if (!synchronizedEventScheduleUsers.contains(user)) {
+					synchronizedEventScheduleUsers.add(user);
+				}
+			}
+		}
+		
+		List<MyDay> requiredDays = Arrays.asList(days);
+		eventSchedule.setRequiredDays(requiredDays);
+		
+		List<MyEvent> events = createEventsFromTEvents(everyTEvent, loginNames, year, weekOfYear, requiredDays);
+		eventSchedule.setEvents(events);
+		
+		// TODO trying to add manually some event that conflicts with locked events.
+		events.add(new MyEvent("sajat", new MyPeriod(MyDay.Friday, new MyTimeslot(10)), users, false));
+		
+		return eventSchedule;
+	}
+	
 //	// TODO implement this
-//	public static EventSchedule createEventSchedule(String[] requiredLoginNames, String[] skippableLoginNames, int year, int weekOfYear, MyDay[] days) {
+//	public static EventSchedule createEventSchedule(String[] loginNames, int year, int weekOfYear, MyDay[] days) {
 //		EventSchedule eventSchedule = new EventSchedule();
 //		
 //		List<TUser> queriedTUsers = queryTUsers(loginNames);
@@ -123,36 +160,6 @@ public class HelloOptaPlanner {
 //		
 //		return eventSchedule;
 //	}
-	
-	// TODO implement this
-	public static EventSchedule createEventSchedule(String[] loginNames, int year, int weekOfYear, MyDay[] days) {
-		EventSchedule eventSchedule = new EventSchedule();
-		
-		List<TUser> queriedTUsers = queryTUsers(loginNames);
-		List<TEvent> everyTEvent = getDistinctTEventsFromTUsers(queriedTUsers);
-		
-		List<User> users = createUsersFromTUsers(queriedTUsers);
-		
-		List<User> synchronizedEventScheduleUsers = Collections.synchronizedList(EventSchedule.getUsers());
-		for (User user : users) {
-			synchronized (synchronizedEventScheduleUsers) {
-				if (!synchronizedEventScheduleUsers.contains(user)) {
-					synchronizedEventScheduleUsers.add(user);
-				}
-			}
-		}
-		
-		List<MyDay> requiredDays = Arrays.asList(days);
-		eventSchedule.setRequiredDays(requiredDays);
-		
-		List<MyEvent> events = createEventsFromTEvents(everyTEvent, loginNames, year, weekOfYear, requiredDays);
-		eventSchedule.setEvents(events);
-		
-		// TODO trying to add manually some event that conflicts with locked events.
-		events.add(new MyEvent("sajat", new MyPeriod(MyDay.Friday, new MyTimeslot(10)), users, false));
-		
-		return eventSchedule;
-	}
 	
 	private static List<MyEvent> createEventsFromTEvents(
 			List<TEvent> everyTEvent, String[] loginNames, int year, int weekOfYear, List<MyDay> requiredDays) {
@@ -253,10 +260,13 @@ public class HelloOptaPlanner {
 		return result;
 	}
 	
-	private static List<User> createUsersFromTUsers(List<TUser> queriedTUsers) {
+	private static List<User> createUsersFromTUsers(List<TUser> queriedTUsers, String[] requiredLoginNames) {
 		Set<User> users = new HashSet<>(queriedTUsers.size());
 		
-		queriedTUsers.forEach(tUser -> users.add(new User(tUser.getDisplayName(), tUser.getLoginName())));
+		queriedTUsers.forEach(tUser -> {
+			boolean isSkippable = !ArrayUtils.contains(requiredLoginNames, tUser.getLoginName());
+			users.add(new User(tUser.getDisplayName(), tUser.getLoginName(), isSkippable));
+		});
 		
 		return new ArrayList<>(users);
 	}
@@ -265,10 +275,6 @@ public class HelloOptaPlanner {
 		Set<TEvent> everyTEvent = new HashSet<>();
 		
 		queriedTUsers.forEach(tUser -> everyTEvent.addAll(tUser.getTEvents()));
-//		queriedTUsers.forEach(tUser -> {
-//			tUser.getTEvents().size();	// prefetch
-//			everyTEvent.addAll(tUser.getTEvents());
-//		});
 		
 		return new ArrayList<>(everyTEvent);
 	}
