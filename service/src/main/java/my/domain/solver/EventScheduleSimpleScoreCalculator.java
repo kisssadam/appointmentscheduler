@@ -1,4 +1,4 @@
-package my.solver.score;
+package my.domain.solver;
 
 import my.domain.EventSchedule;
 import my.domain.MyEvent;

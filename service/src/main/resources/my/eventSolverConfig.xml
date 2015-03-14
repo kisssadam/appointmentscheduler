@@ -6,7 +6,7 @@
 	
 	<scoreDirectorFactory>
 		<scoreDefinitionType>HARD_SOFT</scoreDefinitionType>
-		<easyScoreCalculatorClass>my.solver.score.EventScheduleSimpleScoreCalculator</easyScoreCalculatorClass>
+		<easyScoreCalculatorClass>my.domain.solver.EventScheduleSimpleScoreCalculator</easyScoreCalculatorClass>
 		<!-- <scoreDrl>my/eventScoreRules.drl</scoreDrl> -->
 	</scoreDirectorFactory>
 
