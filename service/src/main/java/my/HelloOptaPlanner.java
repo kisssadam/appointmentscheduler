@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -58,47 +59,32 @@ public class HelloOptaPlanner {
 	}
 	
 	public static void main(String[] args) throws InterruptedException {
-		System.out.println("Hello Opta Planner!");
+		logger.info("Hello Opta Planner!");
 		
 		SolverFactory solverFactory = SolverFactory.createFromXmlResource(SOLVER_CONFIG);
 		Solver solver = solverFactory.buildSolver();
-		
-		/*
-		 * SELECT * FROM SMARTCAMPUS.T_USER WHERE DISPLAY_NAME LIKE '%Ádám%';
-		 */
-//		EventSchedule unsolvedEventSchedule = EventSchedule.createEventSchedule(new String[] {"KOLLARL", "KISSSANDORADAM", "MKOSA", "VAGNERA"});
 		
 //		int currentYear = Calendar.getInstance(budapestTimeZone).get(Calendar.YEAR);
 //		int currentWeek = Calendar.getInstance(budapestTimeZone).get(Calendar.WEEK_OF_YEAR);
 		int currentYear = 2015;
 		int currentWeek = 12;
-		MyDay[] requiredDays = {MyDay.Monday, MyDay.Tuesday};
+		MyDay[] requiredDays = {MyDay.Monday, MyDay.Tuesday, MyDay.Friday};
+		String[] loginNames = new String[] {"KOLLARL", "KISSSANDORADAM", "MKOSA", "VAGNERA"}; 
 		
-		EventSchedule unsolvedEventSchedule = createEventSchedule(
-				new String[] {"KOLLARL", "KISSSANDORADAM", "MKOSA", "VAGNERA"},
-				currentYear,
-				currentWeek,
-				requiredDays);
+		EventSchedule unsolvedEventSchedule = createEventSchedule(loginNames, currentYear, currentWeek, requiredDays);
+//		EventSchedule unsolvedEventSchedule = EventSchedule.createEventSchedule();
 		
 		System.out.println("EVENTS");
-		for (MyEvent event : unsolvedEventSchedule.getEvents()) {
-			System.out.println(event);
-		}
+		unsolvedEventSchedule.getEvents().forEach(System.out::println);
 		System.out.println("ENDOFEVENTS");
 		
 		System.out.println("USERS");
-		for (User user : EventSchedule.getUsers()) {
-			System.out.println(user);
-		}
+		EventSchedule.getUsers().forEach(System.out::println);
 		System.out.println("ENDOFUSERS");
 		
+		System.out.println("unsolvedEventSchedule:");
 		System.out.println(unsolvedEventSchedule);
 		
-//		EventSchedule unsolvedEventSchedule = EventSchedule.createEventSchedule();
-		
-//		new Thread(() -> solver.solve(unsolvedEventSchedule)).start();
-//		Thread.sleep(5000);
-
 		solver.solve(unsolvedEventSchedule);
 		
 		EventSchedule solvedEventSchedule = (EventSchedule) solver.getBestSolution();
@@ -108,6 +94,36 @@ public class HelloOptaPlanner {
 		System.out.println("Goodbye Opta Planner!");
 	}
 	
+//	// TODO implement this
+//	public static EventSchedule createEventSchedule(String[] requiredLoginNames, String[] skippableLoginNames, int year, int weekOfYear, MyDay[] days) {
+//		EventSchedule eventSchedule = new EventSchedule();
+//		
+//		List<TUser> queriedTUsers = queryTUsers(loginNames);
+//		List<TEvent> everyTEvent = getDistinctTEventsFromTUsers(queriedTUsers);
+//		
+//		List<User> users = createUsersFromTUsers(queriedTUsers);
+//		
+//		List<User> synchronizedEventScheduleUsers = Collections.synchronizedList(EventSchedule.getUsers());
+//		for (User user : users) {
+//			synchronized (synchronizedEventScheduleUsers) {
+//				if (!synchronizedEventScheduleUsers.contains(user)) {
+//					synchronizedEventScheduleUsers.add(user);
+//				}
+//			}
+//		}
+//		
+//		List<MyDay> requiredDays = Arrays.asList(days);
+//		eventSchedule.setRequiredDays(requiredDays);
+//		
+//		List<MyEvent> events = createEventsFromTEvents(everyTEvent, loginNames, year, weekOfYear, requiredDays);
+//		eventSchedule.setEvents(events);
+//		
+//		// TODO trying to add manually some event that conflicts with locked events.
+//		events.add(new MyEvent("sajat", new MyPeriod(MyDay.Friday, new MyTimeslot(10)), users, false));
+//		
+//		return eventSchedule;
+//	}
+	
 	// TODO implement this
 	public static EventSchedule createEventSchedule(String[] loginNames, int year, int weekOfYear, MyDay[] days) {
 		EventSchedule eventSchedule = new EventSchedule();
@@ -116,7 +132,15 @@ public class HelloOptaPlanner {
 		List<TEvent> everyTEvent = getDistinctTEventsFromTUsers(queriedTUsers);
 		
 		List<User> users = createUsersFromTUsers(queriedTUsers);
-		EventSchedule.getUsers().addAll(users);
+		
+		List<User> synchronizedEventScheduleUsers = Collections.synchronizedList(EventSchedule.getUsers());
+		for (User user : users) {
+			synchronized (synchronizedEventScheduleUsers) {
+				if (!synchronizedEventScheduleUsers.contains(user)) {
+					synchronizedEventScheduleUsers.add(user);
+				}
+			}
+		}
 		
 		List<MyDay> requiredDays = Arrays.asList(days);
 		eventSchedule.setRequiredDays(requiredDays);
@@ -141,43 +165,38 @@ public class HelloOptaPlanner {
 				   .forEach(tEvent -> {
 					   Timestamp eventStart = tEvent.getEventStart();
 					   Timestamp eventEnd = tEvent.getEventEnd();
-					   
-					   System.out.println("WEEK: " + Integer.parseInt(weekDateFormat.format(eventStart)));
-					   System.out.println("YEAR: " + Integer.parseInt(yearDateFormat.format(eventStart)));
 					
 					   List<User> usersOfEvent = getRequiredUsersOfEvent(tEvent, loginNames);
-					
 					   String title = tEvent.getTitle();
 					   boolean locked = true;
-					   MyDay day = MyDay.valueOf(dayDateFormat.format(eventStart));
 					   
-					   int rangeMinValue = Integer.parseInt(hourDateFormat.format(eventStart));
-					   int rangeMaxValue = Integer.parseInt(hourDateFormat.format(eventEnd));
-					   
-					   int eventEndMinute = Integer.parseInt(minuteDateFormat.format(eventStart));
-					
-					   if (rangeMinValue == rangeMaxValue || eventEndMinute != 0) {
-						   rangeMaxValue++;
-					   }
-					   
-					   IntStream.range(rangeMinValue, rangeMaxValue).forEach(hour -> {
-						   MyTimeslot timeslot = new MyTimeslot(hour);
-						   MyPeriod period = new MyPeriod(day, timeslot);
-						   
-						   events.add(new MyEvent(title, period, usersOfEvent, locked));
-					   });
+					   List<MyPeriod> periods = createPeriodsFromTimestamps(eventStart, eventEnd);
+					   periods.forEach(period -> events.add(new MyEvent(title, period, usersOfEvent, locked)));
 		});
 		
 		return new ArrayList<>(events);
 	}
 
-	private static User getUserByLoginName(String loginName) {
-		for (User user : EventSchedule.getUsers()) {
-			if (user.getLoginName().equals(loginName)) {
-				return user;
-			}
+	private static List<MyPeriod> createPeriodsFromTimestamps(final Timestamp eventStart, final Timestamp eventEnd) {
+		List<MyPeriod> periods = new ArrayList<>();
+		
+		MyDay day = MyDay.valueOf(dayDateFormat.format(eventStart));
+		
+		int rangeMinValue = Integer.parseInt(hourDateFormat.format(eventStart));
+		int rangeMaxValue = Integer.parseInt(hourDateFormat.format(eventEnd));
+		int eventEndMinute = Integer.parseInt(minuteDateFormat.format(eventStart));
+		
+		if (rangeMinValue == rangeMaxValue || eventEndMinute != 0) {
+			rangeMaxValue++;
 		}
-		return null;
+		
+		IntStream.range(rangeMinValue, rangeMaxValue).forEach(hour -> {
+			MyTimeslot timeslot = new MyTimeslot(hour);
+			MyPeriod period = new MyPeriod(day, timeslot);
+			periods.add(period);
+		});
+		
+		return periods;
 	}
 
 	private static List<User> getRequiredUsersOfEvent(TEvent tEvent, String[] loginNames) {
@@ -197,6 +216,26 @@ public class HelloOptaPlanner {
 		}
 		
 		return new ArrayList<>(usersOfEvent);
+	}
+	
+	private static User getUserByLoginName(String loginName) {
+		List<User> synchronizedEventScheduleUsers = Collections.synchronizedList(EventSchedule.getUsers());
+		
+		synchronized (synchronizedEventScheduleUsers) {
+			for (User user : synchronizedEventScheduleUsers) {
+				if (user.getLoginName().equals(loginName)) {
+					return user;
+				}
+			}
+		}
+		
+		return null;
+//		for (User user : EventSchedule.getUsers()) {
+//			if (user.getLoginName().equals(loginName)) {
+//				return user;
+//			}
+//		}
+//		return null;
 	}
 	
 	private static List<TUser> queryTUsers(String[] loginNames) {
@@ -225,10 +264,11 @@ public class HelloOptaPlanner {
 	private static List<TEvent> getDistinctTEventsFromTUsers(List<TUser> queriedTUsers) {
 		Set<TEvent> everyTEvent = new HashSet<>();
 		
-		queriedTUsers.forEach(tUser -> {
-			tUser.getTEvents().size();	// prefetch
-			everyTEvent.addAll(tUser.getTEvents());
-		});
+		queriedTUsers.forEach(tUser -> everyTEvent.addAll(tUser.getTEvents()));
+//		queriedTUsers.forEach(tUser -> {
+//			tUser.getTEvents().size();	// prefetch
+//			everyTEvent.addAll(tUser.getTEvents());
+//		});
 		
 		return new ArrayList<>(everyTEvent);
 	}

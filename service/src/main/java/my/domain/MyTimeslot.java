@@ -35,8 +35,8 @@ public class MyTimeslot {
 	@ValueRangeProvider(id = "periodRange")
 	public static List<MyTimeslot> getPossibleTimeslots() {
 		List<MyTimeslot> possibleTimeslots = new ArrayList<>();
-		for (int currentHour = minHour; currentHour < maxHour; currentHour++) {
-			possibleTimeslots.add(new MyTimeslot(currentHour));
+		for (int hour = minHour; hour < maxHour; hour++) {
+			possibleTimeslots.add(new MyTimeslot(hour));
 		}
 		return possibleTimeslots;
 	}
@@ -73,7 +73,7 @@ public class MyTimeslot {
 		builder.append("]");
 		return builder.toString();
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -99,5 +99,5 @@ public class MyTimeslot {
 		}
 		return true;
 	}
-	
+
 }

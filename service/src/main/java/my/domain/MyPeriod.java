@@ -1,6 +1,5 @@
 package my.domain;
 
-
 public class MyPeriod implements Cloneable {
 
 	private MyDay day;
@@ -47,10 +46,8 @@ public class MyPeriod implements Cloneable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-				+ ((this.day == null) ? 0 : this.day.hashCode());
-		result = prime * result
-				+ ((this.timeslot == null) ? 0 : this.timeslot.hashCode());
+		result = prime * result + ((this.day == null) ? 0 : this.day.hashCode());
+		result = prime * result + ((this.timeslot == null) ? 0 : this.timeslot.hashCode());
 		return result;
 	}
 

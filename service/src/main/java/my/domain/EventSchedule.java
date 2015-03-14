@@ -1,53 +1,23 @@
 package my.domain;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.optaplanner.core.api.domain.solution.PlanningEntityCollectionProperty;
 import org.optaplanner.core.api.domain.solution.PlanningSolution;
 import org.optaplanner.core.api.domain.solution.Solution;
 import org.optaplanner.core.api.domain.valuerange.ValueRangeProvider;
 import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
-import org.optaplanner.core.impl.score.buildin.hardsoft.HardSoftScoreDefinition;
-import org.optaplanner.persistence.xstream.impl.score.XStreamScoreConverter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamConverter;
 
 @PlanningSolution
-@XStreamAlias("EventSchedule")
 public class EventSchedule implements Solution<HardSoftScore> {
 	
-	private static final Logger logger = LoggerFactory.getLogger(EventSchedule.class);
-	
-	private static List<User> users;	// ne legyen static!
+	private static List<User> users;
 	private List<MyPeriod> periods;
 	private List<MyEvent> events;
 	private List<MyDay> requiredDays;
-	
-	@ValueRangeProvider(id = "periodRange")
-	public List<MyPeriod> getPossiblePeriods() {
-		final int numOfDays = requiredDays.size();
-		final int numOfPossibleTimeslots = MyTimeslot.getPossibleTimeslots().size();
-		
-		List<MyPeriod> possiblePeriods = new ArrayList<>(numOfDays*numOfPossibleTimeslots);
-		
-		for (MyDay currentDay : requiredDays) {
-			for (MyTimeslot timeslot: MyTimeslot.getPossibleTimeslots()) {
-				MyPeriod period = new MyPeriod(currentDay, timeslot);
-				possiblePeriods.add(period);
-			}
-		}
-		
-		return possiblePeriods;
-	}
-	
-	@XStreamConverter(value = XStreamScoreConverter.class, types = {HardSoftScoreDefinition.class})
 	private HardSoftScore score;
 	
 	static {
@@ -58,9 +28,9 @@ public class EventSchedule implements Solution<HardSoftScore> {
 		return EventSchedule.users;
 	}
 
-//	public static void setUsers(Set<User> users) {
-//		EventSchedule.users = users;
-//	}
+	public static void setUsers(List<User> users) {
+		EventSchedule.users = users;
+	}
 	
 	@Override
 	public HardSoftScore getScore() {
@@ -108,6 +78,23 @@ public class EventSchedule implements Solution<HardSoftScore> {
 		return null;
 	}
 
+	@ValueRangeProvider(id = "periodRange")
+	public List<MyPeriod> getPossiblePeriods() {
+		final int numOfDays = requiredDays.size();
+		final int numOfPossibleTimeslots = MyTimeslot.getPossibleTimeslots().size();
+		
+		List<MyPeriod> possiblePeriods = new ArrayList<>(numOfDays*numOfPossibleTimeslots);
+		
+		for (MyDay currentDay : requiredDays) {
+			for (MyTimeslot timeslot: MyTimeslot.getPossibleTimeslots()) {
+				MyPeriod period = new MyPeriod(currentDay, timeslot);
+				possiblePeriods.add(period);
+			}
+		}
+		
+		return possiblePeriods;
+	}
+	
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
@@ -118,13 +105,14 @@ public class EventSchedule implements Solution<HardSoftScore> {
 		builder.append("]");
 		return builder.toString();
 	}
-
+	
 	public static EventSchedule createEventSchedule() {
 		EventSchedule eventSchedule = new EventSchedule();
 		
-//		EventSchedule.users = new ArrayList<>();
+		EventSchedule.users = new ArrayList<>();
 		eventSchedule.periods = new ArrayList<>();		
 		eventSchedule.events = new ArrayList<>();
+		eventSchedule.requiredDays = Arrays.asList(new MyDay[] {MyDay.Monday, MyDay.Tuesday});
 		
 		// creating users
 		EventSchedule.users.add(new User("Adam", "kisssandoradam"));
@@ -139,14 +127,14 @@ public class EventSchedule implements Solution<HardSoftScore> {
 				}
 				MyPeriod period = new MyPeriod(day, new MyTimeslot(hour));
 				eventSchedule.periods.add(period);
-				eventSchedule.events.add(new MyEvent(hour + ". event", period, new ArrayList<>(EventSchedule.users), true));			
+				eventSchedule.events.add(new MyEvent(hour + ". event", period, EventSchedule.users, true));			
 			}
 		}
 		
 		// adding movable events
-		eventSchedule.events.add(new MyEvent("mozgathato event", new MyPeriod(MyDay.Monday, new MyTimeslot(9)), new ArrayList<>(EventSchedule.users), false));
-		eventSchedule.events.add(new MyEvent("mozgathato event", new MyPeriod(MyDay.Monday, new MyTimeslot(10)), new ArrayList<>(EventSchedule.users), false));
-		eventSchedule.events.add(new MyEvent("mozgathato event", new MyPeriod(MyDay.Monday, new MyTimeslot(11)), new ArrayList<>(EventSchedule.users), false));
+		eventSchedule.events.add(new MyEvent("mozgathato event", new MyPeriod(MyDay.Monday, new MyTimeslot(9)), EventSchedule.users, false));
+		eventSchedule.events.add(new MyEvent("mozgathato event", new MyPeriod(MyDay.Monday, new MyTimeslot(10)), EventSchedule.users, false));
+		eventSchedule.events.add(new MyEvent("mozgathato event", new MyPeriod(MyDay.Monday, new MyTimeslot(11)), EventSchedule.users, false));
 		
 		return eventSchedule;
 	}

@@ -10,11 +10,8 @@ import org.apache.commons.lang.builder.CompareToBuilder;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
 import org.optaplanner.core.api.domain.variable.PlanningVariable;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-
 @PlanningEntity(difficultyComparatorClass = EventDifficultyComparator.class,
 				movableEntitySelectionFilter = MovableEventSelectionFilter.class)
-@XStreamAlias("MyEvent")
 public class MyEvent implements Serializable, Comparable<MyEvent>, Cloneable {
 	
 	private static final long serialVersionUID = 1L;

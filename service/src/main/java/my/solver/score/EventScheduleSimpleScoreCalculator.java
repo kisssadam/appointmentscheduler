@@ -15,18 +15,18 @@ public class EventScheduleSimpleScoreCalculator implements EasyScoreCalculator<E
 	public Score<?> calculateScore(EventSchedule solution) {
 		int hardScore = 0;
 		int softScore = 0;
-		
+
 		for (MyEvent outerEvent : solution.getEvents()) {
 			for (MyEvent innerEvent : solution.getEvents()) {
 				if (outerEvent == innerEvent) {
 					continue;
 				}
-				
+
 				// http://docs.jboss.org/optaplanner/release/6.2.0.CR4/optaplanner-docs/html_single/#immovablePlanningEntities
 				if (outerEvent.isLocked() == innerEvent.isLocked()) {
 					continue;
 				}
-				
+
 				if (outerEvent.getPeriod().equals(innerEvent.getPeriod())) {
 					for (User user : innerEvent.getUsers()) {
 						if (outerEvent.getUsers().contains(user)) {
@@ -36,8 +36,8 @@ public class EventScheduleSimpleScoreCalculator implements EasyScoreCalculator<E
 				}
 			}
 		}
-		
+
 		return HardSoftScore.valueOf(hardScore, softScore);
 	}
-	
+
 }

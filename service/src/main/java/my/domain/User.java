@@ -1,16 +1,13 @@
 package my.domain;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-
-@XStreamAlias("User")
 public class User implements Cloneable {
 
 	private String displayName;
 	private String loginName;
-	
+
 	public User() {
 	}
-	
+
 	public User(String displayName, String loginName) {
 		super();
 		this.displayName = displayName;
@@ -37,11 +34,8 @@ public class User implements Cloneable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime
-				* result
-				+ ((this.displayName == null) ? 0 : this.displayName.hashCode());
-		result = prime * result
-				+ ((this.loginName == null) ? 0 : this.loginName.hashCode());
+		result = prime * result + ((this.displayName == null) ? 0 : this.displayName.hashCode());
+		result = prime * result + ((this.loginName == null) ? 0 : this.loginName.hashCode());
 		return result;
 	}
 
@@ -89,5 +83,5 @@ public class User implements Cloneable {
 	protected User clone() {
 		return new User(this.displayName, this.loginName);
 	}
-	
+
 }
