@@ -43,6 +43,8 @@ public class HelloOptaPlanner {
 	private static final SimpleDateFormat hourDateFormat;
 	private static final SimpleDateFormat minuteDateFormat;
 	
+	private List<User> users;
+	
 	static {
 		dayDateFormat = new SimpleDateFormat("EEEE");
 		dayDateFormat.setTimeZone(budapestTimeZone);
@@ -60,7 +62,19 @@ public class HelloOptaPlanner {
 		minuteDateFormat.setTimeZone(budapestTimeZone);
 	}
 	
-	public static void main(String[] args) throws InterruptedException {
+	public HelloOptaPlanner() {
+		this.users = new ArrayList<>();
+	}
+	
+	public List<User> getUsers() {
+		return this.users;
+	}
+	
+	public void setUsers(List<User> users) {
+		this.users = users;
+	}
+	
+	private void startAlgorithm() {
 		logger.info("Hello Opta Planner!");
 		
 		SolverFactory solverFactory = SolverFactory.createFromXmlResource(SOLVER_CONFIG);
@@ -71,11 +85,11 @@ public class HelloOptaPlanner {
 		int currentYear = 2015;
 		int currentWeek = 12;
 		MyDay[] requiredDays = {MyDay.Monday, MyDay.Tuesday, MyDay.Friday};
-		String[] loginNames = new String[] {"KOLLARL", "KISSSANDORADAM", "MKOSA"}; 
+		String[] requiredLoginNames = new String[] {"KOLLARL", "KISSSANDORADAM", "MKOSA"};
+		String[] skippableLoginNames = new String[] {"VAGNERA"};
 		
-		EventSchedule unsolvedEventSchedule = createEventSchedule(loginNames, new String[] {"VAGNERA"},currentYear, currentWeek, requiredDays);
-//		EventSchedule unsolvedEventSchedule = createEventSchedule(loginNames, currentYear, currentWeek, requiredDays);
-//		EventSchedule unsolvedEventSchedule = EventSchedule.createEventSchedule();
+		EventSchedule unsolvedEventSchedule = createEventSchedule(requiredLoginNames,skippableLoginNames,
+																  currentYear, currentWeek, requiredDays);
 		
 		System.out.println("EVENTS");
 		unsolvedEventSchedule.getEvents().forEach(System.out::println);
@@ -95,6 +109,11 @@ public class HelloOptaPlanner {
 		System.out.println(solvedEventSchedule);
 		
 		System.out.println("Goodbye Opta Planner!");
+	}
+	
+	public static void main(String[] args) throws InterruptedException {
+		HelloOptaPlanner helloOptaPlanner = new HelloOptaPlanner();
+		helloOptaPlanner.startAlgorithm();
 	}
 	
 	// TODO implement this

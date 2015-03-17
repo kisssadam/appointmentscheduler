@@ -1,7 +1,6 @@
 package my.domain;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -100,40 +99,6 @@ public class EventSchedule implements Solution<HardSoftScore> {
 		builder.append(this.score);
 		builder.append("]");
 		return builder.toString();
-	}
-	
-	public static EventSchedule createEventSchedule() {
-		EventSchedule eventSchedule = new EventSchedule();
-		
-		EventSchedule.users = new ArrayList<>();
-		eventSchedule.periods = new ArrayList<>();		
-		eventSchedule.events = new ArrayList<>();
-		eventSchedule.requiredDays = Arrays.asList(new MyDay[] {MyDay.Monday, MyDay.Tuesday});
-		
-		// creating users
-		boolean notSkippable = false;
-		EventSchedule.users.add(new User("Adam", "kisssandoradam", notSkippable));
-		EventSchedule.users.add(new User("Peter", "kisspeti2000", notSkippable));
-		EventSchedule.users.add(new User("David", "apagyidavid", notSkippable));
-		
-		// adding non movable events
-		for (int hour = MyTimeslot.getMinHour()+1; hour < MyTimeslot.getMaxHour(); hour++) {
-			for (MyDay day : MyDay.values()) {
-				if (day == MyDay.Tuesday) {
-					continue;
-				}
-				MyPeriod period = new MyPeriod(day, new MyTimeslot(hour));
-				eventSchedule.periods.add(period);
-				eventSchedule.events.add(new MyEvent(hour + ". event", period, EventSchedule.users, true));			
-			}
-		}
-		
-		// adding movable events
-		eventSchedule.events.add(new MyEvent("mozgathato event", new MyPeriod(MyDay.Monday, new MyTimeslot(9)), EventSchedule.users, false));
-		eventSchedule.events.add(new MyEvent("mozgathato event", new MyPeriod(MyDay.Monday, new MyTimeslot(10)), EventSchedule.users, false));
-		eventSchedule.events.add(new MyEvent("mozgathato event", new MyPeriod(MyDay.Monday, new MyTimeslot(11)), EventSchedule.users, false));
-		
-		return eventSchedule;
 	}
 	
 }
