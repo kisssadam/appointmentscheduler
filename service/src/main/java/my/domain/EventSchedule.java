@@ -7,8 +7,11 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -37,6 +40,12 @@ public class EventSchedule implements Solution<HardSoftScore> {
 	private static final SimpleDateFormat hourDateFormat;
 	private static final SimpleDateFormat minuteDateFormat;
 
+	private List<User> users;
+	private List<MyPeriod> periods;
+	private List<MyEvent> events;
+	private List<MyDay> requiredDays;
+	private HardSoftScore score;
+
 	static {
 		dayDateFormat = new SimpleDateFormat("EEEE");
 		dayDateFormat.setTimeZone(budapestTimeZone);
@@ -54,11 +63,9 @@ public class EventSchedule implements Solution<HardSoftScore> {
 		minuteDateFormat.setTimeZone(budapestTimeZone);
 	}
 
-	private List<User> users;
-	private List<MyPeriod> periods;
-	private List<MyEvent> events;
-	private List<MyDay> requiredDays;
-	private HardSoftScore score;
+	public EventSchedule() {
+		super();
+	}
 
 	public List<User> getUsers() {
 		return this.users;
@@ -120,12 +127,12 @@ public class EventSchedule implements Solution<HardSoftScore> {
 
 		List<MyPeriod> possiblePeriods = new ArrayList<>(numOfDays * numOfPossibleTimeslots);
 
-		for (MyDay currentDay : requiredDays) {
-			for (MyTimeslot timeslot : MyTimeslot.getPossibleTimeslots()) {
-				MyPeriod period = new MyPeriod(currentDay, timeslot);
+		requiredDays.forEach(day -> {
+			MyTimeslot.getPossibleTimeslots().forEach(timeslot -> {
+				MyPeriod period = new MyPeriod(day, timeslot);
 				possiblePeriods.add(period);
-			}
-		}
+			});
+		});
 
 		return possiblePeriods;
 	}
@@ -148,16 +155,17 @@ public class EventSchedule implements Solution<HardSoftScore> {
 		String[] loginNames = Stream.concat(Arrays.stream(requiredLoginNames), Arrays.stream(skippableLoginNames))
 				.toArray(String[]::new);
 
-		List<TUser> queriedTUsers = queryTUsers(loginNames);
-		List<TEvent> everyTEvent = getDistinctTEventsFromTUsers(queriedTUsers);
+		List<TUser> queriedTUsers = eventSchedule.queryTUsers(loginNames);
+		List<TEvent> everyTEvent = eventSchedule.getDistinctTEventsFromTUsers(queriedTUsers);
 
-		List<User> users = createUsersFromTUsers(queriedTUsers, requiredLoginNames);
+		List<User> users = eventSchedule.createUsersFromTUsers(queriedTUsers, requiredLoginNames);
 		eventSchedule.setUsers(users);
 
 		List<MyDay> requiredDays = Arrays.asList(days);
 		eventSchedule.setRequiredDays(requiredDays);
 
-		List<MyEvent> events = eventSchedule.createEventsFromTEvents(everyTEvent, loginNames, year, weekOfYear, requiredDays);
+		List<MyEvent> events = eventSchedule.createEventsFromTEvents(everyTEvent, loginNames, year, weekOfYear,
+				requiredDays);
 		eventSchedule.setEvents(events);
 
 		// TODO trying to add manually some event that conflicts with locked events.
@@ -166,26 +174,99 @@ public class EventSchedule implements Solution<HardSoftScore> {
 		return eventSchedule;
 	}
 
+	private List<TUser> queryTUsers(String[] loginNames) {
+		EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("SMARTCAMPUS");
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+		TypedQuery<TUser> query = entityManager.createQuery("SELECT t FROM TUser t WHERE t.loginName IN :loginNames",
+				TUser.class);
+		query.setParameter("loginNames", Arrays.asList(loginNames));
+
+		List<TUser> result = query.getResultList();
+
+		entityManager.close();
+		entityManagerFactory.close();
+
+		return result;
+	}
+
+	private List<TEvent> getDistinctTEventsFromTUsers(List<TUser> queriedTUsers) {
+		Set<TEvent> everyTEvent = new HashSet<>();
+
+		queriedTUsers.forEach(tUser -> everyTEvent.addAll(tUser.getTEvents()));
+
+		return new ArrayList<>(everyTEvent);
+	}
+
+	private List<User> createUsersFromTUsers(List<TUser> queriedTUsers, String[] requiredLoginNames) {
+		Set<User> users = new HashSet<>(queriedTUsers.size());
+
+		queriedTUsers.forEach(tUser -> {
+			boolean isSkippable = !ArrayUtils.contains(requiredLoginNames, tUser.getLoginName());
+			users.add(new User(tUser.getDisplayName(), tUser.getLoginName(), isSkippable));
+		});
+
+		return new ArrayList<>(users);
+	}
+
+	// TODO ez jo lenne? Mi az a flatMap? Ameddig nem jo, addig marad a regi megoldas.
+	// SZERINTEM NEM JO, MERT ELTERO A PICKED MOVE. flatmapos cucc monday 16-ot csinal, a sima meg monday 13-mat.
 	private List<MyEvent> createEventsFromTEvents(List<TEvent> everyTEvent, String[] loginNames, int year,
 			int weekOfYear, List<MyDay> requiredDays) {
+//		return everyTEvent.stream()
+//				.filter(tEvent -> Integer.parseInt(yearDateFormat.format(tEvent.getEventStart())) == year)
+//				.filter(tEvent -> Integer.parseInt(weekDateFormat.format(tEvent.getEventStart())) == weekOfYear)
+//				.filter(tEvent -> requiredDays.contains(MyDay.valueOf(dayDateFormat.format(tEvent.getEventStart()))))
+//				.distinct()
+//				.flatMap(new Function<TEvent, Stream<? extends MyEvent>>() {
+//
+//					@Override
+//					public Stream<? extends MyEvent> apply(TEvent tEvent) {
+//						Timestamp eventStart = tEvent.getEventStart();
+//						Timestamp eventEnd = tEvent.getEventEnd();
+//
+//						String title = tEvent.getTitle();
+//						List<User> usersOfEvent = getRequiredUsersOfEvent(tEvent, loginNames);
+//						boolean locked = true;
+//
+//						List<MyPeriod> periods = createPeriodsFromTimestamps(eventStart, eventEnd);
+//						return periods.stream().map(period -> new MyEvent(title, period, usersOfEvent, locked));
+//					}
+//				}).collect(Collectors.toList());
+
 		Set<MyEvent> events = new HashSet<>();
-
+		
 		everyTEvent.stream().filter(tEvent -> Integer.parseInt(yearDateFormat.format(tEvent.getEventStart())) == year)
-				.filter(tEvent -> Integer.parseInt(weekDateFormat.format(tEvent.getEventStart())) == weekOfYear)
-				.filter(tEvent -> requiredDays.contains(MyDay.valueOf(dayDateFormat.format(tEvent.getEventStart()))))
-				.forEach(tEvent -> {
-					Timestamp eventStart = tEvent.getEventStart();
-					Timestamp eventEnd = tEvent.getEventEnd();
-
-					List<User> usersOfEvent = getRequiredUsersOfEvent(tEvent, loginNames);
-					String title = tEvent.getTitle();
-					boolean locked = true;
-
-					List<MyPeriod> periods = createPeriodsFromTimestamps(eventStart, eventEnd);
-					periods.forEach(period -> events.add(new MyEvent(title, period, usersOfEvent, locked)));
-				});
-
+		.filter(tEvent -> Integer.parseInt(weekDateFormat.format(tEvent.getEventStart())) == weekOfYear)
+		.filter(tEvent -> requiredDays.contains(MyDay.valueOf(dayDateFormat.format(tEvent.getEventStart()))))
+		.forEach(tEvent -> {
+			Timestamp eventStart = tEvent.getEventStart();
+			Timestamp eventEnd = tEvent.getEventEnd();
+			
+			List<User> usersOfEvent = getRequiredUsersOfEvent(tEvent, loginNames);
+			String title = tEvent.getTitle();
+			boolean locked = true;
+			
+			List<MyPeriod> periods = createPeriodsFromTimestamps(eventStart, eventEnd);
+			periods.forEach(period -> events.add(new MyEvent(title, period, usersOfEvent, locked)));
+		});
+		
 		return new ArrayList<>(events);
+	}
+	
+	private List<User> getRequiredUsersOfEvent(TEvent tEvent, String[] loginNames) {
+		return Arrays.stream(tEvent.getTUsers().toArray(new TUser[0]))
+					 .filter(tUser -> ArrayUtils.contains(loginNames, tUser.getLoginName()))
+					 .distinct()
+					 .map(tUser -> getUserByLoginName(tUser.getLoginName()))
+					 .collect(Collectors.toList());
+	}
+
+	private User getUserByLoginName(String loginName) {
+		Optional<User> result = this.users.stream()
+										  .filter(user -> user.getLoginName().equals(loginName))
+										  .findFirst();
+		return result.isPresent() ? result.get() : null;
 	}
 
 	private static List<MyPeriod> createPeriodsFromTimestamps(final Timestamp eventStart, final Timestamp eventEnd) {
@@ -208,69 +289,6 @@ public class EventSchedule implements Solution<HardSoftScore> {
 		});
 
 		return periods;
-	}
-
-	private List<User> getRequiredUsersOfEvent(TEvent tEvent, String[] loginNames) {
-		Set<User> usersOfEvent = new HashSet<>();
-		List<String> loginNameList = Arrays.asList(loginNames);
-
-		for (TUser tUser : tEvent.getTUsers()) {
-			String loginName = tUser.getLoginName();
-			if (loginNameList.contains(loginName)) {
-				User user = getUserByLoginName(loginName);
-				if (user == null) {
-					throw new RuntimeException("LoginName: " + loginName + " not found in: " + this.users);
-				} else {
-					usersOfEvent.add(user);
-				}
-			}
-		}
-
-		return new ArrayList<>(usersOfEvent);
-	}
-
-	private User getUserByLoginName(String loginName) {
-		for (User user : this.users) {
-			if (user.getLoginName().equals(loginName)) {
-				return user;
-			}
-		}
-		return null;
-	}
-
-	private static List<TUser> queryTUsers(String[] loginNames) {
-		EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("SMARTCAMPUS");
-		EntityManager entityManager = entityManagerFactory.createEntityManager();
-
-		TypedQuery<TUser> query = entityManager.createQuery("SELECT t FROM TUser t WHERE t.loginName IN :loginNames",
-				TUser.class);
-		query.setParameter("loginNames", Arrays.asList(loginNames));
-
-		List<TUser> result = query.getResultList();
-
-		entityManager.close();
-		entityManagerFactory.close();
-
-		return result;
-	}
-
-	private static List<User> createUsersFromTUsers(List<TUser> queriedTUsers, String[] requiredLoginNames) {
-		Set<User> users = new HashSet<>(queriedTUsers.size());
-
-		queriedTUsers.forEach(tUser -> {
-			boolean isSkippable = !ArrayUtils.contains(requiredLoginNames, tUser.getLoginName());
-			users.add(new User(tUser.getDisplayName(), tUser.getLoginName(), isSkippable));
-		});
-
-		return new ArrayList<>(users);
-	}
-
-	private static List<TEvent> getDistinctTEventsFromTUsers(List<TUser> queriedTUsers) {
-		Set<TEvent> everyTEvent = new HashSet<>();
-
-		queriedTUsers.forEach(tUser -> everyTEvent.addAll(tUser.getTEvents()));
-
-		return new ArrayList<>(everyTEvent);
 	}
 
 }
