@@ -239,8 +239,6 @@ public class EventSchedule implements Solution<HardSoftScore> {
 	}
 
 	private static List<MyPeriod> createPeriodsFromTimestamps(final Timestamp eventStart, final Timestamp eventEnd) {
-		List<MyPeriod> periods = new ArrayList<>();
-
 		MyDay day = MyDay.valueOf(dayDateFormat.format(eventStart));
 
 		int rangeMinValue = Integer.parseInt(hourDateFormat.format(eventStart));
@@ -251,13 +249,10 @@ public class EventSchedule implements Solution<HardSoftScore> {
 			rangeMaxValue++;
 		}
 
-		IntStream.range(rangeMinValue, rangeMaxValue).forEach(hour -> {
-			MyTimeslot timeslot = new MyTimeslot(hour);
-			MyPeriod period = new MyPeriod(day, timeslot);
-			periods.add(period);
-		});
-
-		return periods;
+		return IntStream.range(rangeMinValue, rangeMaxValue)
+						.mapToObj(hour -> new MyPeriod(day, new MyTimeslot(hour)))
+						.distinct()
+						.collect(Collectors.toList());
 	}
 
 }
