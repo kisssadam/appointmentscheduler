@@ -2,6 +2,8 @@ package my.domain;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.optaplanner.core.api.domain.valuerange.ValueRangeProvider;
@@ -33,14 +35,12 @@ public class MyTimeslot implements Comparable<MyTimeslot> {
 		this.hour = hour;
 	}
 
-	// TODO lambdaval egy sor lenne
 	@ValueRangeProvider(id = "periodRange")
 	public static List<MyTimeslot> getPossibleTimeslots() {
-		List<MyTimeslot> possibleTimeslots = new ArrayList<>();
-		for (int hour = minHour; hour <= maxHour; hour++) {
-			possibleTimeslots.add(new MyTimeslot(hour));
-		}
-		return possibleTimeslots;
+		return IntStream.rangeClosed(minHour, maxHour)
+						.mapToObj(hour -> new MyTimeslot(hour))
+						.distinct()
+						.collect(Collectors.toList());
 	}
 
 	public static int getMinHour() {
