@@ -1,1 +1,1 @@
-mvn compile exec:java -Dexec.mainClass=service.jpa.JpaTest
+mvn compile exec:java -Dexec.mainClass=my.HelloOptaPlanner
