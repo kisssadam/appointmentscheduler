@@ -33,10 +33,11 @@ public class MyTimeslot implements Comparable<MyTimeslot> {
 		this.hour = hour;
 	}
 
+	// TODO lambdaval egy sor lenne
 	@ValueRangeProvider(id = "periodRange")
 	public static List<MyTimeslot> getPossibleTimeslots() {
 		List<MyTimeslot> possibleTimeslots = new ArrayList<>();
-		for (int hour = minHour; hour < maxHour; hour++) {
+		for (int hour = minHour; hour <= maxHour; hour++) {
 			possibleTimeslots.add(new MyTimeslot(hour));
 		}
 		return possibleTimeslots;
