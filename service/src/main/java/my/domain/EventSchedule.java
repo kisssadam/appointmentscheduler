@@ -209,49 +209,30 @@ public class EventSchedule implements Solution<HardSoftScore> {
 		return new ArrayList<>(users);
 	}
 
-	// TODO ez jo lenne? Mi az a flatMap? Ameddig nem jo, addig marad a regi megoldas.
-	// SZERINTEM NEM JO, MERT ELTERO A PICKED MOVE. flatmapos cucc monday 16-ot csinal, a sima meg monday 13-mat.
 	private List<MyEvent> createEventsFromTEvents(List<TEvent> everyTEvent, String[] loginNames, int year,
 			int weekOfYear, List<MyDay> requiredDays) {
-//		return everyTEvent.stream()
-//				.filter(tEvent -> Integer.parseInt(yearDateFormat.format(tEvent.getEventStart())) == year)
-//				.filter(tEvent -> Integer.parseInt(weekDateFormat.format(tEvent.getEventStart())) == weekOfYear)
-//				.filter(tEvent -> requiredDays.contains(MyDay.valueOf(dayDateFormat.format(tEvent.getEventStart()))))
-//				.distinct()
-//				.flatMap(new Function<TEvent, Stream<? extends MyEvent>>() {
-//
-//					@Override
-//					public Stream<? extends MyEvent> apply(TEvent tEvent) {
-//						Timestamp eventStart = tEvent.getEventStart();
-//						Timestamp eventEnd = tEvent.getEventEnd();
-//
-//						String title = tEvent.getTitle();
-//						List<User> usersOfEvent = getRequiredUsersOfEvent(tEvent, loginNames);
-//						boolean locked = true;
-//
-//						List<MyPeriod> periods = createPeriodsFromTimestamps(eventStart, eventEnd);
-//						return periods.stream().map(period -> new MyEvent(title, period, usersOfEvent, locked));
-//					}
-//				}).collect(Collectors.toList());
+		return everyTEvent.stream()
+				.filter(tEvent -> Integer.parseInt(yearDateFormat.format(tEvent.getEventStart())) == year)
+				.filter(tEvent -> Integer.parseInt(weekDateFormat.format(tEvent.getEventStart())) == weekOfYear)
+				.filter(tEvent -> requiredDays.contains(MyDay.valueOf(dayDateFormat.format(tEvent.getEventStart()))))
+				.flatMap(new Function<TEvent, Stream<? extends MyEvent>>() {
 
-		Set<MyEvent> events = new HashSet<>();
-		
-		everyTEvent.stream().filter(tEvent -> Integer.parseInt(yearDateFormat.format(tEvent.getEventStart())) == year)
-		.filter(tEvent -> Integer.parseInt(weekDateFormat.format(tEvent.getEventStart())) == weekOfYear)
-		.filter(tEvent -> requiredDays.contains(MyDay.valueOf(dayDateFormat.format(tEvent.getEventStart()))))
-		.forEach(tEvent -> {
-			Timestamp eventStart = tEvent.getEventStart();
-			Timestamp eventEnd = tEvent.getEventEnd();
-			
-			List<User> usersOfEvent = getRequiredUsersOfEvent(tEvent, loginNames);
-			String title = tEvent.getTitle();
-			boolean locked = true;
-			
-			List<MyPeriod> periods = createPeriodsFromTimestamps(eventStart, eventEnd);
-			periods.forEach(period -> events.add(new MyEvent(title, period, usersOfEvent, locked)));
-		});
-		
-		return new ArrayList<>(events);
+					@Override
+					public Stream<? extends MyEvent> apply(TEvent tEvent) {
+						Timestamp eventStart = tEvent.getEventStart();
+						Timestamp eventEnd = tEvent.getEventEnd();
+
+						String title = tEvent.getTitle();
+						List<User> usersOfEvent = getRequiredUsersOfEvent(tEvent, loginNames);
+						boolean locked = true;
+
+						List<MyPeriod> periods = createPeriodsFromTimestamps(eventStart, eventEnd);
+						return periods.stream().map(period -> new MyEvent(title, period, usersOfEvent, locked));
+					}
+				})
+				.distinct()
+				.sorted()
+				.collect(Collectors.toList());
 	}
 	
 	private List<User> getRequiredUsersOfEvent(TEvent tEvent, String[] loginNames) {

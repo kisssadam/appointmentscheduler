@@ -3,9 +3,10 @@ package my.domain;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.optaplanner.core.api.domain.valuerange.ValueRangeProvider;
 
-public class MyTimeslot {
+public class MyTimeslot implements Comparable<MyTimeslot> {
 
 	private static int minHour = 8;
 	private static int maxHour = 19;
@@ -98,6 +99,11 @@ public class MyTimeslot {
 			return false;
 		}
 		return true;
+	}
+
+	@Override
+	public int compareTo(MyTimeslot otherTimeslot) {
+		return new CompareToBuilder().append(this.hour, otherTimeslot.hour).toComparison();
 	}
 
 }

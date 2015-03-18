@@ -118,7 +118,10 @@ public class MyEvent implements Serializable, Comparable<MyEvent>, Cloneable {
 
 	@Override
 	public int compareTo(MyEvent otherEvent) {
-		return new CompareToBuilder().append(this, otherEvent).toComparison();
+		return new CompareToBuilder()
+				.append(this.title, otherEvent.title)
+				.append(this.period, otherEvent.period)
+				.toComparison();
 	}
 
 	@Override

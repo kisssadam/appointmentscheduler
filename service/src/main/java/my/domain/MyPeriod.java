@@ -1,6 +1,8 @@
 package my.domain;
 
-public class MyPeriod implements Cloneable {
+import org.apache.commons.lang3.builder.CompareToBuilder;
+
+public class MyPeriod implements Cloneable, Comparable<MyPeriod> {
 
 	private MyDay day;
 	private MyTimeslot timeslot;
@@ -79,6 +81,11 @@ public class MyPeriod implements Cloneable {
 	@Override
 	protected MyPeriod clone() {
 		return new MyPeriod(this.day, this.timeslot);
+	}
+
+	@Override
+	public int compareTo(MyPeriod otherPeriod) {
+		return new CompareToBuilder().append(this.day, otherPeriod.day).append(this.timeslot, otherPeriod.timeslot).toComparison();
 	}
 
 }
