@@ -5,10 +5,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.TimeZone;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -121,20 +119,11 @@ public class EventSchedule implements Solution<HardSoftScore> {
 	}
 
 	@ValueRangeProvider(id = "periodRange")
-	public List<MyPeriod> getPossiblePeriods() {
-		final int numOfDays = requiredDays.size();
-		final int numOfPossibleTimeslots = MyTimeslot.getPossibleTimeslots().size();
-
-		List<MyPeriod> possiblePeriods = new ArrayList<>(numOfDays * numOfPossibleTimeslots);
-
-		requiredDays.forEach(day -> {
-			MyTimeslot.getPossibleTimeslots().forEach(timeslot -> {
-				MyPeriod period = new MyPeriod(day, timeslot);
-				possiblePeriods.add(period);
-			});
-		});
-
-		return possiblePeriods;
+	public List<? super MyPeriod> getPossiblePeriods() {
+		return this.requiredDays.stream()
+								.flatMap(day -> MyTimeslot.getPossibleTimeslots().stream().map(timeslot -> new MyPeriod(day, timeslot)))
+								.distinct()
+								.collect(Collectors.toList());
 	}
 
 	@Override
@@ -191,22 +180,21 @@ public class EventSchedule implements Solution<HardSoftScore> {
 	}
 
 	private List<TEvent> getDistinctTEventsFromTUsers(List<TUser> queriedTUsers) {
-		Set<TEvent> everyTEvent = new HashSet<>();
-
-		queriedTUsers.forEach(tUser -> everyTEvent.addAll(tUser.getTEvents()));
-
-		return new ArrayList<>(everyTEvent);
+		return queriedTUsers.stream()
+							.flatMap(tUser -> new ArrayList<>(tUser.getTEvents()).stream())
+							.distinct()
+							.collect(Collectors.toList());
 	}
 
 	private List<User> createUsersFromTUsers(List<TUser> queriedTUsers, String[] requiredLoginNames) {
-		Set<User> users = new HashSet<>(queriedTUsers.size());
-
-		queriedTUsers.forEach(tUser -> {
-			boolean isSkippable = !ArrayUtils.contains(requiredLoginNames, tUser.getLoginName());
-			users.add(new User(tUser.getDisplayName(), tUser.getLoginName(), isSkippable));
-		});
-
-		return new ArrayList<>(users);
+		return queriedTUsers.stream()
+							.map(tUser -> {
+								boolean isSkippable = !ArrayUtils.contains(requiredLoginNames, tUser.getLoginName());
+								return new User(tUser.getDisplayName(), tUser.getLoginName(), isSkippable);
+							})
+							.distinct()
+							.sorted()
+							.collect(Collectors.toList());
 	}
 
 	private List<MyEvent> createEventsFromTEvents(List<TEvent> everyTEvent, String[] loginNames, int year,
@@ -236,11 +224,11 @@ public class EventSchedule implements Solution<HardSoftScore> {
 	}
 	
 	private List<User> getRequiredUsersOfEvent(TEvent tEvent, String[] loginNames) {
-		return Arrays.stream(tEvent.getTUsers().toArray(new TUser[0]))
-					 .filter(tUser -> ArrayUtils.contains(loginNames, tUser.getLoginName()))
-					 .distinct()
-					 .map(tUser -> getUserByLoginName(tUser.getLoginName()))
-					 .collect(Collectors.toList());
+		return new ArrayList<>(tEvent.getTUsers()).stream()
+											   	  .filter(tUser -> ArrayUtils.contains(loginNames, tUser.getLoginName()))
+												  .map(tUser -> getUserByLoginName(tUser.getLoginName()))
+												  .distinct()
+												  .collect(Collectors.toList());
 	}
 
 	private User getUserByLoginName(String loginName) {

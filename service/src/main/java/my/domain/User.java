@@ -1,6 +1,8 @@
 package my.domain;
 
-public class User implements Cloneable {
+import org.apache.commons.lang3.builder.CompareToBuilder;
+
+public class User implements Cloneable, Comparable<User> {
 
 	private String displayName;
 	private String loginName;
@@ -92,6 +94,11 @@ public class User implements Cloneable {
 	@Override
 	protected User clone() {
 		return new User(this.displayName, this.loginName, this.skippable);
+	}
+
+	@Override
+	public int compareTo(User otherUser) {
+		return new CompareToBuilder().append(this.loginName, otherUser.loginName).append(this.displayName, otherUser.displayName).toComparison();
 	}
 
 }
