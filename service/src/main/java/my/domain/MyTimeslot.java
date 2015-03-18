@@ -26,7 +26,7 @@ public class MyTimeslot implements Comparable<MyTimeslot> {
 			sb.append(minHour);
 			sb.append(" and ");
 			sb.append(maxHour);
-			sb.append(", but give value is ");
+			sb.append(", but the given value is ");
 			sb.append(hour);
 			sb.append(".");
 			throw new IndexOutOfBoundsException(sb.toString());
