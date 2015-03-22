@@ -157,8 +157,8 @@ public class EventSchedule implements Solution<HardSoftScore> {
 				requiredDays);
 		eventSchedule.setEvents(events);
 
-		// TODO trying to add manually some event that conflicts with locked events.
-		events.add(new MyEvent("sajat", new MyPeriod(MyDay.Friday, new MyTimeslot(10)), users, false));
+		// Add events that should be moved by the algorithm
+		events.add(new MyEvent("Movable event", new MyPeriod(MyDay.Friday, new MyTimeslot(10)), users, false));
 
 		return eventSchedule;
 	}
