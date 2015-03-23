@@ -238,7 +238,7 @@ public class EventSchedule implements Solution<HardSoftScore> {
 		return result.isPresent() ? result.get() : null;
 	}
 
-	private static List<MyPeriod> createPeriodsFromTimestamps(final Timestamp eventStart, final Timestamp eventEnd) {
+	private static List<MyPeriod> createPeriodsFromTimestamps(Timestamp eventStart, Timestamp eventEnd) {
 		MyDay day = MyDay.valueOf(dayDateFormat.format(eventStart));
 
 		int rangeMinValue = Integer.parseInt(hourDateFormat.format(eventStart));
