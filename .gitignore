@@ -1,7 +1,8 @@
 # Other files
 smartcampus.properties
 **/*.log
-
+.settings/**
+.project
 
 # Maven.gitignore
 **/target/
