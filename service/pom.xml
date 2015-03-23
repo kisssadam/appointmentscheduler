@@ -30,23 +30,13 @@
 		</dependency>
 		<dependency>
 			<groupId>com.oracle</groupId>
-			<artifactId>oracle</artifactId>
+			<artifactId>ojdbc6</artifactId>
 			<version>11.2.0.4</version>
 		</dependency>
 		<dependency>
 			<groupId>org.optaplanner</groupId>
 			<artifactId>optaplanner-core</artifactId>
-			<version>6.1.0.Final</version>
-		</dependency>
-		<dependency>
-			<groupId>org.optaplanner</groupId>
-			<artifactId>optaplanner-benchmark</artifactId>
-			<version>6.1.0.Final</version>
-		</dependency>
-		<dependency>
-			<groupId>org.jdom</groupId>
-			<artifactId>jdom</artifactId>
-			<version>1.1</version>
+			<version>6.2.0.Final</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>

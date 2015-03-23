@@ -85,7 +85,9 @@ public class Period implements Cloneable, Comparable<Period> {
 
 	@Override
 	public int compareTo(Period otherPeriod) {
-		return new CompareToBuilder().append(this.day, otherPeriod.day).append(this.timeslot, otherPeriod.timeslot).toComparison();
+		return new CompareToBuilder().append(this.day, otherPeriod.day)
+									 .append(this.timeslot, otherPeriod.timeslot)
+									 .toComparison();
 	}
 
 }

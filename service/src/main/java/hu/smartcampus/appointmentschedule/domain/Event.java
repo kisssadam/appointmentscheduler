@@ -2,6 +2,7 @@ package hu.smartcampus.appointmentschedule.domain;
 
 import hu.smartcampus.appointmentschedule.domain.solver.EventDifficultyComparator;
 import hu.smartcampus.appointmentschedule.domain.solver.MovableEventSelectionFilter;
+import hu.smartcampus.appointmentschedule.domain.solver.PeriodStrengthWeightFactory;
 
 import java.io.Serializable;
 import java.util.List;
@@ -40,7 +41,8 @@ public class Event implements Serializable, Comparable<Event>, Cloneable {
 		this.title = title;
 	}
 	
-	@PlanningVariable(valueRangeProviderRefs = {"periodRange"})
+	@PlanningVariable(valueRangeProviderRefs = {"periodRange"},
+					  strengthWeightFactoryClass = PeriodStrengthWeightFactory.class)
 	public Period getPeriod() {
 		return this.period;
 	}
@@ -116,12 +118,15 @@ public class Event implements Serializable, Comparable<Event>, Cloneable {
 		return builder.toString();
 	}
 
+	/**
+	 * This method is only used during debugging. When {@link EventSchedule#createEventSchedule(String[], String[], int, int, Day[])}
+	 * creates the events then we can print them out to the console.
+	 */
 	@Override
 	public int compareTo(Event otherEvent) {
-		return new CompareToBuilder()
-				.append(this.title, otherEvent.title)
-				.append(this.period, otherEvent.period)
-				.toComparison();
+		return new CompareToBuilder().append(this.period, otherEvent.period)
+									 .append(this.title, otherEvent.title)
+									 .toComparison();
 	}
 
 	@Override

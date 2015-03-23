@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <solver>
+	<exhaustiveSearch>
+    	<exhaustiveSearchType>BRANCH_AND_BOUND</exhaustiveSearchType>
+  	</exhaustiveSearch>
+
 	<solutionClass>hu.smartcampus.appointmentschedule.domain.EventSchedule</solutionClass>
 	<entityClass>hu.smartcampus.appointmentschedule.domain.Event</entityClass>
-	
+
 	<scoreDirectorFactory>
 		<scoreDefinitionType>HARD_SOFT</scoreDefinitionType>
 		<easyScoreCalculatorClass>hu.smartcampus.appointmentschedule.domain.solver.EventScheduleSimpleScoreCalculator</easyScoreCalculatorClass>
@@ -13,15 +17,17 @@
 		<bestScoreLimit>0hard/0soft</bestScoreLimit>
 		<secondsSpentLimit>10</secondsSpentLimit>
 	</termination>
+
 	<constructionHeuristic>
-		<constructionHeuristicType>FIRST_FIT_DECREASING</constructionHeuristicType>
+		<constructionHeuristicType>FIRST_FIT</constructionHeuristicType>
 	</constructionHeuristic>
+
 	<localSearch>
-		<acceptor>
-			<lateAcceptanceSize>500</lateAcceptanceSize>
-		</acceptor>
-		<forager>
-			<acceptedCountLimit>1000</acceptedCountLimit>
-		</forager>
-	</localSearch>
+    	<acceptor>
+      		<simulatedAnnealingStartingTemperature>0hard/0soft</simulatedAnnealingStartingTemperature>
+    	</acceptor>
+    	<forager>
+      		<acceptedCountLimit>1</acceptedCountLimit>
+    	</forager>
+  </localSearch>
 </solver>

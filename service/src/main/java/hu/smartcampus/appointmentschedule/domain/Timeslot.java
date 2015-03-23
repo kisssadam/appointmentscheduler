@@ -18,7 +18,7 @@ public class Timeslot implements Comparable<Timeslot> {
 		super();
 	}
 
-	public Timeslot(final int hour) {
+	public Timeslot(int hour) {
 		super();
 		if (hour < minHour || hour > maxHour) {
 			StringBuilder sb = new StringBuilder(60);
