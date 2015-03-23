@@ -1,4 +1,4 @@
-package my.domain;
+package hu.smartcampus.appointmentschedule.domain;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
 

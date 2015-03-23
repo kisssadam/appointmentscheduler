@@ -1,6 +1,6 @@
-package my.domain.solver;
+package hu.smartcampus.appointmentschedule.domain.solver;
 
-import my.domain.MyEvent;
+import hu.smartcampus.appointmentschedule.domain.MyEvent;
 
 import org.optaplanner.core.impl.heuristic.selector.common.decorator.SelectionFilter;
 import org.optaplanner.core.impl.score.director.ScoreDirector;

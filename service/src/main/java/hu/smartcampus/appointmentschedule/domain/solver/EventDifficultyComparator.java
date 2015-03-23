@@ -1,8 +1,8 @@
-package my.domain.solver;
+package hu.smartcampus.appointmentschedule.domain.solver;
+
+import hu.smartcampus.appointmentschedule.domain.MyEvent;
 
 import java.util.Comparator;
-
-import my.domain.MyEvent;
 
 import org.apache.commons.lang.builder.CompareToBuilder;
 

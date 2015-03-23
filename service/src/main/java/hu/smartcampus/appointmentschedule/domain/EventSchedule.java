@@ -1,4 +1,7 @@
-package my.domain;
+package hu.smartcampus.appointmentschedule.domain;
+
+import hu.smartcampus.db.model.TEvent;
+import hu.smartcampus.db.model.TUser;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -17,9 +20,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
-
-import model.TEvent;
-import model.TUser;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.optaplanner.core.api.domain.solution.PlanningEntityCollectionProperty;

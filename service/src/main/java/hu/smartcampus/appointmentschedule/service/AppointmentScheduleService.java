@@ -1,7 +1,7 @@
-package my;
+package hu.smartcampus.appointmentschedule.service;
 
-import my.domain.EventSchedule;
-import my.domain.MyDay;
+import hu.smartcampus.appointmentschedule.domain.EventSchedule;
+import hu.smartcampus.appointmentschedule.domain.MyDay;
 
 import org.optaplanner.core.api.solver.Solver;
 import org.optaplanner.core.api.solver.SolverFactory;
@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 
 public class AppointmentScheduleService {
 
-	private static final String SOLVER_CONFIG = "my/eventSolverConfig.xml";
+	private static final String SOLVER_CONFIG = "hu/smartcampus/appointmentschedule/solver/eventScheduleSolverConfig.xml";
 	private static final Logger logger = LoggerFactory.getLogger(AppointmentScheduleService.class);
 
 	public static void main(String[] args) throws InterruptedException {

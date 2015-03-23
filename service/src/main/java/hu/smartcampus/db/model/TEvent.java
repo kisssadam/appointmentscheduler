@@ -1,4 +1,4 @@
-package model;
+package hu.smartcampus.db.model;
 
 import java.io.Serializable;
 
@@ -146,15 +146,10 @@ public class TEvent implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime
-				* result
-				+ ((this.description == null) ? 0 : this.description.hashCode());
-		result = prime * result
-				+ ((this.eventEnd == null) ? 0 : this.eventEnd.hashCode());
-		result = prime * result
-				+ ((this.eventStart == null) ? 0 : this.eventStart.hashCode());
-		result = prime * result
-				+ ((this.title == null) ? 0 : this.title.hashCode());
+		result = prime * result + ((this.description == null) ? 0 : this.description.hashCode());
+		result = prime * result + ((this.eventEnd == null) ? 0 : this.eventEnd.hashCode());
+		result = prime * result + ((this.eventStart == null) ? 0 : this.eventStart.hashCode());
+		result = prime * result + ((this.title == null) ? 0 : this.title.hashCode());
 		return result;
 	}
 
@@ -215,32 +210,5 @@ public class TEvent implements Serializable {
 		builder.append("]");
 		return builder.toString();
 	}
-
-//	@Override
-//	public String toString() {
-//		StringBuilder builder = new StringBuilder();
-//		builder.append("TEvent [eventId=");
-//		builder.append(this.eventId);
-//		builder.append(", description=");
-//		builder.append(this.description);
-//		builder.append(", eventEnd=");
-//		builder.append(this.eventEnd);
-//		builder.append(", eventStart=");
-//		builder.append(this.eventStart);
-//		builder.append(", title=");
-//		builder.append(this.title);
-//		builder.append(", TCategories=");
-//		builder.append(this.TCategories);
-//		builder.append(", TAdmins=");
-//		builder.append(this.TAdmins);
-//		builder.append(", TLocations=");
-//		builder.append(this.TLocations);
-//		builder.append(", TUsers=");
-//		builder.append(this.TUsers);
-//		builder.append(", TMessages=");
-//		builder.append(this.TMessages);
-//		builder.append("]");
-//		return builder.toString();
-//	}
 
 }

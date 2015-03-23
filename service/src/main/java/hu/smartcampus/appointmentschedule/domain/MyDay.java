@@ -1,4 +1,4 @@
-package my.domain;
+package hu.smartcampus.appointmentschedule.domain;
 
 public enum MyDay {
 	

@@ -1,17 +1,16 @@
-package model;
+package hu.smartcampus.db.model;
 
 import java.io.Serializable;
 import javax.persistence.*;
 import java.util.List;
-
 
 /**
  * The persistent class for the T_ADMIN database table.
  * 
  */
 @Entity
-@Table(name="T_ADMIN")
-@NamedQuery(name="TAdmin.findAll", query="SELECT t FROM TAdmin t")
+@Table(name = "T_ADMIN")
+@NamedQuery(name = "TAdmin.findAll", query = "SELECT t FROM TAdmin t")
 public class TAdmin implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private long userId;
@@ -22,9 +21,8 @@ public class TAdmin implements Serializable {
 	public TAdmin() {
 	}
 
-
 	@Id
-	@Column(name="USER_ID", unique=true, nullable=false, precision=10)
+	@Column(name = "USER_ID", unique = true, nullable = false, precision = 10)
 	public long getUserId() {
 		return this.userId;
 	}
@@ -33,10 +31,9 @@ public class TAdmin implements Serializable {
 		this.userId = userId;
 	}
 
-
-	//bi-directional one-to-one association to TUser
+	// bi-directional one-to-one association to TUser
 	@OneToOne
-	@JoinColumn(name="USER_ID", nullable=false, insertable=false, updatable=false)
+	@JoinColumn(name = "USER_ID", nullable = false, insertable = false, updatable = false)
 	public TUser getTUser() {
 		return this.TUser;
 	}
@@ -45,9 +42,8 @@ public class TAdmin implements Serializable {
 		this.TUser = TUser;
 	}
 
-
-	//bi-directional many-to-many association to TEvent
-	@ManyToMany(mappedBy="TAdmins")
+	// bi-directional many-to-many association to TEvent
+	@ManyToMany(mappedBy = "TAdmins")
 	public List<TEvent> getTEvents() {
 		return this.TEvents;
 	}
@@ -56,9 +52,8 @@ public class TAdmin implements Serializable {
 		this.TEvents = TEvents;
 	}
 
-
-	//bi-directional many-to-many association to TGroup
-	@ManyToMany(mappedBy="TAdmins")
+	// bi-directional many-to-many association to TGroup
+	@ManyToMany(mappedBy = "TAdmins")
 	public List<TGroup> getTGroups() {
 		return this.TGroups;
 	}

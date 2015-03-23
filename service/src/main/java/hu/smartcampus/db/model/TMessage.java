@@ -1,16 +1,15 @@
-package model;
+package hu.smartcampus.db.model;
 
 import java.io.Serializable;
 import javax.persistence.*;
-
 
 /**
  * The persistent class for the T_MESSAGE database table.
  * 
  */
 @Entity
-@Table(name="T_MESSAGE")
-@NamedQuery(name="TMessage.findAll", query="SELECT t FROM TMessage t")
+@Table(name = "T_MESSAGE")
+@NamedQuery(name = "TMessage.findAll", query = "SELECT t FROM TMessage t")
 public class TMessage implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private long messageId;
@@ -21,9 +20,8 @@ public class TMessage implements Serializable {
 	public TMessage() {
 	}
 
-
 	@Id
-	@Column(name="MESSAGE_ID", unique=true, nullable=false, precision=10)
+	@Column(name = "MESSAGE_ID", unique = true, nullable = false, precision = 10)
 	public long getMessageId() {
 		return this.messageId;
 	}
@@ -32,8 +30,7 @@ public class TMessage implements Serializable {
 		this.messageId = messageId;
 	}
 
-
-	@Column(name="\"MESSAGE\"", length=1000)
+	@Column(name = "\"MESSAGE\"", length = 1000)
 	public String getMessage() {
 		return this.message;
 	}
@@ -42,10 +39,9 @@ public class TMessage implements Serializable {
 		this.message = message;
 	}
 
-
-	//bi-directional many-to-one association to TEvent
+	// bi-directional many-to-one association to TEvent
 	@ManyToOne
-	@JoinColumn(name="EVENT_ID")
+	@JoinColumn(name = "EVENT_ID")
 	public TEvent getTEvent() {
 		return this.TEvent;
 	}
@@ -54,10 +50,9 @@ public class TMessage implements Serializable {
 		this.TEvent = TEvent;
 	}
 
-
-	//bi-directional many-to-one association to TUser
+	// bi-directional many-to-one association to TUser
 	@ManyToOne
-	@JoinColumn(name="USER_ID", nullable=false)
+	@JoinColumn(name = "USER_ID", nullable = false)
 	public TUser getTUser() {
 		return this.TUser;
 	}

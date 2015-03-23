@@ -1,4 +1,4 @@
-package my.domain;
+package hu.smartcampus.appointmentschedule.domain;
 
 import java.util.List;
 import java.util.stream.Collectors;

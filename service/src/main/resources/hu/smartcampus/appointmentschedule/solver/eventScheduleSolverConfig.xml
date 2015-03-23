@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <solver>
 	<!--<environmentMode>FAST_ASSERT</environmentMode> -->
-	<solutionClass>my.domain.EventSchedule</solutionClass>
-	<entityClass>my.domain.MyEvent</entityClass>
+	<solutionClass>hu.smartcampus.appointmentschedule.domain.EventSchedule</solutionClass>
+	<entityClass>hu.smartcampus.appointmentschedule.domain.MyEvent</entityClass>
 	
 	<scoreDirectorFactory>
 		<scoreDefinitionType>HARD_SOFT</scoreDefinitionType>
-		<easyScoreCalculatorClass>my.domain.solver.EventScheduleSimpleScoreCalculator</easyScoreCalculatorClass>
-		<!-- <scoreDrl>my/eventScoreRules.drl</scoreDrl> -->
+		<easyScoreCalculatorClass>hu.smartcampus.appointmentschedule.domain.solver.EventScheduleSimpleScoreCalculator</easyScoreCalculatorClass>
+		<!-- <scoreDrl>hu.smartcampus.appointmentschedule.service/eventScoreRules.drl</scoreDrl> -->
 	</scoreDirectorFactory>
 
 	<termination>

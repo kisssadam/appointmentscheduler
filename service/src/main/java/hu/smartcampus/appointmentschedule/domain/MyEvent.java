@@ -1,10 +1,10 @@
-package my.domain;
+package hu.smartcampus.appointmentschedule.domain;
+
+import hu.smartcampus.appointmentschedule.domain.solver.EventDifficultyComparator;
+import hu.smartcampus.appointmentschedule.domain.solver.MovableEventSelectionFilter;
 
 import java.io.Serializable;
 import java.util.List;
-
-import my.domain.solver.EventDifficultyComparator;
-import my.domain.solver.MovableEventSelectionFilter;
 
 import org.apache.commons.lang.builder.CompareToBuilder;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;

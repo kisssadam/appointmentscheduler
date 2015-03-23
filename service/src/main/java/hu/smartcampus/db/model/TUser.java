@@ -1,4 +1,4 @@
-package model;
+package hu.smartcampus.db.model;
 
 import java.io.Serializable;
 
@@ -112,11 +112,8 @@ public class TUser implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime
-				* result
-				+ ((this.displayName == null) ? 0 : this.displayName.hashCode());
-		result = prime * result
-				+ ((this.loginName == null) ? 0 : this.loginName.hashCode());
+		result = prime * result + ((this.displayName == null) ? 0 : this.displayName.hashCode());
+		result = prime * result + ((this.loginName == null) ? 0 : this.loginName.hashCode());
 		return result;
 	}
 
@@ -159,26 +156,5 @@ public class TUser implements Serializable {
 		builder.append("]");
 		return builder.toString();
 	}
-
-//	@Override
-//	public String toString() {
-//		StringBuilder builder = new StringBuilder();
-//		builder.append("TUser [userId=");
-//		builder.append(this.userId);
-//		builder.append(", displayName=");
-//		builder.append(this.displayName);
-//		builder.append(", loginName=");
-//		builder.append(this.loginName);
-//		builder.append(", smartPassword=");
-//		builder.append(this.smartPassword);
-//		builder.append(", TAdmin=");
-//		builder.append(this.TAdmin);
-//		builder.append(", TEvents=");
-//		builder.append(this.TEvents);
-//		builder.append(", TMessages=");
-//		builder.append(this.TMessages);
-//		builder.append("]");
-//		return builder.toString();
-//	}
-
+	
 }
