@@ -8,10 +8,10 @@ import org.optaplanner.core.api.solver.SolverFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class HelloOptaPlanner {
+public class AppointmentScheduleService {
 
 	private static final String SOLVER_CONFIG = "my/eventSolverConfig.xml";
-	private static final Logger logger = LoggerFactory.getLogger(HelloOptaPlanner.class);
+	private static final Logger logger = LoggerFactory.getLogger(AppointmentScheduleService.class);
 
 	public static void main(String[] args) throws InterruptedException {
 		logger.info("Hello Opta Planner!");
@@ -21,15 +21,15 @@ public class HelloOptaPlanner {
 
 		// int currentYear = Calendar.getInstance(budapestTimeZone).get(Calendar.YEAR);
 		// int currentWeek = Calendar.getInstance(budapestTimeZone).get(Calendar.WEEK_OF_YEAR);
-		int currentYear = 2015;
-		int currentWeek = 12;
+		int year = 2015;
+		int weekOfYear = 12;
 		String[] requiredLoginNames = new String[] { "KOLLARL", "KISSSANDORADAM", "MKOSA" };
 		String[] skippableLoginNames = new String[] { "VAGNERA" };
 		MyDay[] requiredDays = { MyDay.Monday, MyDay.Tuesday, MyDay.Friday };
 
 		EventSchedule unsolvedEventSchedule = EventSchedule.createEventSchedule(requiredLoginNames,
-				skippableLoginNames, currentYear, currentWeek, requiredDays);
-
+				skippableLoginNames, year, weekOfYear, requiredDays);
+		
 		System.out.println("EVENTS");
 		unsolvedEventSchedule.getEvents().forEach(System.out::println);
 		System.out.println("ENDOFEVENTS");
