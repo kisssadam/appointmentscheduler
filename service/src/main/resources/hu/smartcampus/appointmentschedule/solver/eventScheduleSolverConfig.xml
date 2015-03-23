@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <solver>
-	<!--<environmentMode>FAST_ASSERT</environmentMode> -->
 	<solutionClass>hu.smartcampus.appointmentschedule.domain.EventSchedule</solutionClass>
 	<entityClass>hu.smartcampus.appointmentschedule.domain.Event</entityClass>
 	
 	<scoreDirectorFactory>
 		<scoreDefinitionType>HARD_SOFT</scoreDefinitionType>
 		<easyScoreCalculatorClass>hu.smartcampus.appointmentschedule.domain.solver.EventScheduleSimpleScoreCalculator</easyScoreCalculatorClass>
-		<!-- <scoreDrl>hu.smartcampus.appointmentschedule.service/eventScoreRules.drl</scoreDrl> -->
 	</scoreDirectorFactory>
 
 	<termination>
@@ -20,9 +18,6 @@
 	</constructionHeuristic>
 	<localSearch>
 		<acceptor>
-			<!-- Az entityTabuSize-os vackok hashCode-ot hasznalnak, de valami hashcode 
-				violation miatt elszall az egesz program. -->
-			<!-- <entityTabuSize>7</entityTabuSize> -->
 			<lateAcceptanceSize>500</lateAcceptanceSize>
 		</acceptor>
 		<forager>
