@@ -39,7 +39,6 @@ public class EventSchedule implements Solution<HardSoftScore> {
 	private static final SimpleDateFormat minuteDateFormat;
 
 	private List<User> users;
-	private List<MyPeriod> periods;
 	private List<MyEvent> events;
 	private List<MyDay> requiredDays;
 	private HardSoftScore score;
@@ -61,8 +60,24 @@ public class EventSchedule implements Solution<HardSoftScore> {
 		minuteDateFormat.setTimeZone(budapestTimeZone);
 	}
 
-	public EventSchedule() {
+	private EventSchedule() {
 		super();
+	}
+	
+	private EventSchedule(String[] requiredLoginNames, String[] skippableLoginNames, int year, int weekOfYear, MyDay[] days) {
+		String[] mergedLoginNames = Stream.concat(Arrays.stream(requiredLoginNames), Arrays.stream(skippableLoginNames))
+										  .distinct()
+										  .toArray(String[]::new);
+
+		List<TUser> queriedTUsers = queryTUsers(mergedLoginNames);
+		List<TEvent> everyTEvent = getDistinctTEventsFromTUsers(queriedTUsers);
+
+		this.users = createUsersFromTUsers(queriedTUsers, requiredLoginNames);
+		this.requiredDays = Arrays.asList(days);
+		this.events = createEventsFromTEvents(everyTEvent, mergedLoginNames, year, weekOfYear, requiredDays);
+
+		// Add events that should be moved by the algorithm
+		this.events.add(new MyEvent("Movable event", new MyPeriod(MyDay.Friday, new MyTimeslot(10)), users, false));
 	}
 
 	public List<User> getUsers() {
@@ -92,14 +107,6 @@ public class EventSchedule implements Solution<HardSoftScore> {
 		this.events = events;
 	}
 
-	public List<MyPeriod> getPeriods() {
-		return this.periods;
-	}
-
-	public void setPeriods(List<MyPeriod> periods) {
-		this.periods = periods;
-	}
-
 	public List<MyDay> getRequiredDays() {
 		return requiredDays;
 	}
@@ -109,9 +116,7 @@ public class EventSchedule implements Solution<HardSoftScore> {
 	}
 
 	/**
-	 * The method is only used if Drools is used for score calculation. Other score directors do not use it. All
-	 * planning entities are automatically inserted into the Drools working memory. Do not add them in the method
-	 * getProblemFacts().
+	 * {@inheritDoc}
 	 */
 	@Override
 	public Collection<? extends Object> getProblemFacts() {
@@ -138,29 +143,8 @@ public class EventSchedule implements Solution<HardSoftScore> {
 	}
 
 	public static EventSchedule createEventSchedule(String[] requiredLoginNames, String[] skippableLoginNames,
-			int year, int weekOfYear, MyDay[] days) {
-		EventSchedule eventSchedule = new EventSchedule();
-
-		String[] loginNames = Stream.concat(Arrays.stream(requiredLoginNames), Arrays.stream(skippableLoginNames))
-				.toArray(String[]::new);
-
-		List<TUser> queriedTUsers = eventSchedule.queryTUsers(loginNames);
-		List<TEvent> everyTEvent = eventSchedule.getDistinctTEventsFromTUsers(queriedTUsers);
-
-		List<User> users = eventSchedule.createUsersFromTUsers(queriedTUsers, requiredLoginNames);
-		eventSchedule.setUsers(users);
-
-		List<MyDay> requiredDays = Arrays.asList(days);
-		eventSchedule.setRequiredDays(requiredDays);
-
-		List<MyEvent> events = eventSchedule.createEventsFromTEvents(everyTEvent, loginNames, year, weekOfYear,
-				requiredDays);
-		eventSchedule.setEvents(events);
-
-		// Add events that should be moved by the algorithm
-		events.add(new MyEvent("Movable event", new MyPeriod(MyDay.Friday, new MyTimeslot(10)), users, false));
-
-		return eventSchedule;
+													int year, int weekOfYear, MyDay[] days) {
+		return new EventSchedule(requiredLoginNames, skippableLoginNames, year, weekOfYear, days);
 	}
 
 	private List<TUser> queryTUsers(String[] loginNames) {
