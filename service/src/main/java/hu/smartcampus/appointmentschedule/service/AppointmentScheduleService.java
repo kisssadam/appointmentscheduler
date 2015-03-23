@@ -1,7 +1,7 @@
 package hu.smartcampus.appointmentschedule.service;
 
 import hu.smartcampus.appointmentschedule.domain.EventSchedule;
-import hu.smartcampus.appointmentschedule.domain.MyDay;
+import hu.smartcampus.appointmentschedule.domain.Day;
 
 import org.optaplanner.core.api.solver.Solver;
 import org.optaplanner.core.api.solver.SolverFactory;
@@ -25,7 +25,7 @@ public class AppointmentScheduleService {
 		int weekOfYear = 12;
 		String[] requiredLoginNames = new String[] { "KOLLARL", "KISSSANDORADAM", "MKOSA" };
 		String[] skippableLoginNames = new String[] { "VAGNERA" };
-		MyDay[] requiredDays = { MyDay.Monday, MyDay.Tuesday, MyDay.Friday };
+		Day[] requiredDays = { Day.Monday, Day.Tuesday, Day.Friday };
 
 		EventSchedule unsolvedEventSchedule = EventSchedule.createEventSchedule(requiredLoginNames,
 				skippableLoginNames, year, weekOfYear, requiredDays);

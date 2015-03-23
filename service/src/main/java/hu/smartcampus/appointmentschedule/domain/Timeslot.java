@@ -7,18 +7,18 @@ import java.util.stream.IntStream;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.optaplanner.core.api.domain.valuerange.ValueRangeProvider;
 
-public class MyTimeslot implements Comparable<MyTimeslot> {
+public class Timeslot implements Comparable<Timeslot> {
 
 	private static int minHour = 8;
 	private static int maxHour = 19;
 
 	private int hour;
 
-	public MyTimeslot() {
+	public Timeslot() {
 		super();
 	}
 
-	public MyTimeslot(final int hour) {
+	public Timeslot(final int hour) {
 		super();
 		if (hour < minHour || hour > maxHour) {
 			StringBuilder sb = new StringBuilder(60);
@@ -35,9 +35,9 @@ public class MyTimeslot implements Comparable<MyTimeslot> {
 	}
 
 	@ValueRangeProvider(id = "periodRange")
-	public static List<MyTimeslot> getPossibleTimeslots() {
+	public static List<Timeslot> getPossibleTimeslots() {
 		return IntStream.rangeClosed(minHour, maxHour)
-						.mapToObj(hour -> new MyTimeslot(hour))
+						.mapToObj(hour -> new Timeslot(hour))
 						.distinct()
 						.collect(Collectors.toList());
 	}
@@ -47,7 +47,7 @@ public class MyTimeslot implements Comparable<MyTimeslot> {
 	}
 
 	public static void setMinHour(int minHour) {
-		MyTimeslot.minHour = minHour;
+		Timeslot.minHour = minHour;
 	}
 
 	public static int getMaxHour() {
@@ -55,7 +55,7 @@ public class MyTimeslot implements Comparable<MyTimeslot> {
 	}
 
 	public static void setMaxHour(int maxHour) {
-		MyTimeslot.maxHour = maxHour;
+		Timeslot.maxHour = maxHour;
 	}
 
 	public int getHour() {
@@ -69,7 +69,7 @@ public class MyTimeslot implements Comparable<MyTimeslot> {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("MyTimeslot [hour=");
+		builder.append("Timeslot [hour=");
 		builder.append(this.hour);
 		builder.append("]");
 		return builder.toString();
@@ -91,10 +91,10 @@ public class MyTimeslot implements Comparable<MyTimeslot> {
 		if (obj == null) {
 			return false;
 		}
-		if (!(obj instanceof MyTimeslot)) {
+		if (!(obj instanceof Timeslot)) {
 			return false;
 		}
-		MyTimeslot other = (MyTimeslot) obj;
+		Timeslot other = (Timeslot) obj;
 		if (this.hour != other.hour) {
 			return false;
 		}
@@ -102,7 +102,7 @@ public class MyTimeslot implements Comparable<MyTimeslot> {
 	}
 
 	@Override
-	public int compareTo(MyTimeslot otherTimeslot) {
+	public int compareTo(Timeslot otherTimeslot) {
 		return new CompareToBuilder().append(this.hour, otherTimeslot.hour).toComparison();
 	}
 

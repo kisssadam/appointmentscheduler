@@ -2,7 +2,7 @@
 <solver>
 	<!--<environmentMode>FAST_ASSERT</environmentMode> -->
 	<solutionClass>hu.smartcampus.appointmentschedule.domain.EventSchedule</solutionClass>
-	<entityClass>hu.smartcampus.appointmentschedule.domain.MyEvent</entityClass>
+	<entityClass>hu.smartcampus.appointmentschedule.domain.Event</entityClass>
 	
 	<scoreDirectorFactory>
 		<scoreDefinitionType>HARD_SOFT</scoreDefinitionType>

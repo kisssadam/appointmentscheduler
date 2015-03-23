@@ -2,34 +2,34 @@ package hu.smartcampus.appointmentschedule.domain;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
 
-public class MyPeriod implements Cloneable, Comparable<MyPeriod> {
+public class Period implements Cloneable, Comparable<Period> {
 
-	private MyDay day;
-	private MyTimeslot timeslot;
+	private Day day;
+	private Timeslot timeslot;
 
-	public MyPeriod() {
+	public Period() {
 		super();
 	}
 
-	public MyPeriod(MyDay day, MyTimeslot timeslot) {
+	public Period(Day day, Timeslot timeslot) {
 		super();
 		this.day = day;
 		this.timeslot = timeslot;
 	}
 
-	public MyDay getDay() {
+	public Day getDay() {
 		return this.day;
 	}
 
-	public void setDay(MyDay day) {
+	public void setDay(Day day) {
 		this.day = day;
 	}
 
-	public MyTimeslot getTimeslot() {
+	public Timeslot getTimeslot() {
 		return this.timeslot;
 	}
 
-	public void setTimeslot(MyTimeslot timeslot) {
+	public void setTimeslot(Timeslot timeslot) {
 		this.timeslot = timeslot;
 	}
 
@@ -61,10 +61,10 @@ public class MyPeriod implements Cloneable, Comparable<MyPeriod> {
 		if (obj == null) {
 			return false;
 		}
-		if (!(obj instanceof MyPeriod)) {
+		if (!(obj instanceof Period)) {
 			return false;
 		}
-		MyPeriod other = (MyPeriod) obj;
+		Period other = (Period) obj;
 		if (this.day != other.day) {
 			return false;
 		}
@@ -79,12 +79,12 @@ public class MyPeriod implements Cloneable, Comparable<MyPeriod> {
 	}
 
 	@Override
-	protected MyPeriod clone() {
-		return new MyPeriod(this.day, this.timeslot);
+	protected Period clone() {
+		return new Period(this.day, this.timeslot);
 	}
 
 	@Override
-	public int compareTo(MyPeriod otherPeriod) {
+	public int compareTo(Period otherPeriod) {
 		return new CompareToBuilder().append(this.day, otherPeriod.day).append(this.timeslot, otherPeriod.timeslot).toComparison();
 	}
 

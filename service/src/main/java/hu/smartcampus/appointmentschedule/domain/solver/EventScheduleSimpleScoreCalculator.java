@@ -1,7 +1,7 @@
 package hu.smartcampus.appointmentschedule.domain.solver;
 
 import hu.smartcampus.appointmentschedule.domain.EventSchedule;
-import hu.smartcampus.appointmentschedule.domain.MyEvent;
+import hu.smartcampus.appointmentschedule.domain.Event;
 import hu.smartcampus.appointmentschedule.domain.User;
 
 import org.optaplanner.core.api.score.Score;
@@ -16,13 +16,14 @@ public class EventScheduleSimpleScoreCalculator implements EasyScoreCalculator<E
 		int hardScore = 0;
 		int softScore = 0;
 
-		for (MyEvent outerEvent : solution.getEvents()) {
-			for (MyEvent innerEvent : solution.getEvents()) {
+		for (Event outerEvent : solution.getEvents()) {
+			for (Event innerEvent : solution.getEvents()) {
 				if (outerEvent == innerEvent) {
 					continue;
 				}
 
 				// http://docs.jboss.org/optaplanner/release/6.2.0.CR4/optaplanner-docs/html_single/#immovablePlanningEntities
+				// TODO ez itt jo? nem kellene ez? outerEvent.isLocked() == true && innerEvent.isLocked() == true // Mi a kulonbseg?
 				if (outerEvent.isLocked() == innerEvent.isLocked()) {
 					continue;
 				}

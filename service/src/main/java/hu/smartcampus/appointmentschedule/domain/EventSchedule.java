@@ -39,8 +39,8 @@ public class EventSchedule implements Solution<HardSoftScore> {
 	private static final SimpleDateFormat minuteDateFormat;
 
 	private List<User> users;
-	private List<MyEvent> events;
-	private List<MyDay> requiredDays;
+	private List<Event> events;
+	private List<Day> requiredDays;
 	private HardSoftScore score;
 
 	static {
@@ -64,7 +64,7 @@ public class EventSchedule implements Solution<HardSoftScore> {
 		super();
 	}
 	
-	private EventSchedule(String[] requiredLoginNames, String[] skippableLoginNames, int year, int weekOfYear, MyDay[] days) {
+	private EventSchedule(String[] requiredLoginNames, String[] skippableLoginNames, int year, int weekOfYear, Day[] days) {
 		String[] mergedLoginNames = Stream.concat(Arrays.stream(requiredLoginNames), Arrays.stream(skippableLoginNames))
 										  .distinct()
 										  .toArray(String[]::new);
@@ -77,7 +77,7 @@ public class EventSchedule implements Solution<HardSoftScore> {
 		this.events = createEventsFromTEvents(everyTEvent, mergedLoginNames, year, weekOfYear, requiredDays);
 
 		// Add events that should be moved by the algorithm
-		this.events.add(new MyEvent("Movable event", new MyPeriod(MyDay.Friday, new MyTimeslot(10)), users, false));
+		this.events.add(new Event("Movable event", new Period(Day.Friday, new Timeslot(10)), users, false));
 	}
 
 	public List<User> getUsers() {
@@ -99,19 +99,19 @@ public class EventSchedule implements Solution<HardSoftScore> {
 	}
 
 	@PlanningEntityCollectionProperty
-	public List<MyEvent> getEvents() {
+	public List<Event> getEvents() {
 		return this.events;
 	}
 
-	public void setEvents(List<MyEvent> events) {
+	public void setEvents(List<Event> events) {
 		this.events = events;
 	}
 
-	public List<MyDay> getRequiredDays() {
+	public List<Day> getRequiredDays() {
 		return requiredDays;
 	}
 
-	public void setRequiredDays(List<MyDay> requiredDays) {
+	public void setRequiredDays(List<Day> requiredDays) {
 		this.requiredDays = requiredDays;
 	}
 
@@ -124,9 +124,9 @@ public class EventSchedule implements Solution<HardSoftScore> {
 	}
 
 	@ValueRangeProvider(id = "periodRange")
-	public List<? super MyPeriod> getPossiblePeriods() {
+	public List<? super Period> getPossiblePeriods() {
 		return this.requiredDays.stream()
-								.flatMap(day -> MyTimeslot.getPossibleTimeslots().stream().map(timeslot -> new MyPeriod(day, timeslot)))
+								.flatMap(day -> Timeslot.getPossibleTimeslots().stream().map(timeslot -> new Period(day, timeslot)))
 								.distinct()
 								.collect(Collectors.toList());
 	}
@@ -143,7 +143,7 @@ public class EventSchedule implements Solution<HardSoftScore> {
 	}
 
 	public static EventSchedule createEventSchedule(String[] requiredLoginNames, String[] skippableLoginNames,
-													int year, int weekOfYear, MyDay[] days) {
+													int year, int weekOfYear, Day[] days) {
 		return new EventSchedule(requiredLoginNames, skippableLoginNames, year, weekOfYear, days);
 	}
 
@@ -181,16 +181,16 @@ public class EventSchedule implements Solution<HardSoftScore> {
 							.collect(Collectors.toList());
 	}
 
-	private List<MyEvent> createEventsFromTEvents(List<TEvent> everyTEvent, String[] loginNames, int year,
-			int weekOfYear, List<MyDay> requiredDays) {
+	private List<Event> createEventsFromTEvents(List<TEvent> everyTEvent, String[] loginNames, int year,
+			int weekOfYear, List<Day> requiredDays) {
 		return everyTEvent.stream()
 				.filter(tEvent -> Integer.parseInt(yearDateFormat.format(tEvent.getEventStart())) == year)
 				.filter(tEvent -> Integer.parseInt(weekDateFormat.format(tEvent.getEventStart())) == weekOfYear)
-				.filter(tEvent -> requiredDays.contains(MyDay.valueOf(dayDateFormat.format(tEvent.getEventStart()))))
-				.flatMap(new Function<TEvent, Stream<? extends MyEvent>>() {
+				.filter(tEvent -> requiredDays.contains(Day.valueOf(dayDateFormat.format(tEvent.getEventStart()))))
+				.flatMap(new Function<TEvent, Stream<? extends Event>>() {
 
 					@Override
-					public Stream<? extends MyEvent> apply(TEvent tEvent) {
+					public Stream<? extends Event> apply(TEvent tEvent) {
 						Timestamp eventStart = tEvent.getEventStart();
 						Timestamp eventEnd = tEvent.getEventEnd();
 
@@ -198,8 +198,8 @@ public class EventSchedule implements Solution<HardSoftScore> {
 						List<User> usersOfEvent = getRequiredUsersOfEvent(tEvent, loginNames);
 						boolean locked = true;
 
-						List<MyPeriod> periods = createPeriodsFromTimestamps(eventStart, eventEnd);
-						return periods.stream().map(period -> new MyEvent(title, period, usersOfEvent, locked));
+						List<Period> periods = createPeriodsFromTimestamps(eventStart, eventEnd);
+						return periods.stream().map(period -> new Event(title, period, usersOfEvent, locked));
 					}
 				})
 				.distinct()
@@ -222,8 +222,8 @@ public class EventSchedule implements Solution<HardSoftScore> {
 		return result.isPresent() ? result.get() : null;
 	}
 
-	private static List<MyPeriod> createPeriodsFromTimestamps(Timestamp eventStart, Timestamp eventEnd) {
-		MyDay day = MyDay.valueOf(dayDateFormat.format(eventStart));
+	private static List<Period> createPeriodsFromTimestamps(Timestamp eventStart, Timestamp eventEnd) {
+		Day day = Day.valueOf(dayDateFormat.format(eventStart));
 
 		int rangeMinValue = Integer.parseInt(hourDateFormat.format(eventStart));
 		int rangeMaxValue = Integer.parseInt(hourDateFormat.format(eventEnd));
@@ -234,7 +234,7 @@ public class EventSchedule implements Solution<HardSoftScore> {
 		}
 
 		return IntStream.range(rangeMinValue, rangeMaxValue)
-						.mapToObj(hour -> new MyPeriod(day, new MyTimeslot(hour)))
+						.mapToObj(hour -> new Period(day, new Timeslot(hour)))
 						.distinct()
 						.collect(Collectors.toList());
 	}

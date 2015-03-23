@@ -12,19 +12,19 @@ import org.optaplanner.core.api.domain.variable.PlanningVariable;
 
 @PlanningEntity(difficultyComparatorClass = EventDifficultyComparator.class,
 				movableEntitySelectionFilter = MovableEventSelectionFilter.class)
-public class MyEvent implements Serializable, Comparable<MyEvent>, Cloneable {
+public class Event implements Serializable, Comparable<Event>, Cloneable {
 	
 	private static final long serialVersionUID = 1L;
 	private String title;
-	private MyPeriod period;
+	private Period period;
 	private List<User> users;
 	private boolean locked;
 
-	public MyEvent() {
+	public Event() {
 		super();
 	}
 
-	public MyEvent(String title, MyPeriod period, List<User> users, boolean locked) {
+	public Event(String title, Period period, List<User> users, boolean locked) {
 		super();
 		this.title = title;
 		this.period = period;
@@ -41,11 +41,11 @@ public class MyEvent implements Serializable, Comparable<MyEvent>, Cloneable {
 	}
 	
 	@PlanningVariable(valueRangeProviderRefs = {"periodRange"})
-	public MyPeriod getPeriod() {
+	public Period getPeriod() {
 		return this.period;
 	}
 
-	public void setPeriod(MyPeriod period) {
+	public void setPeriod(Period period) {
 		this.period = period;
 	}
 
@@ -82,10 +82,10 @@ public class MyEvent implements Serializable, Comparable<MyEvent>, Cloneable {
 		if (obj == null) {
 			return false;
 		}
-		if (!(obj instanceof MyEvent)) {
+		if (!(obj instanceof Event)) {
 			return false;
 		}
-		MyEvent other = (MyEvent) obj;
+		Event other = (Event) obj;
 		if (this.period == null) {
 			if (other.period != null) {
 				return false;
@@ -106,7 +106,7 @@ public class MyEvent implements Serializable, Comparable<MyEvent>, Cloneable {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("MyEvent [title=");
+		builder.append("Event [title=");
 		builder.append(this.title);
 		builder.append(", period=");
 		builder.append(this.period);
@@ -117,7 +117,7 @@ public class MyEvent implements Serializable, Comparable<MyEvent>, Cloneable {
 	}
 
 	@Override
-	public int compareTo(MyEvent otherEvent) {
+	public int compareTo(Event otherEvent) {
 		return new CompareToBuilder()
 				.append(this.title, otherEvent.title)
 				.append(this.period, otherEvent.period)
@@ -125,8 +125,8 @@ public class MyEvent implements Serializable, Comparable<MyEvent>, Cloneable {
 	}
 
 	@Override
-	protected MyEvent clone() {
-		return new MyEvent(this.title, this.period, this.users, this.locked); 
+	protected Event clone() {
+		return new Event(this.title, this.period, this.users, this.locked); 
 	}
 	
 }

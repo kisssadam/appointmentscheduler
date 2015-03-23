@@ -1,6 +1,6 @@
 package hu.smartcampus.appointmentschedule.domain;
 
-public enum MyDay {
+public enum Day {
 	
 	Monday,
 	Tuesday,
