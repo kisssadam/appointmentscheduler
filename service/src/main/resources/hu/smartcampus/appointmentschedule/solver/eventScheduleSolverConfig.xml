@@ -23,6 +23,9 @@
 	</constructionHeuristic>
 
 	<localSearch>
+		<termination>
+			<unimprovedStepCountLimit>100</unimprovedStepCountLimit>
+		</termination>
     	<acceptor>
       		<simulatedAnnealingStartingTemperature>0hard/0soft</simulatedAnnealingStartingTemperature>
     	</acceptor>
