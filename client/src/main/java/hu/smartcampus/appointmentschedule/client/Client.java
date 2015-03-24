@@ -13,7 +13,8 @@ import javax.xml.ws.Service;
 public class Client {
 	
 	public static void main(String[] args) throws MalformedURLException {
-		URL url = new URL("http://localhost:8080/appointmentschedule?wsdl");
+		URL url = new URL("http://localhost:8080/AppointmentScheduleService/appointmentSchedule?wsdl");
+//		URL url = new URL("http://localhost:8080/appointmentschedule?wsdl");
 		QName qName = new QName("http://service.appointmentschedule.smartcampus.hu/", "AppointmentScheduleImplService");
 		
 		Service service = Service.create(url, qName);
