@@ -1,4 +1,4 @@
-package client;
+package hu.smartcampus.appointmentschedule.client;
 
 import hu.smartcampus.appointmentschedule.domain.Day;
 import hu.smartcampus.appointmentschedule.domain.Period;
