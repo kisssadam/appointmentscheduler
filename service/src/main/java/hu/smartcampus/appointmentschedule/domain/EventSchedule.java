@@ -31,6 +31,7 @@ import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
 @PlanningSolution
 public class EventSchedule implements Solution<HardSoftScore> {
 
+	// TODO have a look at DateFormatSymbols for days.
 	private static final TimeZone budapestTimeZone = TimeZone.getTimeZone("Europe/Budapest");
 	private static final SimpleDateFormat dayDateFormat;
 	private static final SimpleDateFormat weekDateFormat;
@@ -60,6 +61,12 @@ public class EventSchedule implements Solution<HardSoftScore> {
 		minuteDateFormat.setTimeZone(budapestTimeZone);
 	}
 
+	
+	public static EventSchedule createEventSchedule(String[] requiredLoginNames, String[] skippableLoginNames,
+			int year, int weekOfYear, Day[] days) {
+		return new EventSchedule(requiredLoginNames, skippableLoginNames, year, weekOfYear, days);
+	}
+	
 	private EventSchedule() {
 		super();
 	}
@@ -80,10 +87,6 @@ public class EventSchedule implements Solution<HardSoftScore> {
 		this.events.add(new Event("Movable event", new Period(days[0], new Timeslot(8)), users, false));
 	}
 	
-	public static EventSchedule createEventSchedule(String[] requiredLoginNames, String[] skippableLoginNames,
-			int year, int weekOfYear, Day[] days) {
-		return new EventSchedule(requiredLoginNames, skippableLoginNames, year, weekOfYear, days);
-	}
 	
 	private List<TUser> queryTUsers(String[] loginNames) {
 		EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("SMARTCAMPUS");
@@ -124,7 +127,7 @@ public class EventSchedule implements Solution<HardSoftScore> {
 		return everyTEvent.stream()
 				.filter(tEvent -> Integer.parseInt(yearDateFormat.format(tEvent.getEventStart())) == year)
 				.filter(tEvent -> Integer.parseInt(weekDateFormat.format(tEvent.getEventStart())) == weekOfYear)
-				.filter(tEvent -> requiredDays.contains(Day.valueOf(dayDateFormat.format(tEvent.getEventStart()))))
+				.filter(tEvent -> requiredDays.contains(Day.valueOf(dayDateFormat.format(tEvent.getEventStart()).toUpperCase())))
 				.flatMap(new Function<TEvent, Stream<? extends Event>>() {
 					
 					@Override
@@ -161,7 +164,7 @@ public class EventSchedule implements Solution<HardSoftScore> {
 	}
 	
 	private static List<Period> createPeriodsFromTimestamps(Timestamp eventStart, Timestamp eventEnd) {
-		Day day = Day.valueOf(dayDateFormat.format(eventStart));
+		Day day = Day.valueOf(dayDateFormat.format(eventStart).toUpperCase());
 		
 		int rangeMinValue = Integer.parseInt(hourDateFormat.format(eventStart));
 		int rangeMaxValue = Integer.parseInt(hourDateFormat.format(eventEnd));
