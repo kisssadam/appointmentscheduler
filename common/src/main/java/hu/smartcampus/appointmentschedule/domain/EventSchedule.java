@@ -22,7 +22,6 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.optaplanner.core.api.domain.solution.PlanningEntityCollectionProperty;
 import org.optaplanner.core.api.domain.solution.PlanningSolution;
 import org.optaplanner.core.api.domain.solution.Solution;
@@ -62,19 +61,16 @@ public class EventSchedule implements Solution<HardSoftScore> {
 		minuteDateFormat.setTimeZone(budapestTimeZone);
 	}
 
-	public static EventSchedule createEventSchedule(String[] requiredLoginNames, String[] skippableLoginNames,
-			int year, int weekOfYear, DayOfWeek[] daysOfWeek) {
-		return new EventSchedule(requiredLoginNames, skippableLoginNames, year, weekOfYear, Arrays.asList(daysOfWeek));
+	public static EventSchedule createEventSchedule(String[] requiredLoginNames, String[] skippableLoginNames, int year, int weekOfYear, DayOfWeek[] daysOfWeek) {
+		return new EventSchedule(Arrays.asList(requiredLoginNames), Arrays.asList(skippableLoginNames), year, weekOfYear, Arrays.asList(daysOfWeek));
 	}
 	
 	private EventSchedule() {
 		super();
 	}
 	
-	private EventSchedule(String[] requiredLoginNames, String[] skippableLoginNames, int year, int weekOfYear, List<DayOfWeek> daysOfWeek) {
-		String[] mergedLoginNames = Stream.concat(Arrays.stream(requiredLoginNames), Arrays.stream(skippableLoginNames))
-										  .distinct()
-										  .toArray(String[]::new);
+	private EventSchedule(List<String> requiredLoginNames, List<String> skippableLoginNames, int year, int weekOfYear, List<DayOfWeek> daysOfWeek) {
+		List<String> mergedLoginNames = Stream.concat(requiredLoginNames.stream(), skippableLoginNames.stream()).distinct().collect(Collectors.toList());
 
 		List<TUser> queriedTUsers = queryTUsers(mergedLoginNames);
 		List<TEvent> everyTEvent = getDistinctTEventsFromTUsers(queriedTUsers);
@@ -88,13 +84,12 @@ public class EventSchedule implements Solution<HardSoftScore> {
 	}
 	
 	
-	private List<TUser> queryTUsers(String[] loginNames) {
+	private List<TUser> queryTUsers(List<String> loginNames) {
 		EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("SMARTCAMPUS");
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		
-		TypedQuery<TUser> query = entityManager.createQuery("SELECT t FROM TUser t WHERE t.loginName IN :loginNames",
-				TUser.class);
-		query.setParameter("loginNames", Arrays.asList(loginNames));
+		TypedQuery<TUser> query = entityManager.createQuery("SELECT t FROM TUser t WHERE t.loginName IN :loginNames", TUser.class);
+		query.setParameter("loginNames", loginNames);
 		
 		List<TUser> result = query.getResultList();
 		
@@ -111,10 +106,10 @@ public class EventSchedule implements Solution<HardSoftScore> {
 				.collect(Collectors.toList());
 	}
 	
-	private List<User> createUsersFromTUsers(List<TUser> queriedTUsers, String[] requiredLoginNames) {
+	private List<User> createUsersFromTUsers(List<TUser> queriedTUsers, List<String> requiredLoginNames) {
 		return queriedTUsers.stream()
 				.map(tUser -> {
-					boolean isSkippable = !ArrayUtils.contains(requiredLoginNames, tUser.getLoginName());
+					boolean isSkippable = !requiredLoginNames.contains(tUser.getLoginName());
 					return new User(tUser.getDisplayName(), tUser.getLoginName(), isSkippable);
 				})
 				.distinct()
@@ -122,8 +117,7 @@ public class EventSchedule implements Solution<HardSoftScore> {
 				.collect(Collectors.toList());
 	}
 	
-	private List<Event> createEventsFromTEvents(List<TEvent> everyTEvent, String[] loginNames, int year,
-			int weekOfYear, List<DayOfWeek> requiredDays) {
+	private List<Event> createEventsFromTEvents(List<TEvent> everyTEvent, List<String> loginNames, int year, int weekOfYear, List<DayOfWeek> requiredDays) {
 		return everyTEvent.stream()
 				.filter(tEvent -> Integer.parseInt(yearDateFormat.format(tEvent.getEventStart())) == year)
 				.filter(tEvent -> Integer.parseInt(weekDateFormat.format(tEvent.getEventStart())) == weekOfYear)
@@ -147,9 +141,9 @@ public class EventSchedule implements Solution<HardSoftScore> {
 				.collect(Collectors.toList());
 	}
 	
-	private List<User> getRequiredUsersOfEvent(TEvent tEvent, String[] loginNames) {
+	private List<User> getRequiredUsersOfEvent(TEvent tEvent, List<String> loginNames) {
 		return new ArrayList<>(tEvent.getTUsers()).stream()
-				.filter(tUser -> ArrayUtils.contains(loginNames, tUser.getLoginName()))
+				.filter(tUser -> loginNames.contains(tUser.getLoginName()))
 				.map(tUser -> getUserByLoginName(tUser.getLoginName()))
 				.distinct()
 				.collect(Collectors.toList());

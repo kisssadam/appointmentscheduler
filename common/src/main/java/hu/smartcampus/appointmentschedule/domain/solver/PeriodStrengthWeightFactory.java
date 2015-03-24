@@ -3,7 +3,8 @@ package hu.smartcampus.appointmentschedule.domain.solver;
 import hu.smartcampus.appointmentschedule.domain.EventSchedule;
 import hu.smartcampus.appointmentschedule.domain.Period;
 
-import org.apache.commons.lang3.builder.CompareToBuilder;
+import java.util.Comparator;
+
 import org.optaplanner.core.impl.heuristic.selector.common.decorator.SelectionSorterWeightFactory;
 
 public class PeriodStrengthWeightFactory implements SelectionSorterWeightFactory<EventSchedule, Period> {
@@ -23,10 +24,7 @@ public class PeriodStrengthWeightFactory implements SelectionSorterWeightFactory
 
         @Override
 		public int compareTo(PeriodStrengthWeight other) {
-            return new CompareToBuilder()
-                    .append(period.getDay(), other.period.getDay())
-                    .append(period.getTimeslot().getHour(), other.period.getTimeslot().getHour())
-                    .toComparison();
+        	return Comparator.comparing(Period::getDay).thenComparing(Period::getTimeslot).compare(this.period, other.period);
         }
 
     }
