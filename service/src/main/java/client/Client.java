@@ -19,12 +19,14 @@ public class Client {
 		Service service = Service.create(url, qName);
 		AppointmentSchedule appointmentScheduleService = service.getPort(AppointmentSchedule.class);
 		
+//		DayOfWeek
 		
 		int year = 2015;
 		int weekOfYear = 12;
-		String[] requiredLoginNames = new String[] { "KOLLARL", "KISSSANDORADAM", "MKOSA", "PANOVICS", "BURAIP" };
-		String[] skippableLoginNames = new String[] { "VAGNERA" };
-		Day[] days = { Day.Monday, Day.Tuesday, Day.Friday };
+		String[] requiredLoginNames = new String[] { "KOLLARL", "KISSSANDORADAM", "MKOSA", "PANOVICS" };
+		String[] skippableLoginNames = new String[] { "BURAIP", "VAGNERA" };
+//		Day[] days = { Day.MONDAY, Day.TUESDAY, Day.FRIDAY };
+		Day[] days = { Day.TUESDAY };
 		
 		Period period = appointmentScheduleService.getBestPeriod(requiredLoginNames, skippableLoginNames, year, weekOfYear, days);
 		

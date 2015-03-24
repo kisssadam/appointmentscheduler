@@ -3,31 +3,13 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<artifactId>szakdolgozat</artifactId>
-		<groupId>hu.smartcampus.kisssandoradam</groupId>
-		<version>0.0.1-SNAPSHOT</version>
+		<artifactId>appointment-schedule</artifactId>
+		<groupId>hu.smartcampus</groupId>
+		<version>1.0</version>
 	</parent>
-	<!-- <groupId>hu.smartcampus.kisssandoradam</groupId> -->
 	<artifactId>service</artifactId>
-	<!-- <version>0.0.1-SNAPSHOT</version> -->
-	<repositories>
-		<repository>
-			<id>EclipseLink Repo</id>
-			<url>http://download.eclipse.org/rt/eclipselink/maven.repo</url>
-			<name>EclipseLink Repo</name>
-		</repository>
-	</repositories>
+	<packaging>war</packaging>
 	<dependencies>
-		<dependency>
-			<groupId>org.eclipse.persistence</groupId>
-			<artifactId>eclipselink</artifactId>
-			<version>2.2.1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse.persistence</groupId>
-			<artifactId>javax.persistence</artifactId>
-			<version>2.0.3</version>
-		</dependency>
 		<dependency>
 			<groupId>com.oracle</groupId>
 			<artifactId>ojdbc6</artifactId>
@@ -54,16 +36,31 @@
 			<artifactId>commons-lang3</artifactId>
 			<version>3.3.2</version>
 		</dependency>
+		<dependency>
+			<groupId>com.sun.xml.ws</groupId>
+			<artifactId>jaxws-rt</artifactId>
+			<version>2.2.10</version>
+			<type>pom</type>
+		</dependency>
+		<dependency>
+			<groupId>hu.smartcampus</groupId>
+			<artifactId>model</artifactId>
+			<version>1.0</version>
+		</dependency>
 	</dependencies>
 	<build>
-		<resources>
-			<resource>
-				<directory>src/main/resources</directory>
-				<filtering>true</filtering>
-			</resource>
-		</resources>
-		<filters>
-			<filter>smartcampus.properties</filter>
-		</filters>
+		<finalName>AppointmentScheduleService</finalName>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
+		</plugins>
 	</build>
 </project>
