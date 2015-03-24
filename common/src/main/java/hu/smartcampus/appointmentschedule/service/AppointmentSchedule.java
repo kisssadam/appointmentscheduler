@@ -1,11 +1,12 @@
 package hu.smartcampus.appointmentschedule.service;
 
+import java.time.DayOfWeek;
+
 import javax.jws.WebMethod;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 import javax.jws.soap.SOAPBinding.Style;
 
-import hu.smartcampus.appointmentschedule.domain.Day;
 import hu.smartcampus.appointmentschedule.domain.Period;
 
 @WebService
@@ -13,6 +14,6 @@ import hu.smartcampus.appointmentschedule.domain.Period;
 public interface AppointmentSchedule {
 
 	@WebMethod
-	Period getBestPeriod(String[] requiredLoginNames, String[] skippableLoginNames, int year, int weekOfYear, Day[] days);
+	Period getBestPeriod(String[] requiredLoginNames, String[] skippableLoginNames, int year, int weekOfYear, DayOfWeek[] daysOfWeek);
 	
 }

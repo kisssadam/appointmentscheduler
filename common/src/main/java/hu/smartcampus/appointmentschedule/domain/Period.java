@@ -1,27 +1,28 @@
 package hu.smartcampus.appointmentschedule.domain;
 
-import org.apache.commons.lang3.builder.CompareToBuilder;
+import java.time.DayOfWeek;
+import java.util.Comparator;
 
 public class Period implements Cloneable, Comparable<Period> {
 
-	private Day day;
+	private DayOfWeek day;
 	private Timeslot timeslot;
 
 	public Period() {
 		super();
 	}
 
-	public Period(Day day, Timeslot timeslot) {
+	public Period(DayOfWeek day, Timeslot timeslot) {
 		super();
 		this.day = day;
 		this.timeslot = timeslot;
 	}
 
-	public Day getDay() {
+	public DayOfWeek getDay() {
 		return this.day;
 	}
 
-	public void setDay(Day day) {
+	public void setDay(DayOfWeek day) {
 		this.day = day;
 	}
 
@@ -85,9 +86,7 @@ public class Period implements Cloneable, Comparable<Period> {
 
 	@Override
 	public int compareTo(Period otherPeriod) {
-		return new CompareToBuilder().append(this.day, otherPeriod.day)
-									 .append(this.timeslot, otherPeriod.timeslot)
-									 .toComparison();
+		return Comparator.comparing(Period::getDay).thenComparing(Period::getTimeslot).compare(this, otherPeriod);
 	}
 
 }

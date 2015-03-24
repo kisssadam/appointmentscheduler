@@ -5,9 +5,10 @@ import hu.smartcampus.appointmentschedule.domain.solver.MovableEventSelectionFil
 import hu.smartcampus.appointmentschedule.domain.solver.PeriodStrengthWeightFactory;
 
 import java.io.Serializable;
+import java.time.DayOfWeek;
+import java.util.Comparator;
 import java.util.List;
 
-import org.apache.commons.lang.builder.CompareToBuilder;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
 import org.optaplanner.core.api.domain.variable.PlanningVariable;
 
@@ -119,14 +120,12 @@ public class Event implements Serializable, Comparable<Event>, Cloneable {
 	}
 
 	/**
-	 * This method is only used during debugging. When {@link EventSchedule#createEventSchedule(String[], String[], int, int, Day[])}
+	 * This method is only used during debugging. When {@link EventSchedule#createEventSchedule(String[], String[], int, int, DayOfWeek[])}
 	 * creates the events then we can print them out to the console.
 	 */
 	@Override
 	public int compareTo(Event otherEvent) {
-		return new CompareToBuilder().append(this.period, otherEvent.period)
-									 .append(this.title, otherEvent.title)
-									 .toComparison();
+		return Comparator.comparing(Event::getPeriod).thenComparing(Event::getTitle).compare(this, otherEvent);
 	}
 
 	@Override

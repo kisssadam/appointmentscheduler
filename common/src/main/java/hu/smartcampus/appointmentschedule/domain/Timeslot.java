@@ -1,10 +1,10 @@
 package hu.smartcampus.appointmentschedule.domain;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.optaplanner.core.api.domain.valuerange.ValueRangeProvider;
 
 public class Timeslot implements Comparable<Timeslot> {
@@ -103,7 +103,7 @@ public class Timeslot implements Comparable<Timeslot> {
 
 	@Override
 	public int compareTo(Timeslot otherTimeslot) {
-		return new CompareToBuilder().append(this.hour, otherTimeslot.hour).toComparison();
+		return Comparator.comparing(Timeslot::getHour).compare(this, otherTimeslot);
 	}
 
 }

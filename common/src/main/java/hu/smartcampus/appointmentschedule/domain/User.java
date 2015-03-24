@@ -1,6 +1,6 @@
 package hu.smartcampus.appointmentschedule.domain;
 
-import org.apache.commons.lang3.builder.CompareToBuilder;
+import java.util.Comparator;
 
 public class User implements Cloneable, Comparable<User> {
 
@@ -98,7 +98,7 @@ public class User implements Cloneable, Comparable<User> {
 
 	@Override
 	public int compareTo(User otherUser) {
-		return new CompareToBuilder().append(this.loginName, otherUser.loginName).append(this.displayName, otherUser.displayName).toComparison();
+		return Comparator.comparing(User::getLoginName).thenComparing(User::getDisplayName).compare(this, otherUser);
 	}
 
 }
