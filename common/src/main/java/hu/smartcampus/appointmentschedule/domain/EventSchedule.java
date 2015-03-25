@@ -35,7 +35,7 @@ public class EventSchedule implements Solution<HardSoftScore> {
 	 * https://weblogs.java.net/blog/montanajava/archive/2014/06/17/using-java-8-datetime-classes-jpa
 	 */
 	private static final EntityManagerFactory ENTITY_MANAGER_FACTORY;
-	private static final TimeZone BUDAPEST_TIMEZONE;
+	private static final TimeZone BUDAPEST_TIME_ZONE;
 	private static final SimpleDateFormat DAY_DATE_FORMAT;
 	private static final SimpleDateFormat WEEK_DATE_FORMAT;
 	private static final SimpleDateFormat YEAR_DATE_FORMAT;
@@ -51,22 +51,22 @@ public class EventSchedule implements Solution<HardSoftScore> {
 	static {
 		ENTITY_MANAGER_FACTORY = Persistence.createEntityManagerFactory("SMARTCAMPUS");
 		
-		BUDAPEST_TIMEZONE = TimeZone.getTimeZone("Europe/Budapest");
+		BUDAPEST_TIME_ZONE = TimeZone.getTimeZone("Europe/Budapest");
 		
 		DAY_DATE_FORMAT = new SimpleDateFormat("EEEE");
-		DAY_DATE_FORMAT.setTimeZone(BUDAPEST_TIMEZONE);
+		DAY_DATE_FORMAT.setTimeZone(BUDAPEST_TIME_ZONE);
 
 		WEEK_DATE_FORMAT = new SimpleDateFormat("w");
-		WEEK_DATE_FORMAT.setTimeZone(BUDAPEST_TIMEZONE);
+		WEEK_DATE_FORMAT.setTimeZone(BUDAPEST_TIME_ZONE);
 
 		YEAR_DATE_FORMAT = new SimpleDateFormat("yyyy");
-		YEAR_DATE_FORMAT.setTimeZone(BUDAPEST_TIMEZONE);
+		YEAR_DATE_FORMAT.setTimeZone(BUDAPEST_TIME_ZONE);
 
 		HOUR_DATE_FORMAT = new SimpleDateFormat("HH");
-		HOUR_DATE_FORMAT.setTimeZone(BUDAPEST_TIMEZONE);
+		HOUR_DATE_FORMAT.setTimeZone(BUDAPEST_TIME_ZONE);
 
 		MINUTE_DATE_FORMAT = new SimpleDateFormat("mm");
-		MINUTE_DATE_FORMAT.setTimeZone(BUDAPEST_TIMEZONE);
+		MINUTE_DATE_FORMAT.setTimeZone(BUDAPEST_TIME_ZONE);
 	}
 
 	public static EventSchedule createEventSchedule(String[] requiredLoginNames, String[] skippableLoginNames, int year, int weekOfYear, DayOfWeek[] daysOfWeek) {
