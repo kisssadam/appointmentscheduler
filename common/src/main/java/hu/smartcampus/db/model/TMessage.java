@@ -1,6 +1,7 @@
 package hu.smartcampus.db.model;
 
 import java.io.Serializable;
+
 import javax.persistence.*;
 
 /**
@@ -59,6 +60,44 @@ public class TMessage implements Serializable {
 
 	public void setTUser(TUser TUser) {
 		this.TUser = TUser;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((this.TUser == null) ? 0 : this.TUser.hashCode());
+		result = prime * result + ((this.message == null) ? 0 : this.message.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof TMessage)) {
+			return false;
+		}
+		TMessage other = (TMessage) obj;
+		if (this.TUser == null) {
+			if (other.TUser != null) {
+				return false;
+			}
+		} else if (!this.TUser.equals(other.TUser)) {
+			return false;
+		}
+		if (this.message == null) {
+			if (other.message != null) {
+				return false;
+			}
+		} else if (!this.message.equals(other.message)) {
+			return false;
+		}
+		return true;
 	}
 
 }

@@ -1,7 +1,9 @@
 package hu.smartcampus.db.model;
 
 import java.io.Serializable;
+
 import javax.persistence.*;
+
 import java.util.List;
 
 /**
@@ -48,6 +50,36 @@ public class TLocation implements Serializable {
 
 	public void setTEvents(List<TEvent> TEvents) {
 		this.TEvents = TEvents;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((this.locationName == null) ? 0 : this.locationName.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof TLocation)) {
+			return false;
+		}
+		TLocation other = (TLocation) obj;
+		if (this.locationName == null) {
+			if (other.locationName != null) {
+				return false;
+			}
+		} else if (!this.locationName.equals(other.locationName)) {
+			return false;
+		}
+		return true;
 	}
 
 }

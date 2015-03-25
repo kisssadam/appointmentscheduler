@@ -1,7 +1,9 @@
 package hu.smartcampus.db.model;
 
 import java.io.Serializable;
+
 import javax.persistence.*;
+
 import java.util.List;
 
 /**
@@ -48,6 +50,36 @@ public class TGroup implements Serializable {
 
 	public void setTAdmins(List<TAdmin> TAdmins) {
 		this.TAdmins = TAdmins;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((this.groupName == null) ? 0 : this.groupName.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof TGroup)) {
+			return false;
+		}
+		TGroup other = (TGroup) obj;
+		if (this.groupName == null) {
+			if (other.groupName != null) {
+				return false;
+			}
+		} else if (!this.groupName.equals(other.groupName)) {
+			return false;
+		}
+		return true;
 	}
 
 }
