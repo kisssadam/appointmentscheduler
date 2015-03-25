@@ -81,7 +81,7 @@ public class Period implements Cloneable, Comparable<Period> {
 
 	@Override
 	protected Period clone() {
-		return new Period(this.day, this.timeslot);
+		return new Period(this.day, (Timeslot) this.timeslot.clone());
 	}
 
 	@Override

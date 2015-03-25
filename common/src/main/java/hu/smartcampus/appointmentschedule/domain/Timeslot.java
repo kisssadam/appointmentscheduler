@@ -7,7 +7,7 @@ import java.util.stream.IntStream;
 
 import org.optaplanner.core.api.domain.valuerange.ValueRangeProvider;
 
-public class Timeslot implements Comparable<Timeslot> {
+public class Timeslot implements Comparable<Timeslot>, Cloneable {
 
 	private static int minHour = 8;
 	private static int maxHour = 19;
@@ -99,6 +99,11 @@ public class Timeslot implements Comparable<Timeslot> {
 			return false;
 		}
 		return true;
+	}
+	
+	@Override
+	protected Object clone() {
+		return new Timeslot(hour);
 	}
 
 	@Override

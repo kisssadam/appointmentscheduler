@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.time.DayOfWeek;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
 import org.optaplanner.core.api.domain.variable.PlanningVariable;
@@ -130,7 +131,8 @@ public class Event implements Serializable, Comparable<Event>, Cloneable {
 
 	@Override
 	protected Event clone() {
-		return new Event(this.title, this.period, this.users, this.locked); 
+		List<User> clonedUsers = this.users.stream().map(user -> user.clone()).collect(Collectors.toList());
+		return new Event(this.title, this.period.clone(), clonedUsers, this.locked); 
 	}
 	
 }
