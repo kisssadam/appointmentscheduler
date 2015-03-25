@@ -31,34 +31,42 @@ import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
 @PlanningSolution
 public class EventSchedule implements Solution<HardSoftScore> {
 
-	// TODO have a look at DateFormatSymbols for days.
-	private static final TimeZone budapestTimeZone = TimeZone.getTimeZone("Europe/Budapest");
-	private static final SimpleDateFormat dayDateFormat;
-	private static final SimpleDateFormat weekDateFormat;
-	private static final SimpleDateFormat yearDateFormat;
-	private static final SimpleDateFormat hourDateFormat;
-	private static final SimpleDateFormat minuteDateFormat;
-
+	/* TODO at kellene alakitani LocalDateTime-ra az entitiket ez alapjan:
+	 * https://weblogs.java.net/blog/montanajava/archive/2014/06/17/using-java-8-datetime-classes-jpa
+	 */
+	private static final EntityManagerFactory ENTITY_MANAGER_FACTORY;
+	private static final TimeZone BUDAPEST_TIMEZONE;
+	private static final SimpleDateFormat DAY_DATE_FORMAT;
+	private static final SimpleDateFormat WEEK_DATE_FORMAT;
+	private static final SimpleDateFormat YEAR_DATE_FORMAT;
+	private static final SimpleDateFormat HOUR_DATE_FORMAT;
+	private static final SimpleDateFormat MINUTE_DATE_FORMAT;
+	
+	private EntityManager entityManager;
 	private List<User> users;
 	private List<Event> events;
 	private List<DayOfWeek> daysOfWeek;
 	private HardSoftScore score;
 
 	static {
-		dayDateFormat = new SimpleDateFormat("EEEE");
-		dayDateFormat.setTimeZone(budapestTimeZone);
+		ENTITY_MANAGER_FACTORY = Persistence.createEntityManagerFactory("SMARTCAMPUS");
+		
+		BUDAPEST_TIMEZONE = TimeZone.getTimeZone("Europe/Budapest");
+		
+		DAY_DATE_FORMAT = new SimpleDateFormat("EEEE");
+		DAY_DATE_FORMAT.setTimeZone(BUDAPEST_TIMEZONE);
 
-		weekDateFormat = new SimpleDateFormat("w");
-		weekDateFormat.setTimeZone(budapestTimeZone);
+		WEEK_DATE_FORMAT = new SimpleDateFormat("w");
+		WEEK_DATE_FORMAT.setTimeZone(BUDAPEST_TIMEZONE);
 
-		yearDateFormat = new SimpleDateFormat("yyyy");
-		yearDateFormat.setTimeZone(budapestTimeZone);
+		YEAR_DATE_FORMAT = new SimpleDateFormat("yyyy");
+		YEAR_DATE_FORMAT.setTimeZone(BUDAPEST_TIMEZONE);
 
-		hourDateFormat = new SimpleDateFormat("HH");
-		hourDateFormat.setTimeZone(budapestTimeZone);
+		HOUR_DATE_FORMAT = new SimpleDateFormat("HH");
+		HOUR_DATE_FORMAT.setTimeZone(BUDAPEST_TIMEZONE);
 
-		minuteDateFormat = new SimpleDateFormat("mm");
-		minuteDateFormat.setTimeZone(budapestTimeZone);
+		MINUTE_DATE_FORMAT = new SimpleDateFormat("mm");
+		MINUTE_DATE_FORMAT.setTimeZone(BUDAPEST_TIMEZONE);
 	}
 
 	public static EventSchedule createEventSchedule(String[] requiredLoginNames, String[] skippableLoginNames, int year, int weekOfYear, DayOfWeek[] daysOfWeek) {
@@ -70,6 +78,8 @@ public class EventSchedule implements Solution<HardSoftScore> {
 	}
 	
 	private EventSchedule(List<String> requiredLoginNames, List<String> skippableLoginNames, int year, int weekOfYear, List<DayOfWeek> daysOfWeek) {
+		this.entityManager = ENTITY_MANAGER_FACTORY.createEntityManager();
+		
 		List<String> mergedLoginNames = Stream.concat(requiredLoginNames.stream(), skippableLoginNames.stream()).distinct().collect(Collectors.toList());
 
 		List<TUser> queriedTUsers = queryTUsers(mergedLoginNames);
@@ -85,16 +95,10 @@ public class EventSchedule implements Solution<HardSoftScore> {
 	
 	
 	private List<TUser> queryTUsers(List<String> loginNames) {
-		EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("SMARTCAMPUS");
-		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		TypedQuery<TUser> tUserQuery = entityManager.createQuery("SELECT t FROM TUser t WHERE t.loginName IN :loginNames", TUser.class);
+		tUserQuery.setParameter("loginNames", loginNames);
 		
-		TypedQuery<TUser> query = entityManager.createQuery("SELECT t FROM TUser t WHERE t.loginName IN :loginNames", TUser.class);
-		query.setParameter("loginNames", loginNames);
-		
-		List<TUser> result = query.getResultList();
-		
-		entityManager.close();
-		entityManagerFactory.close();
+		List<TUser> result = tUserQuery.getResultList();
 		
 		return result;
 	}
@@ -119,9 +123,9 @@ public class EventSchedule implements Solution<HardSoftScore> {
 	
 	private List<Event> createEventsFromTEvents(List<TEvent> everyTEvent, List<String> loginNames, int year, int weekOfYear, List<DayOfWeek> requiredDays) {
 		return everyTEvent.stream()
-				.filter(tEvent -> Integer.parseInt(yearDateFormat.format(tEvent.getEventStart())) == year)
-				.filter(tEvent -> Integer.parseInt(weekDateFormat.format(tEvent.getEventStart())) == weekOfYear)
-				.filter(tEvent -> requiredDays.contains(DayOfWeek.valueOf(dayDateFormat.format(tEvent.getEventStart()).toUpperCase())))
+				.filter(tEvent -> Integer.parseInt(YEAR_DATE_FORMAT.format(tEvent.getEventStart())) == year)
+				.filter(tEvent -> Integer.parseInt(WEEK_DATE_FORMAT.format(tEvent.getEventStart())) == weekOfYear)
+				.filter(tEvent -> requiredDays.contains(DayOfWeek.valueOf(DAY_DATE_FORMAT.format(tEvent.getEventStart()).toUpperCase())))
 				.flatMap(new Function<TEvent, Stream<? extends Event>>() {
 					
 					@Override
@@ -157,11 +161,11 @@ public class EventSchedule implements Solution<HardSoftScore> {
 	}
 	
 	private static List<Period> createPeriodsFromTimestamps(Timestamp eventStart, Timestamp eventEnd) {
-		DayOfWeek dayOfWeek = DayOfWeek.valueOf(dayDateFormat.format(eventStart).toUpperCase());
+		DayOfWeek dayOfWeek = DayOfWeek.valueOf(DAY_DATE_FORMAT.format(eventStart).toUpperCase());
 		
-		int rangeMinValue = Integer.parseInt(hourDateFormat.format(eventStart));
-		int rangeMaxValue = Integer.parseInt(hourDateFormat.format(eventEnd));
-		int eventEndMinute = Integer.parseInt(minuteDateFormat.format(eventStart));
+		int rangeMinValue = Integer.parseInt(HOUR_DATE_FORMAT.format(eventStart));
+		int rangeMaxValue = Integer.parseInt(HOUR_DATE_FORMAT.format(eventEnd));
+		int eventEndMinute = Integer.parseInt(MINUTE_DATE_FORMAT.format(eventStart));
 		
 		if (rangeMinValue == rangeMaxValue || eventEndMinute != 0) {
 			rangeMaxValue++;
