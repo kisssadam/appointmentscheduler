@@ -83,7 +83,7 @@ public class EventSchedule implements Solution<HardSoftScore> {
 		List<String> mergedLoginNames = Stream.concat(requiredLoginNames.stream(), skippableLoginNames.stream()).distinct().collect(Collectors.toList());
 
 		List<TUser> queriedTUsers = queryTUsers(mergedLoginNames);
-		List<TEvent> everyTEvent = getDistinctTEventsFromTUsers(queriedTUsers);
+		List<TEvent> everyTEvent = getEveryTEventFromTUsers(queriedTUsers);
 
 		this.users = createUsersFromTUsers(queriedTUsers, requiredLoginNames);
 		this.daysOfWeek = daysOfWeek;
@@ -103,7 +103,7 @@ public class EventSchedule implements Solution<HardSoftScore> {
 		return result;
 	}
 	
-	private List<TEvent> getDistinctTEventsFromTUsers(List<TUser> queriedTUsers) {
+	private List<TEvent> getEveryTEventFromTUsers(List<TUser> queriedTUsers) {
 		return queriedTUsers.stream()
 				.flatMap(tUser -> new ArrayList<>(tUser.getTEvents()).stream())
 				.distinct()
