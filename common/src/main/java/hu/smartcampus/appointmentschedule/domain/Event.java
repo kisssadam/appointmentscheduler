@@ -131,8 +131,7 @@ public class Event implements Serializable, Comparable<Event>, Cloneable {
 
 	@Override
 	protected Event clone() {
-		List<User> clonedUsers = this.users.stream().map(user -> user.clone()).collect(Collectors.toList());
-		return new Event(this.title, this.period.clone(), clonedUsers, this.locked); 
+		return new Event(this.title, this.period, this.users, this.locked); 
 	}
 	
 }
