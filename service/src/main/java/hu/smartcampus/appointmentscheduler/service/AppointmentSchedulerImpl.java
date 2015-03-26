@@ -3,7 +3,6 @@ package hu.smartcampus.appointmentscheduler.service;
 import hu.smartcampus.appointmentscheduler.domain.Event;
 import hu.smartcampus.appointmentscheduler.domain.EventSchedule;
 import hu.smartcampus.appointmentscheduler.domain.Period;
-import hu.smartcampus.appointmentscheduler.service.AppointmentScheduler;
 
 import java.time.DayOfWeek;
 import java.util.Optional;
