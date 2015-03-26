@@ -25,11 +25,12 @@ import javax.persistence.TypedQuery;
 import org.optaplanner.core.api.domain.solution.PlanningEntityCollectionProperty;
 import org.optaplanner.core.api.domain.solution.PlanningSolution;
 import org.optaplanner.core.api.domain.solution.Solution;
+import org.optaplanner.core.api.domain.solution.cloner.PlanningCloneable;
 import org.optaplanner.core.api.domain.valuerange.ValueRangeProvider;
 import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
 
 @PlanningSolution
-public class EventSchedule implements Solution<HardSoftScore> {
+public class EventSchedule implements Solution<HardSoftScore>, PlanningCloneable<EventSchedule> {
 
 	/* TODO at kellene alakitani LocalDateTime-ra az entitiket ez alapjan:
 	 * https://weblogs.java.net/blog/montanajava/archive/2014/06/17/using-java-8-datetime-classes-jpa
@@ -237,6 +238,21 @@ public class EventSchedule implements Solution<HardSoftScore> {
 		builder.append(this.score);
 		builder.append("]");
 		return builder.toString();
+	}
+
+	/**
+	 * Clone will only deep copy the {@link #events}.
+	 */
+	@Override
+	public EventSchedule planningClone() {
+		EventSchedule clone = new EventSchedule();
+		
+		clone.setDaysOfWeek(this.daysOfWeek);
+		clone.setScore(this.score);
+		clone.setUsers(this.users);
+		clone.setEvents(this.events.stream().map(event -> event.clone()).collect(Collectors.toList()));
+		
+		return clone;
 	}
 
 }

@@ -6,7 +6,6 @@ import hu.smartcampus.appointmentschedule.domain.solver.PeriodStrengthWeightFact
 
 import java.io.Serializable;
 import java.time.DayOfWeek;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -131,7 +130,7 @@ public class Event implements Serializable, Comparable<Event>, Cloneable {
 
 	@Override
 	protected Event clone() {
-		return new Event(this.title, this.period.clone(), new ArrayList<>(this.users), this.locked); 
+		return new Event(this.title, this.period.clone(), this.users, this.locked); 
 	}
 	
 }
