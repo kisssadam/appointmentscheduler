@@ -1,8 +1,8 @@
-package hu.smartcampus.appointmentschedule.domain.solver;
+package hu.smartcampus.appointmentscheduler.domain.solver;
 
-import hu.smartcampus.appointmentschedule.domain.EventSchedule;
-import hu.smartcampus.appointmentschedule.domain.Event;
-import hu.smartcampus.appointmentschedule.domain.User;
+import hu.smartcampus.appointmentscheduler.domain.Event;
+import hu.smartcampus.appointmentscheduler.domain.EventSchedule;
+import hu.smartcampus.appointmentscheduler.domain.User;
 
 import org.optaplanner.core.api.score.Score;
 import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;

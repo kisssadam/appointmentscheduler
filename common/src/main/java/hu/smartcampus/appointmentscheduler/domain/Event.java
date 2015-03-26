@@ -1,8 +1,8 @@
-package hu.smartcampus.appointmentschedule.domain;
+package hu.smartcampus.appointmentscheduler.domain;
 
-import hu.smartcampus.appointmentschedule.domain.solver.EventDifficultyComparator;
-import hu.smartcampus.appointmentschedule.domain.solver.MovableEventSelectionFilter;
-import hu.smartcampus.appointmentschedule.domain.solver.PeriodStrengthWeightFactory;
+import hu.smartcampus.appointmentscheduler.domain.solver.EventDifficultyComparator;
+import hu.smartcampus.appointmentscheduler.domain.solver.MovableEventSelectionFilter;
+import hu.smartcampus.appointmentscheduler.domain.solver.PeriodStrengthWeightFactory;
 
 import java.io.Serializable;
 import java.time.DayOfWeek;

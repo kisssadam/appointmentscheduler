@@ -4,12 +4,12 @@
     	<exhaustiveSearchType>BRANCH_AND_BOUND</exhaustiveSearchType>
   	</exhaustiveSearch>
 
-	<solutionClass>hu.smartcampus.appointmentschedule.domain.EventSchedule</solutionClass>
-	<entityClass>hu.smartcampus.appointmentschedule.domain.Event</entityClass>
+	<solutionClass>hu.smartcampus.appointmentscheduler.domain.EventSchedule</solutionClass>
+	<entityClass>hu.smartcampus.appointmentscheduler.domain.Event</entityClass>
 
 	<scoreDirectorFactory>
 		<scoreDefinitionType>HARD_SOFT</scoreDefinitionType>
-		<easyScoreCalculatorClass>hu.smartcampus.appointmentschedule.domain.solver.EventScheduleSimpleScoreCalculator</easyScoreCalculatorClass>
+		<easyScoreCalculatorClass>hu.smartcampus.appointmentscheduler.domain.solver.EventScheduleSimpleScoreCalculator</easyScoreCalculatorClass>
 	</scoreDirectorFactory>
 
 	<termination>

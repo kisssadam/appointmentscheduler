@@ -1,6 +1,6 @@
-package hu.smartcampus.appointmentschedule.domain.solver;
+package hu.smartcampus.appointmentscheduler.domain.solver;
 
-import hu.smartcampus.appointmentschedule.domain.Period;
+import hu.smartcampus.appointmentscheduler.domain.Period;
 
 import java.util.Comparator;
 

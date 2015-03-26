@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>hu.smartcampus</groupId>
-		<artifactId>appointment-schedule</artifactId>
+		<artifactId>appointment-scheduler</artifactId>
 		<version>1.0</version>
 	</parent>
 	<artifactId>common</artifactId>

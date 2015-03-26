@@ -1,4 +1,4 @@
-package hu.smartcampus.appointmentschedule.domain;
+package hu.smartcampus.appointmentscheduler.domain;
 
 import hu.smartcampus.db.model.TEvent;
 import hu.smartcampus.db.model.TUser;

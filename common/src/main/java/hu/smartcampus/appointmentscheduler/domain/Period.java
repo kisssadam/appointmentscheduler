@@ -1,4 +1,4 @@
-package hu.smartcampus.appointmentschedule.domain;
+package hu.smartcampus.appointmentscheduler.domain;
 
 import java.time.DayOfWeek;
 import java.util.Comparator;

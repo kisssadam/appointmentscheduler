@@ -1,8 +1,9 @@
-package hu.smartcampus.appointmentschedule.service;
+package hu.smartcampus.appointmentscheduler.service;
 
-import hu.smartcampus.appointmentschedule.domain.Event;
-import hu.smartcampus.appointmentschedule.domain.EventSchedule;
-import hu.smartcampus.appointmentschedule.domain.Period;
+import hu.smartcampus.appointmentscheduler.domain.Event;
+import hu.smartcampus.appointmentscheduler.domain.EventSchedule;
+import hu.smartcampus.appointmentscheduler.domain.Period;
+import hu.smartcampus.appointmentscheduler.service.AppointmentScheduler;
 
 import java.time.DayOfWeek;
 import java.util.Optional;
@@ -14,11 +15,11 @@ import javax.jws.soap.SOAPBinding.Style;
 import org.optaplanner.core.api.solver.Solver;
 import org.optaplanner.core.api.solver.SolverFactory;
 
-@WebService(endpointInterface = "hu.smartcampus.appointmentschedule.service.AppointmentSchedule")
+@WebService(endpointInterface = "hu.smartcampus.appointmentscheduler.service.AppointmentScheduler")
 @SOAPBinding(style = Style.RPC)
-public class AppointmentScheduleImpl implements AppointmentSchedule {
+public class AppointmentSchedulerImpl implements AppointmentScheduler {
 
-	private static final String SOLVER_CONFIG = "hu/smartcampus/appointmentschedule/solver/eventScheduleSolverConfig.xml";
+	private static final String SOLVER_CONFIG = "hu/smartcampus/appointmentscheduler/solver/eventScheduleSolverConfig.xml";
 
 	@Override
 	public Period getBestPeriod(String[] requiredLoginNames, String[] skippableLoginNames, int year, int weekOfYear, DayOfWeek[] daysOfWeek) {
