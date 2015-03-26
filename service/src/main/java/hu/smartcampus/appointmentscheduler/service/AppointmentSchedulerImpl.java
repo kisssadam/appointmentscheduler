@@ -21,11 +21,11 @@ public class AppointmentSchedulerImpl implements AppointmentScheduler {
 	private static final String SOLVER_CONFIG = "hu/smartcampus/appointmentscheduler/solver/eventScheduleSolverConfig.xml";
 
 	@Override
-	public Period getBestPeriod(String[] requiredLoginNames, String[] skippableLoginNames, int year, int weekOfYear, DayOfWeek[] daysOfWeek) {
+	public Period getBestPeriod(String[] requiredLoginNames, String[] skippableLoginNames, DayOfWeek[] daysOfWeek, int year, int weekOfYear, int minHour, int maxHour) {
 		SolverFactory solverFactory = SolverFactory.createFromXmlResource(SOLVER_CONFIG);
 		Solver solver = solverFactory.buildSolver();
 		
-		EventSchedule unsolvedEventSchedule = EventSchedule.createEventSchedule(requiredLoginNames, skippableLoginNames, year, weekOfYear, daysOfWeek);
+		EventSchedule unsolvedEventSchedule = EventSchedule.createEventSchedule(requiredLoginNames, skippableLoginNames, daysOfWeek, year, weekOfYear, minHour, maxHour);
 		solver.solve(unsolvedEventSchedule);
 		
 		EventSchedule solvedEventSchedule = (EventSchedule) solver.getBestSolution();

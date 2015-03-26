@@ -1,61 +1,26 @@
 package hu.smartcampus.appointmentscheduler.domain;
 
+import java.security.InvalidParameterException;
 import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
-import org.optaplanner.core.api.domain.valuerange.ValueRangeProvider;
 
 public class Timeslot implements Comparable<Timeslot>, Cloneable {
-
-	private static int minHour = 8;
-	private static int maxHour = 19;
 
 	private int hour;
 
 	public Timeslot() {
-		super();
+		this(0);
 	}
 
 	public Timeslot(int hour) {
 		super();
-		if (hour < minHour || hour > maxHour) {
+		if (hour < 0 || hour > 23) {
 			StringBuilder sb = new StringBuilder(60);
-			sb.append("Hour should be between ");
-			sb.append(minHour);
-			sb.append(" and ");
-			sb.append(maxHour);
-			sb.append(", but the given value is ");
+			sb.append("Hour should be between 0 and 24, but the given value is ");
 			sb.append(hour);
 			sb.append(".");
-			throw new IndexOutOfBoundsException(sb.toString());
+			throw new InvalidParameterException(sb.toString());
 		}
 		this.hour = hour;
-	}
-
-	@ValueRangeProvider(id = "periodRange")
-	public static List<Timeslot> getPossibleTimeslots() {
-		return IntStream.rangeClosed(minHour, maxHour)
-						.mapToObj(hour -> new Timeslot(hour))
-						.distinct()
-						.collect(Collectors.toList());
-	}
-
-	public static int getMinHour() {
-		return minHour;
-	}
-
-	public static void setMinHour(int minHour) {
-		Timeslot.minHour = minHour;
-	}
-
-	public static int getMaxHour() {
-		return maxHour;
-	}
-
-	public static void setMaxHour(int maxHour) {
-		Timeslot.maxHour = maxHour;
 	}
 
 	public int getHour() {
@@ -100,10 +65,10 @@ public class Timeslot implements Comparable<Timeslot>, Cloneable {
 		}
 		return true;
 	}
-	
+
 	@Override
 	protected Object clone() {
-		return new Timeslot(hour);
+		return new Timeslot(this.hour);
 	}
 
 	@Override

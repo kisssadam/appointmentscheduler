@@ -32,7 +32,8 @@ import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
 @PlanningSolution
 public class EventSchedule implements Solution<HardSoftScore>, PlanningCloneable<EventSchedule> {
 
-	/* TODO at kellene alakitani LocalDateTime-ra az entitiket ez alapjan:
+	/*
+	 * TODO at kellene alakitani LocalDateTime-ra az entitiket ez alapjan:
 	 * https://weblogs.java.net/blog/montanajava/archive/2014/06/17/using-java-8-datetime-classes-jpa
 	 */
 	private static final EntityManagerFactory ENTITY_MANAGER_FACTORY;
@@ -42,18 +43,25 @@ public class EventSchedule implements Solution<HardSoftScore>, PlanningCloneable
 	private static final SimpleDateFormat YEAR_DATE_FORMAT;
 	private static final SimpleDateFormat HOUR_DATE_FORMAT;
 	private static final SimpleDateFormat MINUTE_DATE_FORMAT;
-	
+
 	private EntityManager entityManager;
+	private List<String> requiredLoginNames;
+	private List<String> skippableLoginNames;
+	private List<String> mergedLoginNames;
+	private List<DayOfWeek> daysOfWeek;
+	private int year;
+	private int weekOfYear;
+	private int minHour;
+	private int maxHour;
 	private List<User> users;
 	private List<Event> events;
-	private List<DayOfWeek> daysOfWeek;
 	private HardSoftScore score;
 
 	static {
 		ENTITY_MANAGER_FACTORY = Persistence.createEntityManagerFactory("SMARTCAMPUS");
-		
+
 		BUDAPEST_TIME_ZONE = TimeZone.getTimeZone("Europe/Budapest");
-		
+
 		DAY_DATE_FORMAT = new SimpleDateFormat("EEEE");
 		DAY_DATE_FORMAT.setTimeZone(BUDAPEST_TIME_ZONE);
 
@@ -70,147 +78,230 @@ public class EventSchedule implements Solution<HardSoftScore>, PlanningCloneable
 		MINUTE_DATE_FORMAT.setTimeZone(BUDAPEST_TIME_ZONE);
 	}
 
-	public static EventSchedule createEventSchedule(String[] requiredLoginNames, String[] skippableLoginNames, int year, int weekOfYear, DayOfWeek[] daysOfWeek) {
-		return new EventSchedule(Arrays.asList(requiredLoginNames), Arrays.asList(skippableLoginNames), year, weekOfYear, Arrays.asList(daysOfWeek));
+	public static EventSchedule createEventSchedule(String[] requiredLoginNames, String[] skippableLoginNames, DayOfWeek[] daysOfWeek, int year, int weekOfYear, int minHour, int maxHour) {
+		return new EventSchedule(requiredLoginNames, skippableLoginNames, daysOfWeek, year, weekOfYear, minHour, maxHour);
 	}
-	
+
 	private EventSchedule() {
 		super();
 	}
-	
-	private EventSchedule(List<String> requiredLoginNames, List<String> skippableLoginNames, int year, int weekOfYear, List<DayOfWeek> daysOfWeek) {
+
+	private EventSchedule(String[] requiredLoginNames, String[] skippableLoginNames, DayOfWeek[] daysOfWeek, int year, int weekOfYear, int minHour, int maxHour) {
 		this.entityManager = ENTITY_MANAGER_FACTORY.createEntityManager();
-		
-		List<String> mergedLoginNames = Stream.concat(requiredLoginNames.stream(), skippableLoginNames.stream()).distinct().collect(Collectors.toList());
+
+		this.requiredLoginNames = Arrays.stream(requiredLoginNames).distinct().collect(Collectors.toList());
+		this.skippableLoginNames = Arrays.stream(skippableLoginNames).filter(loginName -> !this.requiredLoginNames.contains(loginName)).distinct().collect(Collectors.toList());
+		this.mergedLoginNames = Stream.concat(this.requiredLoginNames.stream(), this.skippableLoginNames.stream()).distinct().collect(Collectors.toList());
+
+		this.daysOfWeek = Arrays.asList(daysOfWeek);
+		this.year = year;
+		this.weekOfYear = weekOfYear;
+		this.minHour = minHour;
+		this.maxHour = maxHour;
 
 		List<TUser> queriedTUsers = queryTUsers(mergedLoginNames);
-		List<TEvent> everyTEvent = getEveryTEventFromTUsers(queriedTUsers);
+		this.users = createUsersFromTUsers(queriedTUsers);
 
-		this.users = createUsersFromTUsers(queriedTUsers, requiredLoginNames);
-		this.daysOfWeek = daysOfWeek;
-		this.events = createEventsFromTEvents(everyTEvent, mergedLoginNames, year, weekOfYear, daysOfWeek);
+		List<TEvent> everyTEvent = getEveryTEventFromTUsers(queriedTUsers);
+		this.events = createEventsFromTEvents(everyTEvent);
 
 		// Add conflicting events that should be moved by the algorithm
-		this.events.add(new Event("Movable event", new Period(daysOfWeek.get(0), events.get(0).getPeriod().getTimeslot()), users, false));
+		Period conflictingPeriod = new Period(this.daysOfWeek.get(0), events.get(0).getPeriod().getTimeslot());
+		boolean isLocked = false;
+
+		this.events.add(new Event("Movable event", conflictingPeriod, this.users, isLocked));
 	}
-	
-	
+
 	private List<TUser> queryTUsers(List<String> loginNames) {
 		TypedQuery<TUser> tUserQuery = entityManager.createQuery("SELECT t FROM TUser t WHERE t.loginName IN :loginNames", TUser.class);
+
 		tUserQuery.setParameter("loginNames", loginNames);
-		
-		List<TUser> result = tUserQuery.getResultList();
-		
-		return result;
+
+		return tUserQuery.getResultList();
 	}
-	
+
 	private List<TEvent> getEveryTEventFromTUsers(List<TUser> queriedTUsers) {
 		return queriedTUsers.stream()
-				.flatMap(tUser -> new ArrayList<>(tUser.getTEvents()).stream())
-				.distinct()
-				.collect(Collectors.toList());
+							.flatMap(tUser -> new ArrayList<>(tUser.getTEvents()).stream())
+							.distinct()
+							.collect(Collectors.toList());
 	}
-	
-	private List<User> createUsersFromTUsers(List<TUser> queriedTUsers, List<String> requiredLoginNames) {
-		return queriedTUsers.stream()
-				.map(tUser -> {
-					boolean isSkippable = !requiredLoginNames.contains(tUser.getLoginName());
-					return new User(tUser.getDisplayName(), tUser.getLoginName(), isSkippable);
-				})
-				.distinct()
-				.sorted()
-				.collect(Collectors.toList());
+
+	private List<User> createUsersFromTUsers(List<TUser> queriedTUsers) {
+		return queriedTUsers.stream().map(tUser -> {
+			boolean isSkippable = !this.requiredLoginNames.contains(tUser.getLoginName());
+			String displayName = tUser.getDisplayName();
+			String loginName = tUser.getLoginName();
+			
+			return new User(displayName, loginName, isSkippable);
+		})
+		.distinct()
+		.sorted()
+		.collect(Collectors.toList());
 	}
-	
-	private List<Event> createEventsFromTEvents(List<TEvent> everyTEvent, List<String> loginNames, int year, int weekOfYear, List<DayOfWeek> requiredDays) {
-		return everyTEvent.stream()
-				.filter(tEvent -> Integer.parseInt(YEAR_DATE_FORMAT.format(tEvent.getEventStart())) == year)
-				.filter(tEvent -> Integer.parseInt(WEEK_DATE_FORMAT.format(tEvent.getEventStart())) == weekOfYear)
-				.filter(tEvent -> requiredDays.contains(DayOfWeek.valueOf(DAY_DATE_FORMAT.format(tEvent.getEventStart()).toUpperCase())))
+
+	private List<Event> createEventsFromTEvents(List<TEvent> everyTEvent) {
+		List<? super Period> possiblePeriods = getPossiblePeriods();
+		
+		return everyTEvent
+				.stream()
+				.filter(tEvent -> Integer.parseInt(YEAR_DATE_FORMAT.format(tEvent.getEventStart())) == this.year)
+				.filter(tEvent -> Integer.parseInt(WEEK_DATE_FORMAT.format(tEvent.getEventStart())) == this.weekOfYear)
+				.filter(tEvent -> this.daysOfWeek.contains(DayOfWeek.valueOf(DAY_DATE_FORMAT.format(tEvent.getEventStart()).toUpperCase())))
 				.flatMap(new Function<TEvent, Stream<? extends Event>>() {
-					
+
 					@Override
 					public Stream<? extends Event> apply(TEvent tEvent) {
 						Timestamp eventStart = tEvent.getEventStart();
 						Timestamp eventEnd = tEvent.getEventEnd();
-						
+
 						String title = tEvent.getTitle();
-						List<User> usersOfEvent = getRequiredUsersOfEvent(tEvent, loginNames);
+						List<User> usersOfEvent = getRequiredUsersOfTEvent(tEvent);
 						boolean locked = true;
-						
+
 						List<Period> periods = createPeriodsFromTimestamps(eventStart, eventEnd);
 						return periods.stream().map(period -> new Event(title, period, usersOfEvent, locked));
 					}
 				})
+				.filter(event -> possiblePeriods.contains(event.getPeriod()))
 				.distinct()
 				.collect(Collectors.toList());
 	}
 	
-	private List<User> getRequiredUsersOfEvent(TEvent tEvent, List<String> loginNames) {
-		return new ArrayList<>(tEvent.getTUsers()).stream()
-				.filter(tUser -> loginNames.contains(tUser.getLoginName()))
+
+	private List<User> getRequiredUsersOfTEvent(TEvent tEvent) {
+		return new ArrayList<>(tEvent.getTUsers())
+				.stream()
+				.filter(tUser -> this.mergedLoginNames.contains(tUser.getLoginName()))
 				.map(tUser -> getUserByLoginName(tUser.getLoginName()))
 				.distinct()
 				.collect(Collectors.toList());
 	}
 	
+
 	private User getUserByLoginName(String loginName) {
-		Optional<User> result = this.users.stream()
-				.filter(user -> user.getLoginName().equals(loginName))
-				.findFirst();
+		Optional<User> result = this.users.stream().filter(user -> user.getLoginName().equals(loginName)).findFirst();
 		return result.isPresent() ? result.get() : null;
 	}
-	
-	private static List<Period> createPeriodsFromTimestamps(Timestamp eventStart, Timestamp eventEnd) {
+
+	private List<Period> createPeriodsFromTimestamps(Timestamp eventStart, Timestamp eventEnd) {
 		DayOfWeek dayOfWeek = DayOfWeek.valueOf(DAY_DATE_FORMAT.format(eventStart).toUpperCase());
-		
+
 		int rangeMinValue = Integer.parseInt(HOUR_DATE_FORMAT.format(eventStart));
-		int rangeMaxValue = Integer.parseInt(HOUR_DATE_FORMAT.format(eventEnd));
-		int eventEndMinute = Integer.parseInt(MINUTE_DATE_FORMAT.format(eventStart));
+//		rangeMinValue = rangeMinValue < this.minHour ? this.minHour : rangeMinValue;
 		
+		int rangeMaxValue = Integer.parseInt(HOUR_DATE_FORMAT.format(eventEnd));
+//		rangeMaxValue = rangeMaxValue > this.maxHour ? this.maxHour : rangeMaxValue;
+		
+		int eventEndMinute = Integer.parseInt(MINUTE_DATE_FORMAT.format(eventStart));
+
 		if (rangeMinValue == rangeMaxValue || eventEndMinute != 0) {
 			rangeMaxValue++;
 		}
-		
+
 		return IntStream.range(rangeMinValue, rangeMaxValue)
-						.mapToObj(hour -> new Period(dayOfWeek, new Timeslot(hour)))
-						.distinct()
-						.collect(Collectors.toList());
+				.mapToObj(hour -> new Period(dayOfWeek, new Timeslot(hour)))
+				.distinct()
+				.collect(Collectors.toList());
+	}
+
+	public EntityManager getEntityManager() {
+		return this.entityManager;
 	}
 	
+	public void setEntityManager(EntityManager entityManager) {
+		this.entityManager = entityManager;
+	}
+	
+	public List<String> getRequiredLoginNames() {
+		return this.requiredLoginNames;
+	}
+
+	public void setRequiredLoginNames(List<String> requiredLoginNames) {
+		this.requiredLoginNames = requiredLoginNames;
+	}
+
+	public List<String> getSkippableLoginNames() {
+		return this.skippableLoginNames;
+	}
+
+	public void setSkippableLoginNames(List<String> skippableLoginNames) {
+		this.skippableLoginNames = skippableLoginNames;
+	}
+
+	public List<String> getMergedLoginNames() {
+		return this.mergedLoginNames;
+	}
+
+	public void setMergedLoginNames(List<String> mergedLoginNames) {
+		this.mergedLoginNames = mergedLoginNames;
+	}
+
+	public List<DayOfWeek> getDaysOfWeek() {
+		return this.daysOfWeek;
+	}
+
+	public void setDaysOfWeek(List<DayOfWeek> daysOfWeek) {
+		this.daysOfWeek = daysOfWeek;
+	}
+
+	public int getYear() {
+		return this.year;
+	}
+
+	public void setYear(int year) {
+		this.year = year;
+	}
+
+	public int getWeekOfYear() {
+		return this.weekOfYear;
+	}
+
+	public void setWeekOfYear(int weekOfYear) {
+		this.weekOfYear = weekOfYear;
+	}
+
+	public int getMinHour() {
+		return this.minHour;
+	}
+
+	public void setMinHour(int minHour) {
+		this.minHour = minHour;
+	}
+
+	public int getMaxHour() {
+		return this.maxHour;
+	}
+
+	public void setMaxHour(int maxHour) {
+		this.maxHour = maxHour;
+	}
+
 	public List<User> getUsers() {
 		return this.users;
 	}
-	
+
 	public void setUsers(List<User> users) {
 		this.users = users;
-	}
-	
-	@Override
-	public HardSoftScore getScore() {
-		return this.score;
-	}
-	
-	@Override
-	public void setScore(HardSoftScore score) {
-		this.score = score;
 	}
 	
 	@PlanningEntityCollectionProperty
 	public List<Event> getEvents() {
 		return this.events;
 	}
-
+	
 	public void setEvents(List<Event> events) {
 		this.events = events;
 	}
 
-	public List<DayOfWeek> getDaysOfWeek() {
-		return this.daysOfWeek;
+	@Override
+	public HardSoftScore getScore() {
+		return this.score;
 	}
-	
-	public void setDaysOfWeek(List<DayOfWeek> daysOfWeek) {
-		this.daysOfWeek = daysOfWeek;
+
+	@Override
+	public void setScore(HardSoftScore score) {
+		this.score = score;
 	}
 
 	/**
@@ -223,10 +314,15 @@ public class EventSchedule implements Solution<HardSoftScore>, PlanningCloneable
 
 	@ValueRangeProvider(id = "periodRange")
 	public List<? super Period> getPossiblePeriods() {
-		return this.daysOfWeek.stream()
-							  .flatMap(day -> Timeslot.getPossibleTimeslots().stream().map(timeslot -> new Period(day, timeslot)))
-							  .distinct()
-							  .collect(Collectors.toList());
+		return this.daysOfWeek
+				.stream()
+				.flatMap(day -> getPossibleTimeslots().stream().map(timeslot -> new Period(day, timeslot)))
+				.distinct()
+				.collect(Collectors.toList());
+	}
+
+	private List<Timeslot> getPossibleTimeslots() {
+		return IntStream.rangeClosed(this.minHour, this.maxHour).mapToObj(hour -> new Timeslot(hour)).distinct().collect(Collectors.toList());
 	}
 
 	@Override
@@ -247,11 +343,18 @@ public class EventSchedule implements Solution<HardSoftScore>, PlanningCloneable
 	public EventSchedule planningClone() {
 		EventSchedule clone = new EventSchedule();
 		
+		clone.setRequiredLoginNames(this.requiredLoginNames);
+		clone.setSkippableLoginNames(this.skippableLoginNames);
+		clone.setMergedLoginNames(this.mergedLoginNames);
 		clone.setDaysOfWeek(this.daysOfWeek);
-		clone.setScore(this.score);
+		clone.setYear(this.year);
+		clone.setWeekOfYear(this.weekOfYear);
+		clone.setMinHour(this.minHour);
+		clone.setMaxHour(this.maxHour);
 		clone.setUsers(this.users);
 		clone.setEvents(this.events.stream().map(event -> event.clone()).collect(Collectors.toList()));
-		
+		clone.setScore(this.score);
+
 		return clone;
 	}
 

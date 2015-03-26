@@ -14,6 +14,6 @@ import hu.smartcampus.appointmentscheduler.domain.Period;
 public interface AppointmentScheduler {
 
 	@WebMethod
-	Period getBestPeriod(String[] requiredLoginNames, String[] skippableLoginNames, int year, int weekOfYear, DayOfWeek[] daysOfWeek);
+	Period getBestPeriod(String[] requiredLoginNames, String[] skippableLoginNames, DayOfWeek[] daysOfWeek, int year, int weekOfYear, int minHour, int maxHour);
 	
 }
