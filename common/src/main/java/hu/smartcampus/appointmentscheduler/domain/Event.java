@@ -2,7 +2,7 @@ package hu.smartcampus.appointmentscheduler.domain;
 
 import hu.smartcampus.appointmentscheduler.domain.solver.EventDifficultyComparator;
 import hu.smartcampus.appointmentscheduler.domain.solver.MovableEventSelectionFilter;
-import hu.smartcampus.appointmentscheduler.domain.solver.PeriodStrengthWeightFactory;
+import hu.smartcampus.appointmentscheduler.domain.solver.PeriodStrengthComparator;
 
 import java.io.Serializable;
 import java.time.DayOfWeek;
@@ -43,7 +43,7 @@ public class Event implements Serializable, Comparable<Event>, Cloneable {
 	}
 	
 	@PlanningVariable(valueRangeProviderRefs = {"periodRange"},
-					  strengthWeightFactoryClass = PeriodStrengthWeightFactory.class)
+					  strengthComparatorClass = PeriodStrengthComparator.class)
 	public Period getPeriod() {
 		return this.period;
 	}
@@ -67,13 +67,15 @@ public class Event implements Serializable, Comparable<Event>, Cloneable {
 	public void setLocked(boolean locked) {
 		this.locked = locked;
 	}
-	
+
 	@Override
 	public int hashCode() {
-		final int prime = 127;
+		final int prime = 31;
 		int result = 1;
+		result = prime * result + (this.locked ? 1231 : 1237);
 		result = prime * result + ((this.period == null) ? 0 : this.period.hashCode());
 		result = prime * result + ((this.title == null) ? 0 : this.title.hashCode());
+		result = prime * result + ((this.users == null) ? 0 : this.users.hashCode());
 		return result;
 	}
 
@@ -89,6 +91,9 @@ public class Event implements Serializable, Comparable<Event>, Cloneable {
 			return false;
 		}
 		Event other = (Event) obj;
+		if (this.locked != other.locked) {
+			return false;
+		}
 		if (this.period == null) {
 			if (other.period != null) {
 				return false;
@@ -103,6 +108,13 @@ public class Event implements Serializable, Comparable<Event>, Cloneable {
 		} else if (!this.title.equals(other.title)) {
 			return false;
 		}
+		if (this.users == null) {
+			if (other.users != null) {
+				return false;
+			}
+		} else if (!this.users.equals(other.users)) {
+			return false;
+		}
 		return true;
 	}
 
@@ -113,8 +125,8 @@ public class Event implements Serializable, Comparable<Event>, Cloneable {
 		builder.append(this.title);
 		builder.append(", period=");
 		builder.append(this.period);
-		builder.append(", locked=");
-		builder.append(this.locked);
+		builder.append(", users=");
+		builder.append(this.users);
 		builder.append("]");
 		return builder.toString();
 	}

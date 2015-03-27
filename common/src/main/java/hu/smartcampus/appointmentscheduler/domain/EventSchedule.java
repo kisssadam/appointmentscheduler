@@ -27,15 +27,18 @@ import org.optaplanner.core.api.domain.solution.PlanningSolution;
 import org.optaplanner.core.api.domain.solution.Solution;
 import org.optaplanner.core.api.domain.solution.cloner.PlanningCloneable;
 import org.optaplanner.core.api.domain.valuerange.ValueRangeProvider;
-import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
+import org.optaplanner.core.api.score.buildin.hardmediumsoft.HardMediumSoftScore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @PlanningSolution
-public class EventSchedule implements Solution<HardSoftScore>, PlanningCloneable<EventSchedule> {
+public class EventSchedule implements Solution<HardMediumSoftScore>, PlanningCloneable<EventSchedule> {
 
 	/*
 	 * TODO at kellene alakitani LocalDateTime-ra az entitiket ez alapjan:
 	 * https://weblogs.java.net/blog/montanajava/archive/2014/06/17/using-java-8-datetime-classes-jpa
 	 */
+	private static final Logger logger = LoggerFactory.getLogger(EventSchedule.class);
 	private static final EntityManagerFactory ENTITY_MANAGER_FACTORY;
 	private static final TimeZone BUDAPEST_TIME_ZONE;
 	private static final SimpleDateFormat DAY_DATE_FORMAT;
@@ -55,7 +58,7 @@ public class EventSchedule implements Solution<HardSoftScore>, PlanningCloneable
 	private int maxHour;
 	private List<User> users;
 	private List<Event> events;
-	private HardSoftScore score;
+	private HardMediumSoftScore score;
 
 	static {
 		ENTITY_MANAGER_FACTORY = Persistence.createEntityManagerFactory("SMARTCAMPUS");
@@ -106,7 +109,9 @@ public class EventSchedule implements Solution<HardSoftScore>, PlanningCloneable
 		this.events = createEventsFromTEvents(everyTEvent);
 
 		// Add conflicting events that should be moved by the algorithm
-		Period conflictingPeriod = new Period(this.daysOfWeek.get(0), events.get(0).getPeriod().getTimeslot());
+		DayOfWeek conflictingDay = this.daysOfWeek.isEmpty() ? DayOfWeek.MONDAY : this.daysOfWeek.get(0);
+		Timeslot conflictingTimeslot = this.events.isEmpty() ? new Timeslot(0) : this.events.get(0).getPeriod().getTimeslot();
+		Period conflictingPeriod = new Period(conflictingDay, conflictingTimeslot);
 		boolean isLocked = false;
 
 		this.events.add(new Event("Movable event", conflictingPeriod, this.users, isLocked));
@@ -143,7 +148,7 @@ public class EventSchedule implements Solution<HardSoftScore>, PlanningCloneable
 	private List<Event> createEventsFromTEvents(List<TEvent> everyTEvent) {
 		List<? super Period> possiblePeriods = getPossiblePeriods();
 		
-		return everyTEvent
+		List<Event> result = everyTEvent
 				.stream()
 				.filter(tEvent -> Integer.parseInt(YEAR_DATE_FORMAT.format(tEvent.getEventStart())) == this.year)
 				.filter(tEvent -> Integer.parseInt(WEEK_DATE_FORMAT.format(tEvent.getEventStart())) == this.weekOfYear)
@@ -166,6 +171,8 @@ public class EventSchedule implements Solution<HardSoftScore>, PlanningCloneable
 				.filter(event -> possiblePeriods.contains(event.getPeriod()))
 				.distinct()
 				.collect(Collectors.toList());
+		result.forEach(event -> logger.trace(event.toString()));
+		return result;
 	}
 	
 
@@ -188,10 +195,7 @@ public class EventSchedule implements Solution<HardSoftScore>, PlanningCloneable
 		DayOfWeek dayOfWeek = DayOfWeek.valueOf(DAY_DATE_FORMAT.format(eventStart).toUpperCase());
 
 		int rangeMinValue = Integer.parseInt(HOUR_DATE_FORMAT.format(eventStart));
-//		rangeMinValue = rangeMinValue < this.minHour ? this.minHour : rangeMinValue;
-		
 		int rangeMaxValue = Integer.parseInt(HOUR_DATE_FORMAT.format(eventEnd));
-//		rangeMaxValue = rangeMaxValue > this.maxHour ? this.maxHour : rangeMaxValue;
 		
 		int eventEndMinute = Integer.parseInt(MINUTE_DATE_FORMAT.format(eventStart));
 
@@ -295,12 +299,12 @@ public class EventSchedule implements Solution<HardSoftScore>, PlanningCloneable
 	}
 
 	@Override
-	public HardSoftScore getScore() {
+	public HardMediumSoftScore getScore() {
 		return this.score;
 	}
 
 	@Override
-	public void setScore(HardSoftScore score) {
+	public void setScore(HardMediumSoftScore score) {
 		this.score = score;
 	}
 
@@ -313,12 +317,18 @@ public class EventSchedule implements Solution<HardSoftScore>, PlanningCloneable
 	}
 
 	@ValueRangeProvider(id = "periodRange")
-	public List<? super Period> getPossiblePeriods() {
-		return this.daysOfWeek
-				.stream()
-				.flatMap(day -> getPossibleTimeslots().stream().map(timeslot -> new Period(day, timeslot)))
-				.distinct()
-				.collect(Collectors.toList());
+	public List<Period> getPossiblePeriods() {
+		List<Timeslot> possibleTimeslots = getPossibleTimeslots();
+		List<Period> possiblePeriods = new ArrayList<>(daysOfWeek.size() * possibleTimeslots.size());
+		
+		this.daysOfWeek.forEach(dayOfWeek -> {
+			possibleTimeslots.forEach(timeslot -> {
+				possiblePeriods.add(new Period(dayOfWeek, timeslot));
+			});
+		});
+		
+		logger.trace("Possible periods are {}.", possiblePeriods);
+		return possiblePeriods;
 	}
 
 	private List<Timeslot> getPossibleTimeslots() {

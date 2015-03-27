@@ -8,29 +8,34 @@
 	<entityClass>hu.smartcampus.appointmentscheduler.domain.Event</entityClass>
 
 	<scoreDirectorFactory>
-		<scoreDefinitionType>HARD_SOFT</scoreDefinitionType>
+		<scoreDefinitionType>HARD_MEDIUM_SOFT</scoreDefinitionType>
 		<easyScoreCalculatorClass>hu.smartcampus.appointmentscheduler.domain.solver.EventScheduleSimpleScoreCalculator</easyScoreCalculatorClass>
 	</scoreDirectorFactory>
 
 	<termination>
-		<terminationCompositionStyle>OR</terminationCompositionStyle>
-		<bestScoreLimit>0hard/0soft</bestScoreLimit>
+		<!-- <terminationCompositionStyle>OR</terminationCompositionStyle>
+		<bestScoreLimit>0hard/0soft</bestScoreLimit> -->
 		<secondsSpentLimit>10</secondsSpentLimit>
 	</termination>
 
 	<constructionHeuristic>
-		<constructionHeuristicType>FIRST_FIT</constructionHeuristicType>
+		<!-- <constructionHeuristicType>FIRST_FIT</constructionHeuristicType> -->
+		<constructionHeuristicType>WEAKEST_FIT</constructionHeuristicType>
+		<!-- <constructionHeuristicType>STRONGEST_FIT</constructionHeuristicType> -->
 	</constructionHeuristic>
 
 	<localSearch>
+		<changeMoveSelector>
+			<selectionOrder>ORIGINAL</selectionOrder>
+		</changeMoveSelector>
 		<termination>
-			<unimprovedStepCountLimit>100</unimprovedStepCountLimit>
+			<unimprovedStepCountLimit>1000</unimprovedStepCountLimit>
 		</termination>
     	<acceptor>
-      		<simulatedAnnealingStartingTemperature>0hard/0soft</simulatedAnnealingStartingTemperature>
+      		<simulatedAnnealingStartingTemperature>9999hard/9999medium/9999soft</simulatedAnnealingStartingTemperature>
     	</acceptor>
     	<forager>
-      		<acceptedCountLimit>1</acceptedCountLimit>
+      		<acceptedCountLimit>15</acceptedCountLimit>
     	</forager>
   </localSearch>
 </solver>
