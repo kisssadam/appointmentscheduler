@@ -6,6 +6,7 @@ import hu.smartcampus.appointmentscheduler.service.AppointmentScheduler;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.DayOfWeek;
+import java.util.UUID;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
@@ -34,9 +35,15 @@ public class Client {
 		int minHour = 8;
 		int maxHour = 16;
 		
-		Period period = appointmentSchedulerService.getBestPeriod(requiredLoginNames, skippableLoginNames, daysOfWeek, year, weekOfYear, minHour, maxHour);
+		logger.info("Calling createAppointmentScheduler().");
+		UUID requestId = appointmentSchedulerService.createAppointmentScheduler(requiredLoginNames, skippableLoginNames, daysOfWeek, year, weekOfYear, minHour, maxHour);
+		logger.info("Request id: {}", requestId);
+		
+		appointmentSchedulerService.startSolving(requestId);
+		Period period = appointmentSchedulerService.getBestPeriod(requestId);
 		
 		System.out.println(period);
+		
 		logger.info("Exiting client.");
 	}
 

@@ -21,7 +21,7 @@
 				value="jdbc:oracle:thin:@db.inf.unideb.hu:1521:ora11g" />
 			<property name="javax.persistence.jdbc.user" value="${SCUSERNAME}" />
 			<property name="javax.persistence.jdbc.password" value="${SCPASSWORD}" />
-			<property name="eclipselink.logging.level" value="FINE" />
+			<property name="eclipselink.logging.level" value="INFO" />
 			<!-- http://eclipse.org/eclipselink/documentation/2.5/jpa/extensions/p_logging_level.htm -->
 		</properties>
 	</persistence-unit>
