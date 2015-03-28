@@ -13,8 +13,8 @@
 	</scoreDirectorFactory>
 
 	<termination>
-		<!-- <terminationCompositionStyle>OR</terminationCompositionStyle>
-		<bestScoreLimit>0hard/0soft</bestScoreLimit> -->
+		<terminationCompositionStyle>OR</terminationCompositionStyle>
+		<bestScoreLimit>0hard/0medium/0soft</bestScoreLimit>
 		<secondsSpentLimit>10</secondsSpentLimit>
 	</termination>
 
@@ -29,13 +29,13 @@
 			<selectionOrder>ORIGINAL</selectionOrder>
 		</changeMoveSelector>
 		<termination>
-			<unimprovedStepCountLimit>1000</unimprovedStepCountLimit>
+			<unimprovedStepCountLimit>300</unimprovedStepCountLimit>
 		</termination>
     	<acceptor>
       		<simulatedAnnealingStartingTemperature>9999hard/9999medium/9999soft</simulatedAnnealingStartingTemperature>
     	</acceptor>
     	<forager>
-      		<acceptedCountLimit>15</acceptedCountLimit>
+      		<acceptedCountLimit>300</acceptedCountLimit>
     	</forager>
   </localSearch>
 </solver>
