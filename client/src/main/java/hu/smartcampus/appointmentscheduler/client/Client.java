@@ -1,12 +1,15 @@
 package hu.smartcampus.appointmentscheduler.client;
 
-import hu.smartcampus.appointmentscheduler.domain.Period;
 import hu.smartcampus.appointmentscheduler.service.AppointmentScheduler;
+import hu.smartcampus.appointmentscheduler.service.Schedule;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.DayOfWeek;
-import java.util.UUID;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
@@ -27,22 +30,23 @@ public class Client {
 		Service service = Service.create(url, qName);
 		AppointmentScheduler appointmentSchedulerService = service.getPort(AppointmentScheduler.class);
 		
-		String[] requiredLoginNames = new String[] { "KOLLARL", /*"KISSSANDORADAM",*/ /*"MKOSA", "PANOVICS",*/ "BURAIP", "SZAGNES" };
-		String[] skippableLoginNames = new String[] { /*"BURAIP", "VAGNERA"*/ };
+		String[] requiredLoginNames = new String[] { "KOLLARL", /*"KISSSANDORADAM",*/ "MKOSA", "PANOVICS", /*"BURAIP",*/ "SZAGNES" };
+		String[] skippableLoginNames = new String[] { "BURAIP"/*, "VAGNERA"*/ };
 		DayOfWeek[] daysOfWeek = { /*DayOfWeek.SUNDAY,*/ DayOfWeek.TUESDAY };
 		int year = 2015;
 		int weekOfYear = 14;
 		int minHour = 8;
-		int maxHour = 16;
+		int maxHour = 19;
 		
-		logger.info("Calling createAppointmentScheduler().");
-		UUID requestId = appointmentSchedulerService.createAppointmentScheduler(requiredLoginNames, skippableLoginNames, daysOfWeek, year, weekOfYear, minHour, maxHour);
-		logger.info("Request id: {}", requestId);
-		
-		appointmentSchedulerService.startSolving(requestId);
-		Period period = appointmentSchedulerService.getBestPeriod(requestId);
-		
-		System.out.println(period);
+		Schedule schedule = appointmentSchedulerService.schedule(requiredLoginNames, skippableLoginNames, daysOfWeek, year, weekOfYear, minHour, maxHour);
+		List<String> availableUserNames = schedule.getAvailableUsers() == null ? new ArrayList<>() : Arrays.stream(schedule.getAvailableUsers()).map(user -> user.getLoginName()).collect(Collectors.toList());
+		List<String> unavailableUserNames = schedule.getUnavailableUsers() == null ? new ArrayList<>() : Arrays.stream(schedule.getUnavailableUsers()).map(user -> user.getLoginName()).collect(Collectors.toList());
+		System.out.println("Available users: " + availableUserNames);
+		System.out.println("Unavailable users: " + unavailableUserNames);
+		System.out.println("Year: " + schedule.getYear());
+		System.out.println("WeekOfYear: " + schedule.getWeekOfYear());
+		System.out.println("DayOfWeek: " + schedule.getDayOfWeek());
+		System.out.println("Hour: " + schedule.getHour());
 		
 		logger.info("Exiting client.");
 	}
