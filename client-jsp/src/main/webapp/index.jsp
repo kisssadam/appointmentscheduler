@@ -90,7 +90,7 @@
 								<label>Days:</label>
 							</td>
 							<td>
-								<select name="daysOfWeek" multiple="multiple" size="<%=DayOfWeek.values().length%>">
+								<select name="daysOfWeek" multiple="multiple" size="<%=DayOfWeek.values().length%>" required="required">
 									<%
 										for (DayOfWeek dayOfWeek : DayOfWeek.values()) {
 									%>
