@@ -110,7 +110,7 @@ public class EventSchedule implements Solution<HardMediumSoftScore>, PlanningClo
 
 		// Add conflicting events that should be moved by the algorithm
 		DayOfWeek conflictingDay = this.daysOfWeek.isEmpty() ? DayOfWeek.MONDAY : this.daysOfWeek.get(0);
-		Timeslot conflictingTimeslot = this.events.isEmpty() ? new Timeslot(0) : this.events.get(0).getPeriod().getTimeslot();
+		Timeslot conflictingTimeslot = this.events.isEmpty() ? new Timeslot(this.minHour) : this.events.get(0).getPeriod().getTimeslot();
 		Period conflictingPeriod = new Period(conflictingDay, conflictingTimeslot);
 		boolean isLocked = false;
 
