@@ -58,7 +58,7 @@
 			</tr>
 			<tr>
 				<td>
-					<select name="requiredUsers" multiple="multiple" size="20">
+					<select name="requiredLoginNames" multiple="multiple" size="20">
 						<%
 							for (User user : users) {
 						%>
@@ -71,7 +71,7 @@
 					</select>
 				</td>
 				<td>
-					<select name="skippableUsers" multiple="multiple" size="20">
+					<select name="skippableLoginNames" multiple="multiple" size="20">
 						<%
 							for (User user : users) {
 						%>
