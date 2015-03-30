@@ -98,7 +98,7 @@ public class User implements Cloneable, Comparable<User> {
 
 	@Override
 	public int compareTo(User otherUser) {
-		return Comparator.comparing(User::getLoginName).thenComparing(User::getDisplayName).compare(this, otherUser);
+		return Comparator.comparing(User::getDisplayName).thenComparing(User::getLoginName).compare(this, otherUser);
 	}
 
 }
