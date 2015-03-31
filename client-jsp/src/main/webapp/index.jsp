@@ -1,22 +1,25 @@
-<%@page language="java" pageEncoding="utf8" contentType="text/html;charset=UTF-8"%>
-<%@page import="java.time.temporal.TemporalField"%>
-<%@page import="java.util.Locale"%>
-<%@page import="java.time.temporal.WeekFields"%>
-<%@page import="java.time.LocalDate"%>
-<%@page import="java.time.DayOfWeek"%>
-<%@page import="java.util.Collections"%>
-<%@page import="java.util.ArrayList"%>
-<%@page import="java.util.stream.Collectors"%>
-<%@page import="java.util.List"%>
-<%@page import="javax.persistence.EntityManagerFactory"%>
-<%@page import="javax.persistence.EntityManager"%>
-<%@page import="javax.persistence.Persistence"%>
-<%@page import="javax.persistence.TypedQuery"%>
-<%@page import="hu.smartcampus.db.model.TUser"%>
-<%@page import="hu.smartcampus.appointmentscheduler.domain.User"%>
+<%@ page language="java" pageEncoding="utf8" contentType="text/html;charset=UTF-8"%>
+<%@ page import="java.time.DayOfWeek"%>
+<%@ page import="java.util.Collections"%>
+<%@ page import="java.util.ArrayList"%>
+<%@ page import="java.util.List"%>
+<%@ page import="javax.persistence.EntityManagerFactory"%>
+<%@ page import="javax.persistence.EntityManager"%>
+<%@ page import="javax.persistence.Persistence"%>
+<%@ page import="javax.persistence.TypedQuery"%>
+<%@ page import="hu.smartcampus.db.model.TUser"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%
+	EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("SMARTCAMPUS");
+	EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+	TypedQuery<TUser> query = entityManager.createNamedQuery("TUser.findAll", TUser.class);
+	List<TUser> users = query.getResultList();
+	Collections.sort(users);
+	request.setAttribute("userList", users);
+%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -34,15 +37,6 @@ table {
 </head>
 <body>
 	<h1>Appointment Scheduler</h1>
-	<%
-		EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("SMARTCAMPUS");
-		EntityManager entityManager = entityManagerFactory.createEntityManager();
-
-		TypedQuery<TUser> query = entityManager.createNamedQuery("TUser.findAll", TUser.class);
-		List<TUser> users = query.getResultList();
-		Collections.sort(users);
-		request.setAttribute("userList", users);
-	%>
 	<jsp:useBean id="now" class="java.util.Date" />
 	<div align="center" id="scheduler">
 		<form action="result.jsp" method="post" accept-charset="UTF-8">
@@ -58,12 +52,12 @@ table {
 					<tr>
 						<td><select name="requiredLoginNames" multiple="multiple" size="20">
 								<c:forEach items="${userList}" var="user">
-									<option value="${user.loginName}"><c:out value="${user.displayName} - ${user.loginName}" /></option>
+									<option value="${user.loginName}"><c:out value="${user.displayName} - &quot;${user.loginName}&quot;" /></option>
 								</c:forEach>
 						</select></td>
 						<td><select name="skippableLoginNames" multiple="multiple" size="20">
 								<c:forEach items="${userList}" var="user">
-									<option value="${user.loginName}"><c:out value="${user.displayName} - ${user.loginName}" /></option>
+									<option value="${user.loginName}"><c:out value="${user.displayName} - &quot;${user.loginName}&quot;" /></option>
 								</c:forEach>
 						</select></td>
 						<td>
