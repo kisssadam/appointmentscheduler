@@ -30,12 +30,12 @@ public class Client {
 		Service service = Service.create(url, qName);
 		AppointmentScheduler appointmentSchedulerService = service.getPort(AppointmentScheduler.class);
 		
-		String[] requiredLoginNames = new String[] { "KOLLARL", /*"KISSSANDORADAM",*/ "MKOSA", "PANOVICS", /*"BURAIP",*/ "SZAGNES" };
-		String[] skippableLoginNames = new String[] { "BURAIP"/*, "VAGNERA"*/ };
+		String[] requiredLoginNames = new String[] { /*"KOLLARL", /*"KISSSANDORADAM",*/ /*"MKOSA",*/ "PANOVICS", /*"BURAIP",*/ /*"SZAGNES"*/ };
+		String[] skippableLoginNames = new String[] { /*"BURAIP"/*, "VAGNERA"*/ };
 		DayOfWeek[] daysOfWeek = { /*DayOfWeek.SUNDAY,*/ DayOfWeek.TUESDAY };
 		int year = 2015;
 		int weekOfYear = 14;
-		int minHour = 8;
+		int minHour = 14;
 		int maxHour = 19;
 		
 		Schedule schedule = appointmentSchedulerService.schedule(requiredLoginNames, skippableLoginNames, daysOfWeek, year, weekOfYear, minHour, maxHour);

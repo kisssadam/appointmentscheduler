@@ -15,23 +15,20 @@
 <%@page import="hu.smartcampus.db.model.TUser"%>
 <%@page import="hu.smartcampus.appointmentscheduler.domain.User"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-
+<!DOCTYPE html>
 <html>
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<style>
-		input[type="number"] {
-		   width:100%;
-		}
-		body {
-			margin-left: auto;
-			margin-right: auto;
-			width: 50%;
-		}
-		table {
-			white-space: nowrap;
-		}
-	</style>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style>
+input[type="number"] {
+	width: 100%;
+}
+
+table {
+	border: 1px solid black;
+	white-space: nowrap;
+}
+</style>
 </head>
 <body>
 	<h1>Appointment Scheduler</h1>
@@ -47,92 +44,80 @@
 			users.add(new User(tUser.getDisplayName(), tUser.getLoginName(), false));
 		}
 		Collections.sort(users);
-		/* pageContext.setAttribute("users", users); */
+
+		request.setAttribute("userList", users);
 	%>
-	<form action="result.jsp" method="post" accept-charset="UTF-8">
-		<table>
-			<tr>
-				<td align="center"><label>Required users</label></td>
-				<td align="center"><label>Skippable users</label></td>
-				<td align="center"><label>Other settings</label></td>
-			</tr>
-			<tr>
-				<td>
-					<select name="requiredLoginNames" multiple="multiple" size="20">
-						<%
-							for (User user : users) {
-						%>
-						<option value="<%=user.getLoginName()%>">
-							<%=user.getDisplayName()%>
-						</option>
-						<%
-							}
-						%>
-					</select>
-				</td>
-				<td>
-					<select name="skippableLoginNames" multiple="multiple" size="20">
-						<%
-							for (User user : users) {
-						%>
-						<option value="<%=user.getLoginName()%>">
-							<%=user.getDisplayName()%>
-						</option>
-						<%
-							}
-						%>
-					</select>
-				</td>
-				<td>
-					<table>
-						<tr>
-							<td>
-								<label>Days:</label>
-							</td>
-							<td>
-								<select name="daysOfWeek" multiple="multiple" size="<%=DayOfWeek.values().length%>" required="required">
+	<div align="center" id="scheduler">
+		<form action="result.jsp" method="post" accept-charset="UTF-8">
+			<table>
+				<thead>
+					<tr>
+						<td align="center"><label>Required users</label></td>
+						<td align="center"><label>Skippable users</label></td>
+						<td align="center"><label>Other settings</label></td>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><select name="requiredLoginNames" multiple="multiple" size="20">
+								<c:forEach items="${userList}" var="user">
+									<option value="${user.loginName}">${user.displayName}-"${user.loginName}"</option>
+								</c:forEach>
+						</select></td>
+						<td><select name="skippableLoginNames" multiple="multiple" size="20">
+								<c:forEach items="${userList}" var="user">
+									<option value="${user.loginName}">${user.displayName}-"${user.loginName}"</option>
+								</c:forEach>
+						</select></td>
+						<td>
+							<table>
+								<tr>
+									<td><label>Days:</label></td>
+									<td><select name="daysOfWeek" multiple="multiple" size="<%=DayOfWeek.values().length%>"
+										required="required">
+											<%
+												for (DayOfWeek dayOfWeek : DayOfWeek.values()) {
+											%>
+											<option value="<%=dayOfWeek%>">
+												<%=dayOfWeek%>
+											</option>
+											<%
+												}
+											%>
+									</select></td>
+								</tr>
+								<tr>
+									<td>Year:</td>
+									<td align="left"><input type="number" name="year" min="2000" max="9999"
+										value="<%=LocalDate.now().getYear()%>" /></td>
+								</tr>
+								<tr>
+									<td>Week:</td>
 									<%
-										for (DayOfWeek dayOfWeek : DayOfWeek.values()) {
+										TemporalField weekOfYear = WeekFields.of(new Locale("hu_HU")).weekOfYear();
+										int weekNumber = LocalDate.now().get(weekOfYear);
 									%>
-									<option value="<%=dayOfWeek%>">
-										<%=dayOfWeek%>
-									</option>
-									<%
-										}
-									%>
-								</select>
-							</td>
-						</tr>
-						<tr>
-							<td>Year:</td>
-							<td align="left"><input type="number" name="year" min="2000" max="9999" value="<%=LocalDate.now().getYear()%>"/></td>
-						</tr>
-						<tr>
-							<td>Week:</td>
-							<%
-								TemporalField weekOfYear = WeekFields.of(new Locale("hu_HU")).weekOfYear();
-								int weekNumber = LocalDate.now().get(weekOfYear);
-							%>
-							<td align="left"><input type="number" name="weekOfYear" min="1" max="52" value="<%=weekNumber%>"/></td>
-						</tr>
-						<tr>
-							<td width="20em">Minimum hour:</td>
-							<td align="left"><input type="number" name="minHour" min="0" max="23" value="8"/></td>
-						</tr>
-						<tr>
-							<td>Maximum hour:</td>
-							<td align="left"><input type="number" name="maxHour" min="0" max="23" value="19"/></td>
-						</tr>
-					</table>
-				</td>
-			</tr>
-			<tr>
-				<td colspan="3" align="right">
-					<input type="reset"/>
-					<input type="submit" value="Schedule"/>
-				</td>
-			</tr>
-		</table>
-	</form>
+									<td align="left"><input type="number" name="weekOfYear" min="1" max="52" value="<%=weekNumber%>" /></td>
+								</tr>
+								<tr>
+									<td width="20em">Minimum hour:</td>
+									<td align="left"><input type="number" name="minHour" min="0" max="23" value="8" /></td>
+								</tr>
+								<tr>
+									<td>Maximum hour:</td>
+									<td align="left"><input type="number" name="maxHour" min="0" max="23" value="19" /></td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+				</tbody>
+				<tfoot>
+					<tr>
+						<td colspan="3" align="right"><input type="reset" /> <input type="submit" value="Schedule" /></td>
+					</tr>
+				</tfoot>
+			</table>
+		</form>
+	</div>
 </body>
 </html>

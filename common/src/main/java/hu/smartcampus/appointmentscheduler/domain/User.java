@@ -1,9 +1,11 @@
 package hu.smartcampus.appointmentscheduler.domain;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
-public class User implements Cloneable, Comparable<User> {
+public class User implements Cloneable, Comparable<User>, Serializable {
 
+	private static final long serialVersionUID = 1L;
 	private String displayName;
 	private String loginName;
 	private boolean skippable;

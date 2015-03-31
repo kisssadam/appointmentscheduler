@@ -146,8 +146,8 @@ public class EventSchedule implements Solution<HardMediumSoftScore>, PlanningClo
 	}
 
 	private List<Event> createEventsFromTEvents(List<TEvent> everyTEvent) {
+		logger.trace("Queried TEvents are: {}.", everyTEvent);
 		List<? super Period> possiblePeriods = getPossiblePeriods();
-		
 		List<Event> result = everyTEvent
 				.stream()
 				.filter(tEvent -> Integer.parseInt(YEAR_DATE_FORMAT.format(tEvent.getEventStart())) == this.year)
@@ -170,8 +170,9 @@ public class EventSchedule implements Solution<HardMediumSoftScore>, PlanningClo
 				})
 				.filter(event -> possiblePeriods.contains(event.getPeriod()))
 				.distinct()
+				.sorted()
 				.collect(Collectors.toList());
-		result.forEach(event -> logger.trace(event.toString()));
+		logger.trace("Created Events from TEvents are: {}", result);
 		return result;
 	}
 	
