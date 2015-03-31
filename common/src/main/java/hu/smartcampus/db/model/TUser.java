@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 import javax.persistence.*;
 
+import org.apache.commons.lang.builder.CompareToBuilder;
+
 import java.util.List;
 
 /**
@@ -13,7 +15,7 @@ import java.util.List;
 @Entity
 @Table(name = "T_USER")
 @NamedQuery(name = "TUser.findAll", query = "SELECT t FROM TUser t")
-public class TUser implements Serializable {
+public class TUser implements Comparable<TUser>, Serializable {
 	private static final long serialVersionUID = 1L;
 	private long userId;
 	private String displayName;
@@ -156,5 +158,10 @@ public class TUser implements Serializable {
 		builder.append("]");
 		return builder.toString();
 	}
-	
+
+	@Override
+	public int compareTo(TUser o) {
+		return new CompareToBuilder().append(this.displayName, o.displayName).append(this.loginName, o.loginName).toComparison();
+	}
+
 }
