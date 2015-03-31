@@ -14,7 +14,9 @@
 <%@page import="javax.persistence.TypedQuery"%>
 <%@page import="hu.smartcampus.db.model.TUser"%>
 <%@page import="hu.smartcampus.appointmentscheduler.domain.User"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -37,16 +39,11 @@ table {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 
 		TypedQuery<TUser> query = entityManager.createNamedQuery("TUser.findAll", TUser.class);
-		List<TUser> result = query.getResultList();
-
-		List<User> users = new ArrayList<>();
-		for (TUser tUser : result) {
-			users.add(new User(tUser.getDisplayName(), tUser.getLoginName(), false));
-		}
+		List<TUser> users = query.getResultList();
 		Collections.sort(users);
-
 		request.setAttribute("userList", users);
 	%>
+	<jsp:useBean id="now" class="java.util.Date" />
 	<div align="center" id="scheduler">
 		<form action="result.jsp" method="post" accept-charset="UTF-8">
 			<table>
@@ -61,43 +58,31 @@ table {
 					<tr>
 						<td><select name="requiredLoginNames" multiple="multiple" size="20">
 								<c:forEach items="${userList}" var="user">
-									<option value="${user.loginName}">${user.displayName}-"${user.loginName}"</option>
+									<option value="${user.loginName}"><c:out value="${user.displayName} - ${user.loginName}" /></option>
 								</c:forEach>
 						</select></td>
 						<td><select name="skippableLoginNames" multiple="multiple" size="20">
 								<c:forEach items="${userList}" var="user">
-									<option value="${user.loginName}">${user.displayName}-"${user.loginName}"</option>
+									<option value="${user.loginName}"><c:out value="${user.displayName} - ${user.loginName}" /></option>
 								</c:forEach>
 						</select></td>
 						<td>
 							<table>
 								<tr>
 									<td><label>Days:</label></td>
-									<td><select name="daysOfWeek" multiple="multiple" size="<%=DayOfWeek.values().length%>"
-										required="required">
-											<%
-												for (DayOfWeek dayOfWeek : DayOfWeek.values()) {
-											%>
-											<option value="<%=dayOfWeek%>">
-												<%=dayOfWeek%>
-											</option>
-											<%
-												}
-											%>
+									<td><select name="daysOfWeek" multiple="multiple" size="${fn:length(DayOfWeek.values())}" required="required">
+											<c:forEach items="${DayOfWeek.values()}" var="day">
+												<option value="${day}">${day}</option>
+											</c:forEach>
 									</select></td>
 								</tr>
 								<tr>
 									<td>Year:</td>
-									<td align="left"><input type="number" name="year" min="2000" max="9999"
-										value="<%=LocalDate.now().getYear()%>" /></td>
+									<td align="left"><input type="number" name="year" min="2000" max="9999" value='<fmt:formatDate pattern= "y" value="${now}"/>' /></td>
 								</tr>
 								<tr>
 									<td>Week:</td>
-									<%
-										TemporalField weekOfYear = WeekFields.of(new Locale("hu_HU")).weekOfYear();
-										int weekNumber = LocalDate.now().get(weekOfYear);
-									%>
-									<td align="left"><input type="number" name="weekOfYear" min="1" max="52" value="<%=weekNumber%>" /></td>
+									<td align="left"><input type="number" name="weekOfYear" min="1" max="52" value='<fmt:formatDate pattern="w" value="${now}"/>' /></td>
 								</tr>
 								<tr>
 									<td width="20em">Minimum hour:</td>
