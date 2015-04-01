@@ -15,7 +15,7 @@ public class Timeslot implements Comparable<Timeslot>, Cloneable {
 		super();
 		if (hour < 0 || hour > 23) {
 			StringBuilder sb = new StringBuilder(60);
-			sb.append("Hour should be between 0 and 24, but the given value is ");
+			sb.append("Hour should be between 0 and 23, but the given value is ");
 			sb.append(hour);
 			sb.append(".");
 			throw new InvalidParameterException(sb.toString());
