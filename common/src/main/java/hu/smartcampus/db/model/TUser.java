@@ -1,12 +1,21 @@
 package hu.smartcampus.db.model;
 
 import java.io.Serializable;
-
-import javax.persistence.*;
-
-import org.apache.commons.lang.builder.CompareToBuilder;
-
+import java.text.Collator;
 import java.util.List;
+import java.util.Locale;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
 
 /**
  * The persistent class for the T_USER database table.
@@ -19,6 +28,7 @@ import java.util.List;
 		@NamedQuery(name = "TUser.findByLoginName", query = "SELECT t FROM TUser t WHERE t.loginName IN :loginNames") })
 public class TUser implements Comparable<TUser>, Serializable {
 	private static final long serialVersionUID = 1L;
+	private static final Collator hungarianCollator = Collator.getInstance(new Locale("hu", "HU"));
 	private long userId;
 	private String displayName;
 	private String loginName;
@@ -165,9 +175,12 @@ public class TUser implements Comparable<TUser>, Serializable {
 	}
 
 	@Override
-	public int compareTo(TUser o) {
-		return new CompareToBuilder().append(this.displayName, o.displayName)
-				.append(this.loginName, o.loginName).toComparison();
+	public int compareTo(TUser otherTUser) {
+		int result = hungarianCollator.compare(this.displayName, otherTUser.displayName);
+		if (result == 0) {
+			result = hungarianCollator.compare(this.loginName, otherTUser.loginName);
+		}
+		return result;
 	}
 
 }
