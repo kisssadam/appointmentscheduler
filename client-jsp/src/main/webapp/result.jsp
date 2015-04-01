@@ -1,7 +1,6 @@
 <%@page import="hu.smartcampus.appointmentscheduler.domain.User"%>
 <%@page import="hu.smartcampus.appointmentscheduler.service.Schedule"%>
-<%@page
-	import="hu.smartcampus.appointmentscheduler.service.AppointmentScheduler"%>
+<%@page import="hu.smartcampus.appointmentscheduler.service.AppointmentScheduler"%>
 <%@page import="javax.xml.ws.Service"%>
 <%@page import="javax.xml.namespace.QName"%>
 <%@page import="java.net.URL"%>
@@ -11,8 +10,7 @@
 <%@page import="java.util.Arrays"%>
 <%@page import="java.util.Iterator"%>
 <%@page import="java.util.Enumeration"%>
-<%@page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%
 	request.setCharacterEncoding("UTF-8");
 %>
@@ -59,14 +57,6 @@
 
 		Schedule schedule = appointmentSchedulerService.schedule(requiredLoginNames, skippableLoginNames,
 				daysOfWeek, year, weekOfYear, minHour, maxHour);
-		/* List<String> availableUserNames = schedule.getAvailableUsers() == null ? new ArrayList<>() : Arrays.stream(schedule.getAvailableUsers()).map(user -> user.getLoginName()).collect(Collectors.toList());
-		List<String> unavailableUserNames = schedule.getUnavailableUsers() == null ? new ArrayList<>() : Arrays.stream(schedule.getUnavailableUsers()).map(user -> user.getLoginName()).collect(Collectors.toList()); */
-		/* System.out.println("Available users: " + availableUserNames);
-		System.out.println("Unavailable users: " + unavailableUserNames); */
-		System.out.println("Year: " + schedule.getYear());
-		System.out.println("WeekOfYear: " + schedule.getWeekOfYear());
-		System.out.println("DayOfWeek: " + schedule.getDayOfWeek());
-		System.out.println("Hour: " + schedule.getHour());
 	%>
 	<table>
 		<tr>
