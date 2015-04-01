@@ -21,7 +21,7 @@ table {
 <body>
 	<h1>Appointment Scheduler</h1>
 	<div align="center" id="scheduler">
-		<form action="result.jsp" method="post" accept-charset="UTF-8">
+		<form action="show-result" method="post" accept-charset="UTF-8">
 			<table>
 				<thead>
 					<tr>

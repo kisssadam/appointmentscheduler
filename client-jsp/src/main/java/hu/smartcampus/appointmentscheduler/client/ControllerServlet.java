@@ -22,22 +22,25 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Servlet implementation class Controller
  */
-@WebServlet("/Controller")
-public class IndexControllerServlet extends HttpServlet {
+@WebServlet
+public class ControllerServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
-	private final EntityManagerFactory entityManagerFactory;
+	private static final EntityManagerFactory ENTITY_MANAGER_FACTORY;
 	private final EntityManager entityManager;
 	private final TypedQuery<TUser> userQuery;
+
+	static {
+		ENTITY_MANAGER_FACTORY = Persistence.createEntityManagerFactory("SMARTCAMPUS");
+	}
 
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
-	public IndexControllerServlet() {
+	public ControllerServlet() {
 		super();
 		System.out.println("New controller has been instantiated");
-		this.entityManagerFactory = Persistence.createEntityManagerFactory("SMARTCAMPUS");
-		this.entityManager = this.entityManagerFactory.createEntityManager();
+		this.entityManager = ENTITY_MANAGER_FACTORY.createEntityManager();
 		this.userQuery = this.entityManager.createNamedQuery("TUser.findAll", TUser.class);
 	}
 
@@ -52,8 +55,7 @@ public class IndexControllerServlet extends HttpServlet {
 
 	@Override
 	public void destroy() {
-		super.destroy();
-		this.entityManagerFactory.close();
+		this.entityManager.close();
 	}
 
 	/**
@@ -71,15 +73,35 @@ public class IndexControllerServlet extends HttpServlet {
 	}
 
 	private void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		List<TUser> queriedUsers = userQuery.getResultList();
-		Collections.sort(queriedUsers);
-		request.setAttribute("userList", queriedUsers);
-		
-		request.setAttribute("daysOfWeek", DayOfWeek.values());
-		request.setAttribute("now", new Date());
-		
-		RequestDispatcher requestDispatcher = request.getRequestDispatcher("WEB-INF/index.jsp");
-		requestDispatcher.forward(request, response);
+		String servletPath = request.getServletPath();
+		System.out.println(servletPath);
+		switch (servletPath) {
+		case "/index":
+			List<TUser> queriedUsers = userQuery.getResultList();
+			Collections.sort(queriedUsers);
+			request.setAttribute("userList", queriedUsers);
+
+			request.setAttribute("daysOfWeek", DayOfWeek.values());
+			request.setAttribute("now", new Date());
+
+			dispatch(request, response, "WEB-INF/index.jsp");
+			// RequestDispatcher requestDispatcher = request.getRequestDispatcher("WEB-INF/index.jsp");
+			// requestDispatcher.forward(request, response);
+			break;
+
+		case "/show-result":
+			dispatch(request, response, "WEB-INF/result.jsp");
+			break;
+
+		default:
+			break;
+		}
+
+	}
+
+	private void dispatch(HttpServletRequest request, HttpServletResponse response, String page) throws ServletException, IOException {
+		RequestDispatcher dispatcher = request.getRequestDispatcher(page);
+		dispatcher.forward(request, response);
 	}
 
 }

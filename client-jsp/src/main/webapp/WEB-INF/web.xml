@@ -6,14 +6,19 @@
 	<display-name>Appointment Scheduler Web Application</display-name>
 
 	<servlet>
-		<servlet-name>IndexControllerServlet</servlet-name>
-		<servlet-class>hu.smartcampus.appointmentscheduler.client.IndexControllerServlet</servlet-class>
+		<servlet-name>ControllerServlet</servlet-name>
+		<servlet-class>hu.smartcampus.appointmentscheduler.client.ControllerServlet</servlet-class>
 		<load-on-startup>0</load-on-startup>
 	</servlet>
 
 	<servlet-mapping>
-		<servlet-name>IndexControllerServlet</servlet-name>
+		<servlet-name>ControllerServlet</servlet-name>
 		<url-pattern>/index</url-pattern>
+	</servlet-mapping>
+	
+	<servlet-mapping>
+		<servlet-name>ControllerServlet</servlet-name>
+		<url-pattern>/show-result</url-pattern>
 	</servlet-mapping>
 
 	<welcome-file-list>
