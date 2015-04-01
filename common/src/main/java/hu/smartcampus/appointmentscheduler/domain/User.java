@@ -1,11 +1,13 @@
 package hu.smartcampus.appointmentscheduler.domain;
 
 import java.io.Serializable;
-import java.util.Comparator;
+import java.text.Collator;
+import java.util.Locale;
 
 public class User implements Cloneable, Comparable<User>, Serializable {
 
 	private static final long serialVersionUID = 1L;
+	private static final Collator hungarianCollator = Collator.getInstance(new Locale("hu", "HU"));
 	private String displayName;
 	private String loginName;
 	private boolean skippable;
@@ -100,7 +102,11 @@ public class User implements Cloneable, Comparable<User>, Serializable {
 
 	@Override
 	public int compareTo(User otherUser) {
-		return Comparator.comparing(User::getDisplayName).thenComparing(User::getLoginName).compare(this, otherUser);
+		int result = hungarianCollator.compare(this.displayName, otherUser.displayName);
+		if (result == 0) {
+			result = hungarianCollator.compare(this.loginName, otherUser.loginName);
+		}
+		return result;
 	}
 
 }
