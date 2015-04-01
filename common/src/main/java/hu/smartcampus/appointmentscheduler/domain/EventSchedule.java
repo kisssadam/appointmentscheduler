@@ -118,11 +118,10 @@ public class EventSchedule implements Solution<HardMediumSoftScore>, PlanningClo
 	}
 
 	private List<TUser> queryTUsers(List<String> loginNames) {
-		TypedQuery<TUser> tUserQuery = entityManager.createQuery("SELECT t FROM TUser t WHERE t.loginName IN :loginNames", TUser.class);
-
-		tUserQuery.setParameter("loginNames", loginNames);
-
-		return tUserQuery.getResultList();
+		TypedQuery<TUser> query = entityManager.createNamedQuery("TUser.findByLoginName", TUser.class);
+		query.setParameter("loginNames", loginNames);
+		
+		return query.getResultList();
 	}
 
 	private List<TEvent> getEveryTEventFromTUsers(List<TUser> queriedTUsers) {

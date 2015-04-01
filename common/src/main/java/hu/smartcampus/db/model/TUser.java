@@ -14,7 +14,9 @@ import java.util.List;
  */
 @Entity
 @Table(name = "T_USER")
-@NamedQuery(name = "TUser.findAll", query = "SELECT t FROM TUser t")
+@NamedQueries({
+		@NamedQuery(name = "TUser.findAll", query = "SELECT t FROM TUser t"),
+		@NamedQuery(name = "TUser.findByLoginName", query = "SELECT t FROM TUser t WHERE t.loginName IN :loginNames") })
 public class TUser implements Comparable<TUser>, Serializable {
 	private static final long serialVersionUID = 1L;
 	private long userId;
@@ -114,8 +116,11 @@ public class TUser implements Comparable<TUser>, Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((this.displayName == null) ? 0 : this.displayName.hashCode());
-		result = prime * result + ((this.loginName == null) ? 0 : this.loginName.hashCode());
+		result = prime
+				* result
+				+ ((this.displayName == null) ? 0 : this.displayName.hashCode());
+		result = prime * result
+				+ ((this.loginName == null) ? 0 : this.loginName.hashCode());
 		return result;
 	}
 
@@ -161,7 +166,8 @@ public class TUser implements Comparable<TUser>, Serializable {
 
 	@Override
 	public int compareTo(TUser o) {
-		return new CompareToBuilder().append(this.displayName, o.displayName).append(this.loginName, o.loginName).toComparison();
+		return new CompareToBuilder().append(this.displayName, o.displayName)
+				.append(this.loginName, o.loginName).toComparison();
 	}
 
 }
