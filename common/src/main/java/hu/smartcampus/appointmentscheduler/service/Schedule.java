@@ -44,10 +44,12 @@ public class Schedule implements Serializable {
 			}
 		}
 		this.unavailableUsers = unavailableUsers.toArray(new User[unavailableUsers.size()]);
+		Arrays.sort(this.unavailableUsers);
 
 		List<User> availableUsers = new ArrayList<>(solvedEventSchedule.getUsers());
 		availableUsers.removeAll(unavailableUsers);
 		this.availableUsers = availableUsers.toArray(new User[availableUsers.size()]);
+		Arrays.sort(this.availableUsers);
 
 		int year = solvedEventSchedule.getYear();
 		int weekOfYear = solvedEventSchedule.getWeekOfYear();

@@ -7,14 +7,29 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Insert title here</title>
+<style type="text/css">
+thead {
+	text-align: center;
+}
+
+table.center {
+	margin-left: auto;
+	margin-right: auto;
+}
+
+td {
+	vertical-align: top;
+}
+</style>
 </head>
+<fmt:setLocale value="hu_HU" />
 <body>
-	<p>
-		<fmt:setLocale value="hu_HU" />
-		<fmt:formatDate value="${schedule.date}" pattern="yyyy. MMMM dd. (EEEE) H:mm" />
-	</p>
-	<table>
+	<table class="center">
 		<thead>
+			<tr>
+				<td colspan="2"><fmt:formatDate value="${schedule.date}" pattern="yyyy. MMMM dd. (EEEE) H:mm" />
+					<hr /></td>
+			</tr>
 			<tr>
 				<td>Available users</td>
 				<td>Unavailable users</td>
@@ -22,14 +37,14 @@
 		</thead>
 		<tbody>
 			<tr>
-				<td align="center" valign="top">
+				<td>
 					<ol>
 						<c:forEach items="${schedule.availableUsers}" var="user">
 							<li>${user.displayName}</li>
 						</c:forEach>
 					</ol>
 				</td>
-				<td align="center" valign="top">
+				<td>
 					<ol>
 						<c:forEach items="${schedule.unavailableUsers}" var="user">
 							<li>${user.displayName}</li>
