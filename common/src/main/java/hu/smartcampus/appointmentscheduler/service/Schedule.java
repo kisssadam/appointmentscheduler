@@ -1,24 +1,26 @@
 package hu.smartcampus.appointmentscheduler.service;
 
-import java.time.DayOfWeek;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import hu.smartcampus.appointmentscheduler.domain.Event;
 import hu.smartcampus.appointmentscheduler.domain.EventSchedule;
 import hu.smartcampus.appointmentscheduler.domain.Period;
 import hu.smartcampus.appointmentscheduler.domain.User;
 
-public class Schedule {
+import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
+public class Schedule implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 	private User[] availableUsers;
 	private User[] unavailableUsers;
-	private int year;
-	private int weekOfYear;
-	private DayOfWeek dayOfWeek;
-	private int hour;
+	private Date date;
 
 	public Schedule() {
 		super();
@@ -47,23 +49,37 @@ public class Schedule {
 		availableUsers.removeAll(unavailableUsers);
 		this.availableUsers = availableUsers.toArray(new User[availableUsers.size()]);
 
-		this.year = solvedEventSchedule.getYear();
-		this.weekOfYear = solvedEventSchedule.getWeekOfYear();
+		int year = solvedEventSchedule.getYear();
+		int weekOfYear = solvedEventSchedule.getWeekOfYear();
 
 		Period period = movableEvents.get(0).getPeriod();
-		this.dayOfWeek = period.getDay();
-		this.hour = period.getTimeslot().getHour();
+		DayOfWeek dayOfWeek = period.getDay();
+		int hour = period.getTimeslot().getHour();
+
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-ww-EEEE-H");
+		StringBuilder sb = new StringBuilder();
+		sb.append(year);
+		sb.append("-");
+		sb.append(weekOfYear);
+		sb.append("-");
+		sb.append(dayOfWeek);
+		sb.append("-");
+		sb.append(hour);
+		Date date;
+		try {
+			date = simpleDateFormat.parse(sb.toString());
+		} catch (ParseException e) {
+			date = new Date();
+			e.printStackTrace();
+		}
+		this.date = date;
 	}
 
-	public Schedule(User[] availableUsers, User[] unavailableUsers,
-					int year, int weekOfYear, DayOfWeek dayOfWeek, int hour) {
+	public Schedule(User[] availableUsers, User[] unavailableUsers, Date date) {
 		super();
 		this.availableUsers = availableUsers;
 		this.unavailableUsers = unavailableUsers;
-		this.year = year;
-		this.weekOfYear = weekOfYear;
-		this.dayOfWeek = dayOfWeek;
-		this.hour = hour;
+		this.date = date;
 	}
 
 	public User[] getAvailableUsers() {
@@ -82,81 +98,42 @@ public class Schedule {
 		this.unavailableUsers = unavailableUsers;
 	}
 
-	public int getYear() {
-		return this.year;
+	public Date getDate() {
+		return date;
 	}
 
-	public void setYear(int year) {
-		this.year = year;
-	}
-
-	public int getWeekOfYear() {
-		return this.weekOfYear;
-	}
-
-	public void setWeekOfYear(int weekOfYear) {
-		this.weekOfYear = weekOfYear;
-	}
-
-	public DayOfWeek getDayOfWeek() {
-		return this.dayOfWeek;
-	}
-
-	public void setDayOfWeek(DayOfWeek dayOfWeek) {
-		this.dayOfWeek = dayOfWeek;
-	}
-
-	public int getHour() {
-		return this.hour;
-	}
-
-	public void setHour(int hour) {
-		this.hour = hour;
+	public void setDate(Date date) {
+		this.date = date;
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + Arrays.hashCode(this.availableUsers);
-		result = prime * result + ((this.dayOfWeek == null) ? 0 : this.dayOfWeek.hashCode());
-		result = prime * result + this.hour;
-		result = prime * result + Arrays.hashCode(this.unavailableUsers);
-		result = prime * result + this.weekOfYear;
-		result = prime * result + this.year;
+		result = prime * result + Arrays.hashCode(availableUsers);
+		result = prime * result + ((date == null) ? 0 : date.hashCode());
+		result = prime * result + Arrays.hashCode(unavailableUsers);
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj) {
+		if (this == obj)
 			return true;
-		}
-		if (obj == null) {
+		if (obj == null)
 			return false;
-		}
-		if (!(obj instanceof Schedule)) {
+		if (getClass() != obj.getClass())
 			return false;
-		}
 		Schedule other = (Schedule) obj;
-		if (!Arrays.equals(this.availableUsers, other.availableUsers)) {
+		if (!Arrays.equals(availableUsers, other.availableUsers))
 			return false;
-		}
-		if (this.dayOfWeek != other.dayOfWeek) {
+		if (date == null) {
+			if (other.date != null)
+				return false;
+		} else if (!date.equals(other.date))
 			return false;
-		}
-		if (this.hour != other.hour) {
+		if (!Arrays.equals(unavailableUsers, other.unavailableUsers))
 			return false;
-		}
-		if (!Arrays.equals(this.unavailableUsers, other.unavailableUsers)) {
-			return false;
-		}
-		if (this.weekOfYear != other.weekOfYear) {
-			return false;
-		}
-		if (this.year != other.year) {
-			return false;
-		}
 		return true;
 	}
 
@@ -164,17 +141,11 @@ public class Schedule {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("Schedule [availableUsers=");
-		builder.append(Arrays.toString(this.availableUsers));
+		builder.append(Arrays.toString(availableUsers));
 		builder.append(", unavailableUsers=");
-		builder.append(Arrays.toString(this.unavailableUsers));
-		builder.append(", year=");
-		builder.append(this.year);
-		builder.append(", weekOfYear=");
-		builder.append(this.weekOfYear);
-		builder.append(", dayOfWeek=");
-		builder.append(this.dayOfWeek);
-		builder.append(", hour=");
-		builder.append(this.hour);
+		builder.append(Arrays.toString(unavailableUsers));
+		builder.append(", date=");
+		builder.append(date);
 		builder.append("]");
 		return builder.toString();
 	}
