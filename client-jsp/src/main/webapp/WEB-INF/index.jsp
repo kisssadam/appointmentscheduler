@@ -21,7 +21,8 @@ table {
 <body>
 	<h1>Appointment Scheduler</h1>
 	<div align="center" id="scheduler">
-		<form action="show-result" method="post" accept-charset="UTF-8">
+		<form action="index" method="post" accept-charset="UTF-8">
+			<input type="hidden" name="action" value="show-result" />
 			<table>
 				<thead>
 					<tr>
