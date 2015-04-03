@@ -27,7 +27,7 @@ td {
 	<table class="center">
 		<thead>
 			<tr>
-				<td colspan="2"><fmt:formatDate value="${schedule.date}" pattern="yyyy. MMMM dd. (EEEE) H:mm" />
+				<td colspan="2"><fmt:formatDate value="${schedule.date}" pattern="yyyy. MMMM dd. (EEEE) - H:mm" />
 					<hr /></td>
 			</tr>
 			<tr>
