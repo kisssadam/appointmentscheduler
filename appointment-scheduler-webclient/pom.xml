@@ -8,11 +8,8 @@
 		<artifactId>appointment-scheduler</artifactId>
 		<version>1.0</version>
 	</parent>
-	<!-- <groupId>hu.smartcampus</groupId> -->
-	<artifactId>client-jsp</artifactId>
-	<!-- <version>1.0</version> -->
+	<artifactId>appointment-scheduler-webclient</artifactId>
 	<packaging>war</packaging>
-	<name>client-jsp Maven Webapp</name>
 	<url>http://maven.apache.org</url>
 	<dependencies>
 		<dependency>
@@ -25,16 +22,19 @@
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
 			<version>3.1.0</version>
+			<!-- <scope>provided</scope> -->
 		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>jstl</artifactId>
 			<version>1.2</version>
+			<!-- <scope>provided</scope> -->
 		</dependency>
 		<dependency>
 			<groupId>org.glassfish.web</groupId>
 			<artifactId>jstl-impl</artifactId>
 			<version>1.2</version>
+			<!-- <scope>provided</scope> -->
 			<exclusions>
 				<exclusion>
 					<artifactId>servlet-api</artifactId>
@@ -52,11 +52,9 @@
 		</dependency>
 		<dependency>
 			<groupId>hu.smartcampus</groupId>
-			<artifactId>common</artifactId>
+			<artifactId>appointment-scheduler-common</artifactId>
 			<version>1.0</version>
 		</dependency>
 	</dependencies>
-	<build>
-		<finalName>client-jsp</finalName>
-	</build>
+	<!-- <build> <finalName>AppointmentSchedulerWebclient</finalName> </build> -->
 </project>

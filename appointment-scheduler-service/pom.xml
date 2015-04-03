@@ -3,22 +3,23 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<artifactId>appointment-scheduler</artifactId>
 		<groupId>hu.smartcampus</groupId>
+		<artifactId>appointment-scheduler</artifactId>
 		<version>1.0</version>
 	</parent>
-	<artifactId>service</artifactId>
+	<artifactId>appointment-scheduler-service</artifactId>
 	<packaging>war</packaging>
 	<dependencies>
 		<dependency>
 			<groupId>com.sun.xml.ws</groupId>
-			<artifactId>jaxws-rt</artifactId>
+			<artifactId>jaxws-ri</artifactId>
 			<version>2.2.10</version>
+			<!-- <scope>provided</scope> -->
 			<type>pom</type>
 		</dependency>
 		<dependency>
 			<groupId>hu.smartcampus</groupId>
-			<artifactId>common</artifactId>
+			<artifactId>appointment-scheduler-common</artifactId>
 			<version>1.0</version>
 		</dependency>
 	</dependencies>

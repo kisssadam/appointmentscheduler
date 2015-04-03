@@ -133,7 +133,7 @@ public class ControllerServlet extends HttpServlet {
 		int minHour = Integer.parseInt(request.getParameter("minHour"));
 		int maxHour = Integer.parseInt(request.getParameter("maxHour"));
 
-		URL url = new URL("http://localhost:8080/AppointmentSchedulerService/appointmentScheduler?wsdl");
+		URL url = new URL("http://localhost:8080/appointment-scheduler-service/appointmentScheduler?wsdl");
 		QName qName = new QName("http://service.appointmentscheduler.smartcampus.hu/", "AppointmentSchedulerImplService");
 		Service service = Service.create(url, qName);
 		AppointmentScheduler appointmentSchedulerService = service.getPort(AppointmentScheduler.class);

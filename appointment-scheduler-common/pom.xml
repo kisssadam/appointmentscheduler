@@ -6,7 +6,7 @@
 		<artifactId>appointment-scheduler</artifactId>
 		<version>1.0</version>
 	</parent>
-	<artifactId>common</artifactId>
+	<artifactId>appointment-scheduler-common</artifactId>
 	<packaging>jar</packaging>
 	<repositories>
 		<repository>
