@@ -5,13 +5,13 @@
 	version="2.1">
 	<persistence-unit name="SMARTCAMPUS">
 		<mapping-file>META-INF/orm.xml</mapping-file>
-		<class>hu.smartcampus.db.model.TAdmin</class>
-		<class>hu.smartcampus.db.model.TCategory</class>
-		<class>hu.smartcampus.db.model.TEvent</class>
-		<class>hu.smartcampus.db.model.TGroup</class>
-		<class>hu.smartcampus.db.model.TLocation</class>
-		<class>hu.smartcampus.db.model.TMessage</class>
-		<class>hu.smartcampus.db.model.TUser</class>
+		<class>hu.smartcampus.appointmentscheduler.entity.TAdmin</class>
+		<class>hu.smartcampus.appointmentscheduler.entity.TCategory</class>
+		<class>hu.smartcampus.appointmentscheduler.entity.TEvent</class>
+		<class>hu.smartcampus.appointmentscheduler.entity.TGroup</class>
+		<class>hu.smartcampus.appointmentscheduler.entity.TLocation</class>
+		<class>hu.smartcampus.appointmentscheduler.entity.TMessage</class>
+		<class>hu.smartcampus.appointmentscheduler.entity.TUser</class>
 		<!-- shouldn't be valid for java SE per specification, but it works for 
 			EclipseLink ... -->
 		<exclude-unlisted-classes>false</exclude-unlisted-classes>

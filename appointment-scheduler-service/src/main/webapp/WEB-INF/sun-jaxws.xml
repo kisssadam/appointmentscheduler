@@ -3,6 +3,6 @@
 	version="2.0">
 
 	<endpoint name="appointment-scheduler-service" url-pattern="/appointmentscheduler"
-		implementation="hu.smartcampus.appointmentscheduler.service.AppointmentSchedulerImpl" />
+		implementation="hu.smartcampus.appointmentscheduler.service.AppointmentSchedulerServiceImpl" />
 
 </endpoints>

@@ -14,11 +14,11 @@ import org.optaplanner.core.api.solver.SolverFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@WebService(endpointInterface = "hu.smartcampus.appointmentscheduler.service.AppointmentScheduler")
+@WebService(endpointInterface = "hu.smartcampus.appointmentscheduler.service.AppointmentSchedulerService")
 @SOAPBinding(style = Style.RPC)
-public class AppointmentSchedulerImpl implements AppointmentScheduler {
+public class AppointmentSchedulerServiceImpl implements AppointmentSchedulerService {
 
-	private static final Logger logger = LoggerFactory.getLogger(AppointmentSchedulerImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger(AppointmentSchedulerServiceImpl.class);
 	private static final String SOLVER_CONFIG = "hu/smartcampus/appointmentscheduler/solver/eventScheduleSolverConfig.xml";
 
 	@Override

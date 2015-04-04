@@ -1,8 +1,8 @@
 package hu.smartcampus.appointmentscheduler.client;
 
-import hu.smartcampus.appointmentscheduler.service.AppointmentScheduler;
+import hu.smartcampus.appointmentscheduler.entity.TUser;
+import hu.smartcampus.appointmentscheduler.service.AppointmentSchedulerService;
 import hu.smartcampus.appointmentscheduler.service.Schedule;
-import hu.smartcampus.db.model.TUser;
 
 import java.io.IOException;
 import java.net.URL;
@@ -134,9 +134,9 @@ public class ControllerServlet extends HttpServlet {
 		int maxHour = Integer.parseInt(request.getParameter("maxHour"));
 
 		URL url = new URL("http://localhost:8080/AppointmentSchedulerService/appointmentscheduler?wsdl");
-		QName qName = new QName("http://service.appointmentscheduler.smartcampus.hu/", "AppointmentSchedulerImplService");
+		QName qName = new QName("http://service.appointmentscheduler.smartcampus.hu/", "AppointmentSchedulerServiceImplService");
 		Service service = Service.create(url, qName);
-		AppointmentScheduler appointmentSchedulerService = service.getPort(AppointmentScheduler.class);
+		AppointmentSchedulerService appointmentSchedulerService = service.getPort(AppointmentSchedulerService.class);
 
 		Schedule schedule = appointmentSchedulerService.schedule(requiredLoginNames, skippableLoginNames, daysOfWeek, year,
 				weekOfYear, minHour, maxHour);

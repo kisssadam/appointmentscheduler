@@ -1,4 +1,4 @@
-package hu.smartcampus.db.model;
+package hu.smartcampus.appointmentscheduler.entity;
 
 import java.io.Serializable;
 import java.text.Collator;

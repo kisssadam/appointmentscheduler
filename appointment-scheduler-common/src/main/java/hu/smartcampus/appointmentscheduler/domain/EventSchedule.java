@@ -1,7 +1,7 @@
 package hu.smartcampus.appointmentscheduler.domain;
 
-import hu.smartcampus.db.model.TEvent;
-import hu.smartcampus.db.model.TUser;
+import hu.smartcampus.appointmentscheduler.entity.TEvent;
+import hu.smartcampus.appointmentscheduler.entity.TUser;
 
 import java.sql.Timestamp;
 import java.time.DayOfWeek;

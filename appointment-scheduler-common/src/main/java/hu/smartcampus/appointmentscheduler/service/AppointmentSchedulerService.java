@@ -9,7 +9,7 @@ import javax.jws.soap.SOAPBinding.Style;
 
 @WebService
 @SOAPBinding(style = Style.RPC)
-public interface AppointmentScheduler {
+public interface AppointmentSchedulerService {
 
 	@WebMethod
 	Schedule schedule(String[] requiredLoginNames, String[] skippableLoginNames, DayOfWeek[] daysOfWeek, int year, int weekOfYear, int minHour, int maxHour);
