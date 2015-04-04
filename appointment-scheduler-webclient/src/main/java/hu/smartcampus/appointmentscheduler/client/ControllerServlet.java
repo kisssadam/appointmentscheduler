@@ -49,9 +49,9 @@ public class ControllerServlet extends HttpServlet {
 	 */
 	public ControllerServlet() {
 		super();
+		logger.trace("Instantiating servlet. Creating entity manager.");
 		this.entityManager = ENTITY_MANAGER_FACTORY.createEntityManager();
 		this.userQuery = this.entityManager.createNamedQuery("TUser.findAll", TUser.class);
-		logger.trace("New ControllerServlet has been instantiated");
 	}
 
 	@Override
@@ -60,12 +60,16 @@ public class ControllerServlet extends HttpServlet {
 	}
 
 	private void prefetchUsers() {
+		logger.trace("Prefetching users.");
 		userQuery.getResultList();
 	}
 
 	@Override
 	public void destroy() {
-		this.entityManager.close();
+		logger.trace("Destroying servlet. Closing entity manager.");
+		if (this.entityManager.isOpen()) {
+			this.entityManager.close();
+		}
 	}
 
 	/**
@@ -127,12 +131,13 @@ public class ControllerServlet extends HttpServlet {
 			dayOfWeekList.add(DayOfWeek.valueOf(dayOfWeekString));
 		}
 		DayOfWeek[] daysOfWeek = dayOfWeekList.toArray(new DayOfWeek[dayOfWeekList.size()]);
-		
+
 		int year = Integer.parseInt(request.getParameter("year"));
 		int weekOfYear = Integer.parseInt(request.getParameter("weekOfYear"));
 		int minHour = Integer.parseInt(request.getParameter("minHour"));
 		int maxHour = Integer.parseInt(request.getParameter("maxHour"));
 
+		logger.trace("Trying to access the appointment scheduler service.");
 		URL url = new URL("http://localhost:8080/AppointmentSchedulerService/appointmentscheduler?wsdl");
 		QName qName = new QName("http://service.appointmentscheduler.smartcampus.hu/", "AppointmentSchedulerServiceImplService");
 		Service service = Service.create(url, qName);
