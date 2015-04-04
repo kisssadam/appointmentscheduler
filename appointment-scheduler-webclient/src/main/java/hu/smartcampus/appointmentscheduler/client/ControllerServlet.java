@@ -28,9 +28,6 @@ import javax.xml.ws.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Servlet implementation class Controller
- */
 @WebServlet
 public class ControllerServlet extends HttpServlet {
 
