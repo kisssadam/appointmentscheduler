@@ -32,14 +32,10 @@ import org.slf4j.LoggerFactory;
 public class ControllerServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
-	private static final EntityManagerFactory entityManagerFactory;
+	private static final EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("SMARTCAMPUS");
 	private static final Logger logger = LoggerFactory.getLogger(ControllerServlet.class);
 	private final EntityManager entityManager;
 	private final TypedQuery<TUser> userQuery;
-
-	static {
-		entityManagerFactory = Persistence.createEntityManagerFactory("SMARTCAMPUS");
-	}
 
 	/**
 	 * @see HttpServlet#HttpServlet()
