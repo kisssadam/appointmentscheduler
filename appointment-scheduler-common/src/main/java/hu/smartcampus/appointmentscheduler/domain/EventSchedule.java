@@ -39,13 +39,13 @@ public class EventSchedule implements Solution<HardMediumSoftScore>, PlanningClo
      * https://weblogs.java.net/blog/montanajava/archive/2014/06/17/using-java-8-datetime-classes-jpa
      */
     private static final Logger logger = LoggerFactory.getLogger(EventSchedule.class);
-    private static final EntityManagerFactory ENTITY_MANAGER_FACTORY;
-    private static final ZoneId BUDAPEST_ZONE_ID;
-    private static final DateTimeFormatter DAY_DATE_TIME_FORMATTER;
-    private static final DateTimeFormatter WEEK_DATE_TIME_FORMATER;
-    private static final DateTimeFormatter YEAR_DATE_TIME_FORMATER;
-    private static final DateTimeFormatter HOUR_DATE_TIME_FORMATTER;
-    private static final DateTimeFormatter MINUTE_DATE_TIME_FORMATTER;
+    private static final EntityManagerFactory entityManagerFactory;
+    private static final ZoneId BudapestZoneId;
+    private static final DateTimeFormatter DayDateTimeFormatter;
+    private static final DateTimeFormatter WeekDateTimeFormatter;
+    private static final DateTimeFormatter YearDateTimeFormatter;
+    private static final DateTimeFormatter HourDateTimeFormatter;
+    private static final DateTimeFormatter MinuteDateTimeFormatter;
 
     private EntityManager entityManager;
     private List<String> requiredLoginNames;
@@ -61,15 +61,15 @@ public class EventSchedule implements Solution<HardMediumSoftScore>, PlanningClo
     private HardMediumSoftScore score;
 
     static {
-        ENTITY_MANAGER_FACTORY = Persistence.createEntityManagerFactory("SMARTCAMPUS");
+        entityManagerFactory = Persistence.createEntityManagerFactory("SMARTCAMPUS");
 
-        BUDAPEST_ZONE_ID = ZoneId.of("Europe/Budapest");
+        BudapestZoneId = ZoneId.of("Europe/Budapest");
 
-        DAY_DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("EEEE");
-        WEEK_DATE_TIME_FORMATER = DateTimeFormatter.ofPattern("w");
-        YEAR_DATE_TIME_FORMATER = DateTimeFormatter.ofPattern("yyyy");
-        HOUR_DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("H");
-        MINUTE_DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("m");
+        DayDateTimeFormatter = DateTimeFormatter.ofPattern("EEEE");
+        WeekDateTimeFormatter = DateTimeFormatter.ofPattern("w");
+        YearDateTimeFormatter = DateTimeFormatter.ofPattern("yyyy");
+        HourDateTimeFormatter = DateTimeFormatter.ofPattern("H");
+        MinuteDateTimeFormatter = DateTimeFormatter.ofPattern("m");
     }
 
     public static EventSchedule createEventSchedule(String[] requiredLoginNames, String[] skippableLoginNames, DayOfWeek[] daysOfWeek, int year, int weekOfYear, int minHour, int maxHour) {
@@ -81,7 +81,7 @@ public class EventSchedule implements Solution<HardMediumSoftScore>, PlanningClo
     }
 
     private EventSchedule(String[] requiredLoginNames, String[] skippableLoginNames, DayOfWeek[] daysOfWeek, int year, int weekOfYear, int minHour, int maxHour) {
-        this.entityManager = ENTITY_MANAGER_FACTORY.createEntityManager();
+        this.entityManager = entityManagerFactory.createEntityManager();
 
         this.requiredLoginNames = Arrays.stream(requiredLoginNames).distinct().collect(Collectors.toList());
         this.skippableLoginNames = Arrays.stream(skippableLoginNames).filter(loginName -> !this.requiredLoginNames.contains(loginName)).distinct().collect(Collectors.toList());
@@ -142,9 +142,9 @@ public class EventSchedule implements Solution<HardMediumSoftScore>, PlanningClo
         List<? super Period> possiblePeriods = getPossiblePeriods();
         List<Event> result = everyTEvent
                 .stream()
-                .filter(tEvent -> Integer.parseInt(tEvent.getEventStart().toInstant().atZone(BUDAPEST_ZONE_ID).format(YEAR_DATE_TIME_FORMATER)) == this.year)
-                .filter(tEvent -> Integer.parseInt(tEvent.getEventStart().toInstant().atZone(BUDAPEST_ZONE_ID).format(WEEK_DATE_TIME_FORMATER)) == this.weekOfYear)
-                .filter(tEvent -> this.daysOfWeek.contains(DayOfWeek.valueOf(tEvent.getEventStart().toInstant().atZone(BUDAPEST_ZONE_ID).format(DAY_DATE_TIME_FORMATTER).toUpperCase())))
+                .filter(tEvent -> Integer.parseInt(tEvent.getEventStart().toInstant().atZone(BudapestZoneId).format(YearDateTimeFormatter)) == this.year)
+                .filter(tEvent -> Integer.parseInt(tEvent.getEventStart().toInstant().atZone(BudapestZoneId).format(WeekDateTimeFormatter)) == this.weekOfYear)
+                .filter(tEvent -> this.daysOfWeek.contains(DayOfWeek.valueOf(tEvent.getEventStart().toInstant().atZone(BudapestZoneId).format(DayDateTimeFormatter).toUpperCase())))
                 .flatMap(new Function<TEvent, Stream<? extends Event>>() {
 
                     @Override
@@ -185,12 +185,12 @@ public class EventSchedule implements Solution<HardMediumSoftScore>, PlanningClo
     }
 
     private List<Period> createPeriodsFromTimestamps(Timestamp eventStart, Timestamp eventEnd) {
-        DayOfWeek dayOfWeek = DayOfWeek.valueOf(eventStart.toInstant().atZone(BUDAPEST_ZONE_ID).format(DAY_DATE_TIME_FORMATTER).toUpperCase());
+        DayOfWeek dayOfWeek = DayOfWeek.valueOf(eventStart.toInstant().atZone(BudapestZoneId).format(DayDateTimeFormatter).toUpperCase());
 
-        int rangeMinValue = Integer.parseInt(eventStart.toInstant().atZone(BUDAPEST_ZONE_ID).format(HOUR_DATE_TIME_FORMATTER));
-        int rangeMaxValue = Integer.parseInt(eventEnd.toInstant().atZone(BUDAPEST_ZONE_ID).format(HOUR_DATE_TIME_FORMATTER));
+        int rangeMinValue = Integer.parseInt(eventStart.toInstant().atZone(BudapestZoneId).format(HourDateTimeFormatter));
+        int rangeMaxValue = Integer.parseInt(eventEnd.toInstant().atZone(BudapestZoneId).format(HourDateTimeFormatter));
         
-        int eventEndMinute = Integer.parseInt(eventStart.toInstant().atZone(BUDAPEST_ZONE_ID).format(MINUTE_DATE_TIME_FORMATTER));
+        int eventEndMinute = Integer.parseInt(eventStart.toInstant().atZone(BudapestZoneId).format(MinuteDateTimeFormatter));
 
         if (rangeMinValue == rangeMaxValue || eventEndMinute != 0) {
             rangeMaxValue++;
