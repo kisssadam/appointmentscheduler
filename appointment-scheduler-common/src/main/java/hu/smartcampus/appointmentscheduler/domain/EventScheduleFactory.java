@@ -58,8 +58,6 @@ public class EventScheduleFactory {
 
 	public EventSchedule newEventSchedule(String[] requiredLoginNames, String[] skippableLoginNames,
 			DayOfWeek[] daysOfWeek, int year, int weekOfYear, int minHour, int maxHour) {
-		EventSchedule eventSchedule = new EventSchedule();
-
 		List<String> requiredLoginNameList = Arrays.stream(requiredLoginNames).distinct()
 				.collect(Collectors.toList());
 		List<String> skippableLoginNameList = Arrays.stream(skippableLoginNames)
@@ -89,9 +87,8 @@ public class EventScheduleFactory {
 
 		eventList.add(new Event("Movable event", conflictingPeriod, userList, isLocked));
 
-		eventSchedule.setRequiredLoginNames(requiredLoginNameList);
-		eventSchedule.setSkippableLoginNames(skippableLoginNameList);
-		eventSchedule.setMergedLoginNames(mergedLoginNames);
+		EventSchedule eventSchedule = new EventSchedule();
+		eventSchedule.setPossiblePeriods(possiblePeriods);
 		eventSchedule.setDaysOfWeek(dayOfWeekList);
 		eventSchedule.setYear(year);
 		eventSchedule.setWeekOfYear(weekOfYear);
@@ -99,7 +96,6 @@ public class EventScheduleFactory {
 		eventSchedule.setMaxHour(maxHour);
 		eventSchedule.setUsers(userList);
 		eventSchedule.setEvents(eventList);
-
 		return eventSchedule;
 	}
 

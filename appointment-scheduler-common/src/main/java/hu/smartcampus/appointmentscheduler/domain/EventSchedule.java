@@ -1,11 +1,9 @@
 package hu.smartcampus.appointmentscheduler.domain;
 
 import java.time.DayOfWeek;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import org.optaplanner.core.api.domain.solution.PlanningEntityCollectionProperty;
 import org.optaplanner.core.api.domain.solution.PlanningSolution;
@@ -13,17 +11,11 @@ import org.optaplanner.core.api.domain.solution.Solution;
 import org.optaplanner.core.api.domain.solution.cloner.PlanningCloneable;
 import org.optaplanner.core.api.domain.valuerange.ValueRangeProvider;
 import org.optaplanner.core.api.score.buildin.hardmediumsoft.HardMediumSoftScore;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @PlanningSolution
 public class EventSchedule implements Solution<HardMediumSoftScore>, PlanningCloneable<EventSchedule> {
 
-	private static final Logger logger = LoggerFactory.getLogger(EventSchedule.class);
-
-	private List<String> requiredLoginNames;
-	private List<String> skippableLoginNames;
-	private List<String> mergedLoginNames;
+	private List<Period> possiblePeriods;
 	private List<DayOfWeek> daysOfWeek;
 	private int year;
 	private int weekOfYear;
@@ -37,13 +29,9 @@ public class EventSchedule implements Solution<HardMediumSoftScore>, PlanningClo
 		super();
 	}
 
-	public EventSchedule(List<String> requiredLoginNames, List<String> skippableLoginNames,
-			List<String> mergedLoginNames, List<DayOfWeek> daysOfWeek, int year, int weekOfYear, int minHour,
-			int maxHour, List<User> users, List<Event> events, HardMediumSoftScore score) {
+	public EventSchedule(List<Period> possiblePeriods, List<DayOfWeek> daysOfWeek, int year, int weekOfYear,
+			int minHour, int maxHour, List<User> users, List<Event> events, HardMediumSoftScore score) {
 		super();
-		this.requiredLoginNames = requiredLoginNames;
-		this.skippableLoginNames = skippableLoginNames;
-		this.mergedLoginNames = mergedLoginNames;
 		this.daysOfWeek = daysOfWeek;
 		this.year = year;
 		this.weekOfYear = weekOfYear;
@@ -52,30 +40,6 @@ public class EventSchedule implements Solution<HardMediumSoftScore>, PlanningClo
 		this.users = users;
 		this.events = events;
 		this.score = score;
-	}
-
-	public List<String> getRequiredLoginNames() {
-		return this.requiredLoginNames;
-	}
-
-	public void setRequiredLoginNames(List<String> requiredLoginNames) {
-		this.requiredLoginNames = requiredLoginNames;
-	}
-
-	public List<String> getSkippableLoginNames() {
-		return this.skippableLoginNames;
-	}
-
-	public void setSkippableLoginNames(List<String> skippableLoginNames) {
-		this.skippableLoginNames = skippableLoginNames;
-	}
-
-	public List<String> getMergedLoginNames() {
-		return this.mergedLoginNames;
-	}
-
-	public void setMergedLoginNames(List<String> mergedLoginNames) {
-		this.mergedLoginNames = mergedLoginNames;
 	}
 
 	public List<DayOfWeek> getDaysOfWeek() {
@@ -145,32 +109,21 @@ public class EventSchedule implements Solution<HardMediumSoftScore>, PlanningClo
 		this.score = score;
 	}
 
+	@ValueRangeProvider(id = "periodRange")
+	public List<Period> getPossiblePeriods() {
+		return this.possiblePeriods;
+	}
+
+	public void setPossiblePeriods(List<Period> possiblePeriods) {
+		this.possiblePeriods = possiblePeriods;
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public Collection<? extends Object> getProblemFacts() {
 		return null;
-	}
-
-	@ValueRangeProvider(id = "periodRange")
-	public List<Period> getPossiblePeriods() {
-		List<Timeslot> possibleTimeslots = getPossibleTimeslots();
-		List<Period> possiblePeriods = new ArrayList<>(daysOfWeek.size() * possibleTimeslots.size());
-
-		this.daysOfWeek.forEach(dayOfWeek -> {
-			possibleTimeslots.forEach(timeslot -> {
-				possiblePeriods.add(new Period(dayOfWeek, timeslot));
-			});
-		});
-
-		logger.trace("Possible periods are {}.", possiblePeriods);
-		return possiblePeriods;
-	}
-
-	private List<Timeslot> getPossibleTimeslots() {
-		return IntStream.rangeClosed(this.minHour, this.maxHour).mapToObj(hour -> new Timeslot(hour)).distinct()
-				.collect(Collectors.toList());
 	}
 
 	@Override
@@ -190,10 +143,7 @@ public class EventSchedule implements Solution<HardMediumSoftScore>, PlanningClo
 	@Override
 	public EventSchedule planningClone() {
 		EventSchedule clone = new EventSchedule();
-
-		clone.setRequiredLoginNames(this.requiredLoginNames);
-		clone.setSkippableLoginNames(this.skippableLoginNames);
-		clone.setMergedLoginNames(this.mergedLoginNames);
+		clone.setPossiblePeriods(possiblePeriods);
 		clone.setDaysOfWeek(this.daysOfWeek);
 		clone.setYear(this.year);
 		clone.setWeekOfYear(this.weekOfYear);
@@ -202,7 +152,6 @@ public class EventSchedule implements Solution<HardMediumSoftScore>, PlanningClo
 		clone.setUsers(this.users);
 		clone.setEvents(this.events.stream().map(event -> event.clone()).collect(Collectors.toList()));
 		clone.setScore(this.score);
-
 		return clone;
 	}
 
