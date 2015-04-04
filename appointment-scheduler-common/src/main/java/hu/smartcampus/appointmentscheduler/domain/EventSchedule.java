@@ -87,7 +87,9 @@ public class EventSchedule implements Solution<HardMediumSoftScore>, PlanningClo
         this.skippableLoginNames = Arrays.stream(skippableLoginNames).filter(loginName -> !this.requiredLoginNames.contains(loginName)).distinct().collect(Collectors.toList());
         this.mergedLoginNames = Stream.concat(this.requiredLoginNames.stream(), this.skippableLoginNames.stream()).distinct().collect(Collectors.toList());
 
+        Arrays.sort(daysOfWeek);
         this.daysOfWeek = Arrays.asList(daysOfWeek);
+        
         this.year = year;
         this.weekOfYear = weekOfYear;
         this.minHour = minHour;

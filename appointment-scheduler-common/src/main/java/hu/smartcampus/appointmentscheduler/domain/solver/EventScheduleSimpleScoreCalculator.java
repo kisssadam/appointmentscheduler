@@ -2,8 +2,10 @@ package hu.smartcampus.appointmentscheduler.domain.solver;
 
 import hu.smartcampus.appointmentscheduler.domain.Event;
 import hu.smartcampus.appointmentscheduler.domain.EventSchedule;
+import hu.smartcampus.appointmentscheduler.domain.Period;
 import hu.smartcampus.appointmentscheduler.domain.User;
 
+import java.time.DayOfWeek;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,10 +41,35 @@ public class EventScheduleSimpleScoreCalculator implements EasyScoreCalculator<E
 		}
 		
 		for (Event movableEvent : movableEvents) {
-			softScore -= movableEvent.getPeriod().getTimeslot().getHour() - solution.getMinHour();
+//			softScore -= movableEvent.getPeriod().getTimeslot().getHour() - solution.getMinHour();
+			softScore -= distanceFromBestPeriod(solution, movableEvent.getPeriod());
 		}
 		
 		return HardMediumSoftScore.valueOf(hardScore, mediumScore, softScore);
+	}
+	
+	private static int distanceFromBestPeriod(EventSchedule solution, Period period) {
+		Period bestPeriod = solution.getPossiblePeriods().get(0);
+		int bestHour = bestPeriod.getTimeslot().getHour();
+		
+		int dayIndex = getCustomIndexOfDay(solution, period.getDay());
+		int hour = period.getTimeslot().getHour();
+		
+		int dayDistance = 100 * dayIndex;
+		int hourDistance = hour - bestHour;
+		
+		return hourDistance + dayDistance;
+//		if (hourDistance != 0 && dayDistance != 0) {
+//			return hourDistance + dayDistance;
+//		} else if (dayDistance == 0) {
+//			return hourDistance;
+//		} else {
+//			return dayDistance;
+//		}
+	}
+	
+	private static int getCustomIndexOfDay(EventSchedule solution, DayOfWeek dayOfWeek) {
+		return solution.getDaysOfWeek().indexOf(dayOfWeek);
 	}
 
 }
