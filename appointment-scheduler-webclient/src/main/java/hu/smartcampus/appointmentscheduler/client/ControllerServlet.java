@@ -32,13 +32,13 @@ import org.slf4j.LoggerFactory;
 public class ControllerServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
-	private static final EntityManagerFactory ENTITY_MANAGER_FACTORY;
+	private static final EntityManagerFactory entityManagerFactory;
 	private static final Logger logger = LoggerFactory.getLogger(ControllerServlet.class);
 	private final EntityManager entityManager;
 	private final TypedQuery<TUser> userQuery;
 
 	static {
-		ENTITY_MANAGER_FACTORY = Persistence.createEntityManagerFactory("SMARTCAMPUS");
+		entityManagerFactory = Persistence.createEntityManagerFactory("SMARTCAMPUS");
 	}
 
 	/**
@@ -47,7 +47,7 @@ public class ControllerServlet extends HttpServlet {
 	public ControllerServlet() {
 		super();
 		logger.trace("Instantiating servlet. Creating entity manager.");
-		this.entityManager = ENTITY_MANAGER_FACTORY.createEntityManager();
+		this.entityManager = entityManagerFactory.createEntityManager();
 		this.userQuery = this.entityManager.createNamedQuery("TUser.findAll", TUser.class);
 	}
 
