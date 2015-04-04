@@ -6,7 +6,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Insert title here</title>
+<title>Result of scheduling</title>
 <style type="text/css">
 thead {
 	text-align: center;
@@ -19,6 +19,9 @@ table.center {
 
 td {
 	vertical-align: top;
+	padding-left: 10px;
+	padding-right: 10px;
+	padding-left: 10px;
 }
 </style>
 </head>
@@ -37,7 +40,7 @@ td {
 		</thead>
 		<tbody>
 			<tr>
-				<td>
+				<td style="border-right: solid 1px black">
 					<ol>
 						<c:forEach items="${schedule.availableUsers}" var="user">
 							<li>${user.displayName}</li>

@@ -7,6 +7,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Appointment Scheduler</title>
 <style>
 input[type="number"] {
 	width: 100%;
@@ -19,7 +20,7 @@ table {
 </style>
 </head>
 <body>
-	<h1>Appointment Scheduler</h1>
+	<h1 style="text-align: center">Appointment Scheduler</h1>
 	<div align="center" id="scheduler">
 		<form action="index" method="post" accept-charset="UTF-8">
 			<input type="hidden" name="action" value="show-result" />
@@ -75,7 +76,8 @@ table {
 				</tbody>
 				<tfoot>
 					<tr>
-						<td colspan="3" align="right"><input type="reset" /> <input type="submit" value="Schedule" /></td>
+						<td>Note: Use "CTRL + Left Mouse Button" to select multiple items.</td>
+						<td colspan="2" align="right"><input type="reset" /> <input type="submit" value="Schedule" /></td>
 					</tr>
 				</tfoot>
 			</table>
