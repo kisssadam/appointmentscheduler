@@ -41,7 +41,6 @@ public class EventScheduleSimpleScoreCalculator implements EasyScoreCalculator<E
 		}
 		
 		for (Event movableEvent : movableEvents) {
-//			softScore -= movableEvent.getPeriod().getTimeslot().getHour() - solution.getMinHour();
 			softScore -= distanceFromBestPeriod(solution, movableEvent.getPeriod());
 		}
 		
@@ -52,24 +51,17 @@ public class EventScheduleSimpleScoreCalculator implements EasyScoreCalculator<E
 		Period bestPeriod = solution.getPossiblePeriods().get(0);
 		int bestHour = bestPeriod.getTimeslot().getHour();
 		
-		int dayIndex = getCustomIndexOfDay(solution, period.getDay());
+		int dayIndex = getCustomIndexOfDay(solution.getDaysOfWeek(), period.getDay());
 		int hour = period.getTimeslot().getHour();
 		
 		int dayDistance = 100 * dayIndex;
 		int hourDistance = hour - bestHour;
 		
 		return hourDistance + dayDistance;
-//		if (hourDistance != 0 && dayDistance != 0) {
-//			return hourDistance + dayDistance;
-//		} else if (dayDistance == 0) {
-//			return hourDistance;
-//		} else {
-//			return dayDistance;
-//		}
 	}
 	
-	private static int getCustomIndexOfDay(EventSchedule solution, DayOfWeek dayOfWeek) {
-		return solution.getDaysOfWeek().indexOf(dayOfWeek);
+	private static int getCustomIndexOfDay(List<DayOfWeek> possibleDays, DayOfWeek dayOfWeek) {
+		return possibleDays.indexOf(dayOfWeek);
 	}
 
 }
