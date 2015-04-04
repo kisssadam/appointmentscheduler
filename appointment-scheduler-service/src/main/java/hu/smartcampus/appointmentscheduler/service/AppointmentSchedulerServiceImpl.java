@@ -1,6 +1,7 @@
 package hu.smartcampus.appointmentscheduler.service;
 
 import hu.smartcampus.appointmentscheduler.domain.EventSchedule;
+import hu.smartcampus.appointmentscheduler.domain.EventScheduleFactory;
 
 import java.time.DayOfWeek;
 import java.util.UUID;
@@ -29,7 +30,9 @@ public class AppointmentSchedulerServiceImpl implements AppointmentSchedulerServ
 		Solver solver = solverFactory.buildSolver();
 		
 		logger.info("Start solving on request: {}", requestId);
-		EventSchedule unsolvedEventSchedule = EventSchedule.createEventSchedule(requiredLoginNames, skippableLoginNames, daysOfWeek, year, weekOfYear, minHour, maxHour);
+		EventScheduleFactory eventScheduleFactory = new EventScheduleFactory();
+		EventSchedule unsolvedEventSchedule = eventScheduleFactory.newEventSchedule(requiredLoginNames, skippableLoginNames, daysOfWeek, year, weekOfYear, minHour, maxHour);
+//		EventSchedule unsolvedEventSchedule = EventSchedule.createEventSchedule(requiredLoginNames, skippableLoginNames, daysOfWeek, year, weekOfYear, minHour, maxHour);
 		solver.solve(unsolvedEventSchedule);
 		
 		EventSchedule solvedEventSchedule = (EventSchedule) solver.getBestSolution();
