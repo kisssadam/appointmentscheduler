@@ -34,10 +34,6 @@ import org.slf4j.LoggerFactory;
 @PlanningSolution
 public class EventSchedule implements Solution<HardMediumSoftScore>, PlanningCloneable<EventSchedule> {
 
-    /*
-     * TODO at kellene alakitani LocalDateTime-ra az entitiket ez alapjan:
-     * https://weblogs.java.net/blog/montanajava/archive/2014/06/17/using-java-8-datetime-classes-jpa
-     */
     private static final Logger logger = LoggerFactory.getLogger(EventSchedule.class);
     private static final EntityManagerFactory entityManagerFactory;
     private static final ZoneId BudapestZoneId;
