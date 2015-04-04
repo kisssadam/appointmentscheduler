@@ -42,6 +42,15 @@ public class EventSchedule implements Solution<HardMediumSoftScore>, PlanningClo
 		this.score = score;
 	}
 
+	@ValueRangeProvider(id = "periodRange")
+	public List<Period> getPossiblePeriods() {
+		return this.possiblePeriods;
+	}
+
+	public void setPossiblePeriods(List<Period> possiblePeriods) {
+		this.possiblePeriods = possiblePeriods;
+	}
+
 	public List<DayOfWeek> getDaysOfWeek() {
 		return this.daysOfWeek;
 	}
@@ -107,15 +116,6 @@ public class EventSchedule implements Solution<HardMediumSoftScore>, PlanningClo
 	@Override
 	public void setScore(HardMediumSoftScore score) {
 		this.score = score;
-	}
-
-	@ValueRangeProvider(id = "periodRange")
-	public List<Period> getPossiblePeriods() {
-		return this.possiblePeriods;
-	}
-
-	public void setPossiblePeriods(List<Period> possiblePeriods) {
-		this.possiblePeriods = possiblePeriods;
 	}
 
 	/**
