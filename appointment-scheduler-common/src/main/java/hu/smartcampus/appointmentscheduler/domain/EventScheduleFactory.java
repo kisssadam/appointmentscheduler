@@ -6,11 +6,11 @@ import hu.smartcampus.appointmentscheduler.entity.TUser;
 import java.sql.Timestamp;
 import java.time.DayOfWeek;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -54,10 +54,12 @@ public class EventScheduleFactory {
 		synchronized (EventScheduleFactory.class) {
 			this.entityManager = entityManagerFactory.createEntityManager();
 		}
+		logger.trace("New EventScheduleFactory has been instantiated.");
 	}
 
 	public EventSchedule newEventSchedule(String[] requiredLoginNames, String[] skippableLoginNames,
 			DayOfWeek[] daysOfWeek, int year, int weekOfYear, int minHour, int maxHour) {
+		logger.trace("Checking arguments in newEventSchedule().");
 		if (requiredLoginNames == null || requiredLoginNames.length == 0) {
 			throw new IllegalArgumentException("Illegal requiredLoginNames argument: "
 					+ Arrays.toString(requiredLoginNames) + ".");
@@ -81,6 +83,7 @@ public class EventScheduleFactory {
 			String message = "Argument minHour (" + minHour + ") is bigger than maxHour (" + maxHour + ")";
 			throw new IllegalArgumentException(message);
 		}
+		logger.trace("Finished checking arguments in newEventSchedule(). Creating EventSchedule.");
 
 		List<String> requiredLoginNameList = Arrays.stream(requiredLoginNames).distinct()
 				.collect(Collectors.toList());
@@ -103,12 +106,11 @@ public class EventScheduleFactory {
 				dayOfWeekList, mergedLoginNames, userList);
 
 		// Add conflicting event that should be moved by the algorithm
-		DayOfWeek conflictingDay = dayOfWeekList.isEmpty() ? DayOfWeek.MONDAY : dayOfWeekList.get(0);
+		DayOfWeek conflictingDay = dayOfWeekList.get(0);
 		Timeslot conflictingTimeslot = eventList.isEmpty() ? new Timeslot(minHour) : eventList.get(0).getPeriod()
 				.getTimeslot();
 		Period conflictingPeriod = new Period(conflictingDay, conflictingTimeslot);
 		boolean isLocked = false;
-
 		eventList.add(new Event("Movable event", conflictingPeriod, userList, isLocked));
 
 		EventSchedule eventSchedule = new EventSchedule();
@@ -121,23 +123,6 @@ public class EventScheduleFactory {
 		eventSchedule.setUsers(userList);
 		eventSchedule.setEvents(eventList);
 		return eventSchedule;
-	}
-
-	private List<Timeslot> getPossibleTimeslots(int minHour, int maxHour) {
-		return IntStream.rangeClosed(minHour, maxHour).mapToObj(hour -> new Timeslot(hour)).distinct()
-				.collect(Collectors.toList());
-	}
-
-	private List<Period> createPossiblePeriods(List<Timeslot> timeslots, List<DayOfWeek> daysOfWeek) {
-		List<Period> possiblePeriods = new ArrayList<>(timeslots.size() * daysOfWeek.size());
-
-		daysOfWeek.forEach(dayOfWeek -> {
-			timeslots.forEach(timeslot -> {
-				possiblePeriods.add(new Period(dayOfWeek, timeslot));
-			});
-		});
-
-		return possiblePeriods;
 	}
 
 	private List<TUser> queryTUsers(List<String> loginNames) {
@@ -164,8 +149,7 @@ public class EventScheduleFactory {
 
 	private List<Event> createEventsFromTEvents(List<TEvent> everyTEvent, List<Period> possiblePeriods, int year,
 			int weekOfYear, List<DayOfWeek> daysOfWeek, List<String> mergedLoginNames, List<User> users) {
-		logger.trace("Queried TEvents are: {}.", everyTEvent);
-		List<Event> result = everyTEvent
+		return everyTEvent
 				.stream()
 				.filter(tEvent -> Integer.parseInt(tEvent.getEventStart().toInstant().atZone(budapestZoneId)
 						.format(yearDateTimeFormatter)) == year)
@@ -174,7 +158,6 @@ public class EventScheduleFactory {
 				.filter(tEvent -> daysOfWeek.contains(DayOfWeek.valueOf(tEvent.getEventStart().toInstant()
 						.atZone(budapestZoneId).format(dayDateTimeFormatter).toUpperCase())))
 				.flatMap(new Function<TEvent, Stream<? extends Event>>() {
-
 					@Override
 					public Stream<? extends Event> apply(TEvent tEvent) {
 						Timestamp eventStart = tEvent.getEventStart();
@@ -189,8 +172,6 @@ public class EventScheduleFactory {
 					}
 				}).filter(event -> possiblePeriods.contains(event.getPeriod())).distinct().sorted()
 				.collect(Collectors.toList());
-		logger.trace("Created Events from TEvents are: {}", result);
-		return result;
 	}
 
 	private List<User> getRequiredUsersOfTEvent(TEvent tEvent, List<String> mergedLoginNames, List<User> users) {
@@ -201,21 +182,17 @@ public class EventScheduleFactory {
 	}
 
 	private User getUserByLoginName(String loginName, List<User> users) {
-		Optional<User> result = users.stream().filter(user -> user.getLoginName().equals(loginName)).findFirst();
-		return result.isPresent() ? result.get() : null;
+		return users.stream().filter(user -> user.getLoginName().equals(loginName)).findFirst().orElse(null);
 	}
 
 	private List<Period> createPeriodsFromTimestamps(Timestamp eventStart, Timestamp eventEnd) {
-		DayOfWeek dayOfWeek = DayOfWeek.valueOf(eventStart.toInstant().atZone(budapestZoneId)
-				.format(dayDateTimeFormatter).toUpperCase());
+		ZonedDateTime formattableEventStart = eventStart.toInstant().atZone(budapestZoneId);
+		ZonedDateTime formattableEventEnd = eventEnd.toInstant().atZone(budapestZoneId);
 
-		int rangeMinValue = Integer.parseInt(eventStart.toInstant().atZone(budapestZoneId)
-				.format(hourDateTimeFormatter));
-		int rangeMaxValue = Integer.parseInt(eventEnd.toInstant().atZone(budapestZoneId)
-				.format(hourDateTimeFormatter));
-
-		int eventEndMinute = Integer.parseInt(eventStart.toInstant().atZone(budapestZoneId)
-				.format(minuteDateTimeFormatter));
+		DayOfWeek dayOfWeek = DayOfWeek.valueOf(formattableEventStart.format(dayDateTimeFormatter).toUpperCase());
+		int rangeMinValue = Integer.parseInt(formattableEventStart.format(hourDateTimeFormatter));
+		int rangeMaxValue = Integer.parseInt(formattableEventEnd.format(hourDateTimeFormatter));
+		int eventEndMinute = Integer.parseInt(formattableEventStart.format(minuteDateTimeFormatter));
 
 		if (rangeMinValue == rangeMaxValue || eventEndMinute != 0) {
 			rangeMaxValue++;
@@ -223,6 +200,23 @@ public class EventScheduleFactory {
 
 		return IntStream.range(rangeMinValue, rangeMaxValue)
 				.mapToObj(hour -> new Period(dayOfWeek, new Timeslot(hour))).distinct().collect(Collectors.toList());
+	}
+
+	private List<Period> createPossiblePeriods(List<Timeslot> timeslots, List<DayOfWeek> daysOfWeek) {
+		List<Period> possiblePeriods = new ArrayList<>(timeslots.size() * daysOfWeek.size());
+
+		daysOfWeek.forEach(dayOfWeek -> {
+			timeslots.forEach(timeslot -> {
+				possiblePeriods.add(new Period(dayOfWeek, timeslot));
+			});
+		});
+
+		return possiblePeriods;
+	}
+
+	private List<Timeslot> getPossibleTimeslots(int minHour, int maxHour) {
+		return IntStream.rangeClosed(minHour, maxHour).mapToObj(hour -> new Timeslot(hour)).distinct()
+				.collect(Collectors.toList());
 	}
 
 }
