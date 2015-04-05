@@ -4,6 +4,7 @@ import hu.smartcampus.appointmentscheduler.domain.EventSchedule;
 import hu.smartcampus.appointmentscheduler.domain.EventScheduleFactory;
 
 import java.time.DayOfWeek;
+import java.util.Arrays;
 import java.util.UUID;
 
 import javax.jws.WebService;
@@ -33,7 +34,10 @@ public class AppointmentSchedulerServiceImpl implements AppointmentSchedulerServ
 
 		EventSchedule unsolvedEventSchedule;
 		try {
-			logger.trace("Creating unsolvedEventSchedule on request {}.", requestId);
+			logger.trace(
+					"Creating unsolvedEventSchedule on request {} with the following parameters: requiredLoginNames: {}, skippableLoginNames: {}, daysOfWeek: {}, year: {}, weekOfYear: {}, minHour: {}, maxHour: {}.",
+					requestId, Arrays.toString(requiredLoginNames), Arrays.toString(skippableLoginNames),
+					Arrays.toString(daysOfWeek), year, weekOfYear, minHour, maxHour);
 			unsolvedEventSchedule = eventScheduleFactory.newEventSchedule(requiredLoginNames, skippableLoginNames,
 					daysOfWeek, year, weekOfYear, minHour, maxHour);
 			logger.trace("Finished creating unsolvedEventSchedule on request {}.", requestId);

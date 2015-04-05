@@ -59,7 +59,6 @@ public class EventScheduleFactory {
 	public EventSchedule newEventSchedule(String[] requiredLoginNames, String[] skippableLoginNames,
 			DayOfWeek[] daysOfWeek, int year, int weekOfYear, int minHour, int maxHour) {
 		if (requiredLoginNames == null || requiredLoginNames.length == 0) {
-			// TODO lehet, hogy nem toString kellene, hanem arrays.toString() ???????
 			throw new IllegalArgumentException("Illegal requiredLoginNames argument: "
 					+ Arrays.toString(requiredLoginNames) + ".");
 		}
