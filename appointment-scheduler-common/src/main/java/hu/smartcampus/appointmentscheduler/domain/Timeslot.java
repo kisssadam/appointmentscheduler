@@ -17,16 +17,17 @@ public class Timeslot implements Comparable<Timeslot>, Cloneable {
 	public Timeslot(int hour) {
 		super();
 		if (hour < 0 || hour > 23) {
-			StringBuilder sb = new StringBuilder(60);
-			sb.append("Hour should be between 0 and 23, but the given value is ");
-			sb.append(hour);
-			sb.append(".");
-			throw new InvalidParameterException(sb.toString());
+			String message = "Hour should be between 0 and 23, but the given value is " + hour + ".";
+			throw new InvalidParameterException(message);
 		}
 		this.hour = hour;
 	}
 
 	public static List<Timeslot> createPossibleTimeslots(int minHour, int maxHour) {
+		if (minHour > maxHour) {
+			String message = "Argument minhour " + minHour + " is bigger then argument maxHour" + maxHour + ".";
+			throw new IllegalArgumentException(message);
+		}
 		return IntStream.rangeClosed(minHour, maxHour).mapToObj(hour -> new Timeslot(hour)).distinct()
 				.collect(Collectors.toList());
 	}
