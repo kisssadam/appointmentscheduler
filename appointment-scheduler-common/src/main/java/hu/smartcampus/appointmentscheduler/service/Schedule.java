@@ -36,7 +36,7 @@ public class Schedule implements Serializable {
 			for (Event movableEvent : movableEvents) {
 				if (lockedEvent.getPeriod().equals(movableEvent.getPeriod())) {
 					for (User user : movableEvent.getUsers()) {
-						if (lockedEvent.getUsers().contains(user)) {
+						if (lockedEvent.getUsers().contains(user) && !unavailableUsers.contains(user)) {
 							unavailableUsers.add(user);
 						}
 					}

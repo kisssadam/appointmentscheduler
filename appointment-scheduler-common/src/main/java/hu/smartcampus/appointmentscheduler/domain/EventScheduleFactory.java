@@ -117,7 +117,7 @@ public class EventScheduleFactory {
 	}
 
 	private List<TEvent> queryTEventsFromTUsers(List<TUser> queriedTUsers) {
-		return queriedTUsers.stream().flatMap(tUser -> new ArrayList<>(tUser.getTEvents()).stream()).distinct()
+		return queriedTUsers.stream().flatMap(tUser -> new ArrayList<>(tUser.getTEvents()).stream())
 				.collect(Collectors.toList());
 	}
 
