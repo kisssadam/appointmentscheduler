@@ -2,6 +2,9 @@ package hu.smartcampus.appointmentscheduler.domain;
 
 import java.security.InvalidParameterException;
 import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class Timeslot implements Comparable<Timeslot>, Cloneable {
 
@@ -21,6 +24,11 @@ public class Timeslot implements Comparable<Timeslot>, Cloneable {
 			throw new InvalidParameterException(sb.toString());
 		}
 		this.hour = hour;
+	}
+
+	public static List<Timeslot> createPossibleTimeslots(int minHour, int maxHour) {
+		return IntStream.rangeClosed(minHour, maxHour).mapToObj(hour -> new Timeslot(hour)).distinct()
+				.collect(Collectors.toList());
 	}
 
 	public int getHour() {

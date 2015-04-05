@@ -2,18 +2,15 @@ package hu.smartcampus.appointmentscheduler.domain;
 
 import hu.smartcampus.appointmentscheduler.entity.TEvent;
 import hu.smartcampus.appointmentscheduler.entity.TUser;
+import hu.smartcampus.appointmentscheduler.utils.FormatUtils;
 
 import java.sql.Timestamp;
 import java.time.DayOfWeek;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import javax.persistence.EntityManager;
@@ -28,25 +25,11 @@ public class EventScheduleFactory {
 
 	private static final Logger logger = LoggerFactory.getLogger(EventScheduleFactory.class);
 	private static final EntityManagerFactory entityManagerFactory;
-	private static final ZoneId budapestZoneId;
-	private static final DateTimeFormatter dayDateTimeFormatter;
-	private static final DateTimeFormatter weekDateTimeFormatter;
-	private static final DateTimeFormatter yearDateTimeFormatter;
-	private static final DateTimeFormatter hourDateTimeFormatter;
-	private static final DateTimeFormatter minuteDateTimeFormatter;
 
 	private EntityManager entityManager;
 
 	static {
 		entityManagerFactory = Persistence.createEntityManagerFactory("SMARTCAMPUS");
-
-		budapestZoneId = ZoneId.of("Europe/Budapest");
-
-		dayDateTimeFormatter = DateTimeFormatter.ofPattern("EEEE");
-		weekDateTimeFormatter = DateTimeFormatter.ofPattern("w");
-		yearDateTimeFormatter = DateTimeFormatter.ofPattern("yyyy");
-		hourDateTimeFormatter = DateTimeFormatter.ofPattern("H");
-		minuteDateTimeFormatter = DateTimeFormatter.ofPattern("m");
 	}
 
 	public EventScheduleFactory() {
@@ -101,7 +84,8 @@ public class EventScheduleFactory {
 		List<User> userList = createUsersFromTUsers(queriedTUsers, requiredLoginNameList);
 
 		List<TEvent> everyTEvent = queryTEventsFromTUsers(queriedTUsers);
-		List<Period> possiblePeriods = createPossiblePeriods(getPossibleTimeslots(minHour, maxHour), dayOfWeekList);
+		List<Timeslot> possibleTimeslots = Timeslot.createPossibleTimeslots(minHour, maxHour);
+		List<Period> possiblePeriods = Period.createPossiblePeriods(possibleTimeslots, dayOfWeekList);
 		List<Event> eventList = createEventsFromTEvents(everyTEvent, possiblePeriods, year, weekOfYear,
 				dayOfWeekList, mergedLoginNames, userList);
 
@@ -149,14 +133,10 @@ public class EventScheduleFactory {
 
 	private List<Event> createEventsFromTEvents(List<TEvent> everyTEvent, List<Period> possiblePeriods, int year,
 			int weekOfYear, List<DayOfWeek> daysOfWeek, List<String> mergedLoginNames, List<User> users) {
-		return everyTEvent
-				.stream()
-				.filter(tEvent -> Integer.parseInt(tEvent.getEventStart().toInstant().atZone(budapestZoneId)
-						.format(yearDateTimeFormatter)) == year)
-				.filter(tEvent -> Integer.parseInt(tEvent.getEventStart().toInstant().atZone(budapestZoneId)
-						.format(weekDateTimeFormatter)) == weekOfYear)
-				.filter(tEvent -> daysOfWeek.contains(DayOfWeek.valueOf(tEvent.getEventStart().toInstant()
-						.atZone(budapestZoneId).format(dayDateTimeFormatter).toUpperCase())))
+		return everyTEvent.stream()
+				.filter(tEvent -> FormatUtils.getYearFromTimestamp(tEvent.getEventStart()) == year)
+				.filter(tEvent -> FormatUtils.getWeekFromTimestamp(tEvent.getEventStart()) == weekOfYear)
+				.filter(tEvent -> daysOfWeek.contains(FormatUtils.getDayOfWeekFromTimeStamp(tEvent.getEventStart())))
 				.flatMap(new Function<TEvent, Stream<? extends Event>>() {
 					@Override
 					public Stream<? extends Event> apply(TEvent tEvent) {
@@ -167,7 +147,7 @@ public class EventScheduleFactory {
 						List<User> usersOfEvent = getRequiredUsersOfTEvent(tEvent, mergedLoginNames, users);
 						boolean locked = true;
 
-						List<Period> periods = createPeriodsFromTimestamps(eventStart, eventEnd);
+						List<Period> periods = Period.createPeriodsFromTimestamps(eventStart, eventEnd);
 						return periods.stream().map(period -> new Event(title, period, usersOfEvent, locked));
 					}
 				}).filter(event -> possiblePeriods.contains(event.getPeriod())).distinct().sorted()
@@ -183,40 +163,6 @@ public class EventScheduleFactory {
 
 	private User getUserByLoginName(String loginName, List<User> users) {
 		return users.stream().filter(user -> user.getLoginName().equals(loginName)).findFirst().orElse(null);
-	}
-
-	private List<Period> createPeriodsFromTimestamps(Timestamp eventStart, Timestamp eventEnd) {
-		ZonedDateTime formattableEventStart = eventStart.toInstant().atZone(budapestZoneId);
-		ZonedDateTime formattableEventEnd = eventEnd.toInstant().atZone(budapestZoneId);
-
-		DayOfWeek dayOfWeek = DayOfWeek.valueOf(formattableEventStart.format(dayDateTimeFormatter).toUpperCase());
-		int rangeMinValue = Integer.parseInt(formattableEventStart.format(hourDateTimeFormatter));
-		int rangeMaxValue = Integer.parseInt(formattableEventEnd.format(hourDateTimeFormatter));
-		int eventEndMinute = Integer.parseInt(formattableEventStart.format(minuteDateTimeFormatter));
-
-		if (rangeMinValue == rangeMaxValue || eventEndMinute != 0) {
-			rangeMaxValue++;
-		}
-
-		return IntStream.range(rangeMinValue, rangeMaxValue)
-				.mapToObj(hour -> new Period(dayOfWeek, new Timeslot(hour))).distinct().collect(Collectors.toList());
-	}
-
-	private List<Period> createPossiblePeriods(List<Timeslot> timeslots, List<DayOfWeek> daysOfWeek) {
-		List<Period> possiblePeriods = new ArrayList<>(timeslots.size() * daysOfWeek.size());
-
-		daysOfWeek.forEach(dayOfWeek -> {
-			timeslots.forEach(timeslot -> {
-				possiblePeriods.add(new Period(dayOfWeek, timeslot));
-			});
-		});
-
-		return possiblePeriods;
-	}
-
-	private List<Timeslot> getPossibleTimeslots(int minHour, int maxHour) {
-		return IntStream.rangeClosed(minHour, maxHour).mapToObj(hour -> new Timeslot(hour)).distinct()
-				.collect(Collectors.toList());
 	}
 
 }

@@ -1,7 +1,14 @@
 package hu.smartcampus.appointmentscheduler.domain;
 
+import hu.smartcampus.appointmentscheduler.utils.FormatUtils;
+
+import java.sql.Timestamp;
 import java.time.DayOfWeek;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class Period implements Cloneable, Comparable<Period> {
 
@@ -16,6 +23,32 @@ public class Period implements Cloneable, Comparable<Period> {
 		super();
 		this.day = day;
 		this.timeslot = timeslot;
+	}
+
+	public static List<Period> createPeriodsFromTimestamps(Timestamp eventStart, Timestamp eventEnd) {
+		DayOfWeek dayOfWeek = FormatUtils.getDayOfWeekFromTimeStamp(eventStart);
+		int rangeMinValue = FormatUtils.getHourFromTimestamp(eventStart);
+		int rangeMaxValue = FormatUtils.getHourFromTimestamp(eventEnd);
+		int eventEndMinute = FormatUtils.getMinuteFromTimestamp(eventStart);
+
+		if (rangeMinValue == rangeMaxValue || eventEndMinute != 0) {
+			rangeMaxValue++;
+		}
+
+		return IntStream.range(rangeMinValue, rangeMaxValue)
+				.mapToObj(hour -> new Period(dayOfWeek, new Timeslot(hour))).distinct().collect(Collectors.toList());
+	}
+
+	public static List<Period> createPossiblePeriods(List<Timeslot> timeslots, List<DayOfWeek> daysOfWeek) {
+		List<Period> possiblePeriods = new ArrayList<>(timeslots.size() * daysOfWeek.size());
+
+		daysOfWeek.forEach(dayOfWeek -> {
+			timeslots.forEach(timeslot -> {
+				possiblePeriods.add(new Period(dayOfWeek, timeslot));
+			});
+		});
+
+		return possiblePeriods;
 	}
 
 	public DayOfWeek getDay() {
