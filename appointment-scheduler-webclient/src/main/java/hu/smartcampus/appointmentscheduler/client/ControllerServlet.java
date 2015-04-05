@@ -120,8 +120,10 @@ public class ControllerServlet extends HttpServlet {
 
 		String[] dayOfWeekStrings = request.getParameterValues("daysOfWeek");
 		List<DayOfWeek> dayOfWeekList = new ArrayList<>();
-		for (String dayOfWeekString : dayOfWeekStrings) {
-			dayOfWeekList.add(DayOfWeek.valueOf(dayOfWeekString));
+		if (dayOfWeekStrings != null) {
+			for (String dayOfWeekString : dayOfWeekStrings) {
+				dayOfWeekList.add(DayOfWeek.valueOf(dayOfWeekString));
+			}			
 		}
 		DayOfWeek[] daysOfWeek = dayOfWeekList.toArray(new DayOfWeek[dayOfWeekList.size()]);
 

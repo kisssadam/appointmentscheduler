@@ -21,6 +21,7 @@ public class AppointmentSchedulerServiceImpl implements AppointmentSchedulerServ
 
 	private static final Logger logger = LoggerFactory.getLogger(AppointmentSchedulerServiceImpl.class);
 	private static final String SOLVER_CONFIG = "hu/smartcampus/appointmentscheduler/solver/eventScheduleSolverConfig.xml";
+	private static final EventScheduleFactory eventScheduleFactory = new EventScheduleFactory();
 
 	@Override
 	public Schedule schedule(String[] requiredLoginNames, String[] skippableLoginNames, DayOfWeek[] daysOfWeek,
@@ -30,10 +31,17 @@ public class AppointmentSchedulerServiceImpl implements AppointmentSchedulerServ
 		SolverFactory solverFactory = SolverFactory.createFromXmlResource(SOLVER_CONFIG);
 		Solver solver = solverFactory.buildSolver();
 
+		EventSchedule unsolvedEventSchedule;
+		try {
+			logger.trace("Creating unsolvedEventSchedule on request {}.", requestId);
+			unsolvedEventSchedule = eventScheduleFactory.newEventSchedule(requiredLoginNames, skippableLoginNames,
+					daysOfWeek, year, weekOfYear, minHour, maxHour);
+			logger.trace("Finished creating unsolvedEventSchedule on request {}.", requestId);
+		} catch (IllegalArgumentException ex) {
+			logger.error(ex.getMessage());
+			return null;
+		}
 		logger.info("Start solving on request: {}", requestId);
-		EventScheduleFactory eventScheduleFactory = new EventScheduleFactory();
-		EventSchedule unsolvedEventSchedule = eventScheduleFactory.newEventSchedule(requiredLoginNames,
-				skippableLoginNames, daysOfWeek, year, weekOfYear, minHour, maxHour);
 		solver.solve(unsolvedEventSchedule);
 
 		EventSchedule solvedEventSchedule = (EventSchedule) solver.getBestSolution();

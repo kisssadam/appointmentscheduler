@@ -58,6 +58,31 @@ public class EventScheduleFactory {
 
 	public EventSchedule newEventSchedule(String[] requiredLoginNames, String[] skippableLoginNames,
 			DayOfWeek[] daysOfWeek, int year, int weekOfYear, int minHour, int maxHour) {
+		if (requiredLoginNames == null || requiredLoginNames.length == 0) {
+			// TODO lehet, hogy nem toString kellene, hanem arrays.toString() ???????
+			throw new IllegalArgumentException("Illegal requiredLoginNames argument: "
+					+ Arrays.toString(requiredLoginNames) + ".");
+		}
+		if (daysOfWeek == null || daysOfWeek.length == 0) {
+			throw new IllegalArgumentException("Illegal daysOfWeek argument: " + Arrays.toString(daysOfWeek) + ".");
+		}
+		if (weekOfYear < 1 || weekOfYear > 52) {
+			String message = "Argument weekOfYear is " + weekOfYear + ". It should be between 1 and 52.";
+			throw new IllegalArgumentException(message);
+		}
+		if (minHour < 0 || minHour > 23) {
+			String message = "Argument minHour is " + minHour + ". It should be between 0 and 23.";
+			throw new IllegalArgumentException(message);
+		}
+		if (maxHour < 0 || maxHour > 23) {
+			String message = "Argument maxHour is " + maxHour + ". It should be between 0 and 23.";
+			throw new IllegalArgumentException(message);
+		}
+		if (minHour > maxHour) {
+			String message = "Argument minHour (" + minHour + ") is bigger than maxHour (" + maxHour + ")";
+			throw new IllegalArgumentException(message);
+		}
+
 		List<String> requiredLoginNameList = Arrays.stream(requiredLoginNames).distinct()
 				.collect(Collectors.toList());
 		List<String> skippableLoginNameList = Arrays.stream(skippableLoginNames)
