@@ -11,7 +11,7 @@ public class User implements Cloneable, Comparable<User>, Serializable {
 	private String displayName;
 	private String loginName;
 	private boolean skippable;
-	
+
 	public User() {
 	}
 
@@ -37,7 +37,7 @@ public class User implements Cloneable, Comparable<User>, Serializable {
 	public void setLoginName(String loginName) {
 		this.loginName = loginName;
 	}
-	
+
 	public boolean isSkippable() {
 		return this.skippable;
 	}
@@ -45,7 +45,7 @@ public class User implements Cloneable, Comparable<User>, Serializable {
 	public void setSkippable(boolean skippable) {
 		this.skippable = skippable;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
