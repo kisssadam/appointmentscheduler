@@ -80,22 +80,55 @@ public class EventScheduleFactory {
 		Arrays.sort(daysOfWeek);
 		List<DayOfWeek> dayOfWeekList = Arrays.asList(daysOfWeek);
 
+		logger.trace("Querying TUsers with following login names: {}.", mergedLoginNames);
 		List<TUser> queriedTUsers = queryTUsers(mergedLoginNames);
-		List<User> userList = createUsersFromTUsers(queriedTUsers, requiredLoginNameList);
+		if (logger.isTraceEnabled()) {
+			logger.trace("Queried TUsers are:");
+			queriedTUsers.forEach(tUser -> logger.trace("{}", tUser));
+		}
 
+		logger.trace("Creating Users from TUsers.");
+		List<User> userList = createUsersFromTUsers(queriedTUsers, requiredLoginNameList);
+		logger.trace("Users has been created from TUsers.");
+
+		logger.trace("Querying TEvents from TUsers.");
 		List<TEvent> everyTEvent = queryTEventsFromTUsers(queriedTUsers);
+		if (logger.isTraceEnabled()) {
+			logger.trace("The following TEvents has been queried:");
+			everyTEvent.forEach(tEvent -> logger.trace("{}", tEvent));
+		}
+
+		logger.trace("Creating possible timeslots between {} and {}.", minHour, maxHour);
 		List<Timeslot> possibleTimeslots = Timeslot.createPossibleTimeslots(minHour, maxHour);
+		if (logger.isTraceEnabled()) {
+			logger.trace("Possible timeslots between {} and {} are:", minHour, maxHour);
+			possibleTimeslots.forEach(timeslot -> logger.trace("{}", timeslot));
+		}
+		logger.trace("Creating possible periods from timeslots: {} and days: {}.", possibleTimeslots, dayOfWeekList);
 		List<Period> possiblePeriods = Period.createPossiblePeriods(possibleTimeslots, dayOfWeekList);
+		if (logger.isTraceEnabled()) {
+			logger.trace("Possible periods are:");
+			possiblePeriods.forEach(possiblePeriod -> logger.trace("{}", possiblePeriod));
+		}
+
+		logger.trace("Creating Events from TEvents.");
 		List<Event> eventList = createEventsFromTEvents(everyTEvent, possiblePeriods, year, weekOfYear,
 				dayOfWeekList, mergedLoginNames, userList);
+		if (logger.isTraceEnabled()) {
+			logger.trace("The following events has been created:");
+			eventList.forEach(event -> logger.trace("{}", event));
+		}
 
 		// Add conflicting event that should be moved by the algorithm
+		logger.trace("Adding an unlocked and conflicting event to the previously created event list.");
 		DayOfWeek conflictingDay = dayOfWeekList.get(0);
 		Timeslot conflictingTimeslot = eventList.isEmpty() ? new Timeslot(minHour) : eventList.get(0).getPeriod()
 				.getTimeslot();
 		Period conflictingPeriod = new Period(conflictingDay, conflictingTimeslot);
 		boolean isLocked = false;
-		eventList.add(new Event("Movable event", conflictingPeriod, userList, isLocked));
+		Event unlockedEvent = new Event("Unlocked event", conflictingPeriod, userList, isLocked);
+		eventList.add(unlockedEvent);
+		logger.trace("The following unlocked event has been added to the event list: {}", unlockedEvent);
 
 		EventSchedule eventSchedule = new EventSchedule();
 		eventSchedule.setPossiblePeriods(possiblePeriods);
