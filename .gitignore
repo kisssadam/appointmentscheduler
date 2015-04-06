@@ -3,6 +3,8 @@ smartcampus.properties
 **/*.log
 .settings/**
 .project
+target/
+
 
 # Maven.gitignore
 **/target/
