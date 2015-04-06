@@ -20,7 +20,7 @@ public abstract class FormatUtils {
 	private static final ZoneId budapestZoneId;
 
 	/**
-	 * {@link #getDayOfWeekFromTimeStamp(Timestamp)} uses to return {@link DayOfWeek} of {@link Timestamp}.
+	 * {@link #getDayOfWeekFromTimeStamp(Timestamp)} uses to return the {@link DayOfWeek} of {@link Timestamp}.
 	 */
 	private static final DateTimeFormatter dayOfWeekDateTimeFormatter;
 
@@ -30,17 +30,17 @@ public abstract class FormatUtils {
 	private static final DateTimeFormatter weekDateTimeFormatter;
 
 	/**
-	 * {@link #getYearFromTimestamp(Timestamp)} uses to return year of {@link Timestamp}.
+	 * {@link #getYearFromTimestamp(Timestamp)} uses to return the year of {@link Timestamp}.
 	 */
 	private static final DateTimeFormatter yearDateTimeFormatter;
 
 	/**
-	 * {@link #getHourFromTimestamp(Timestamp)} uses to return hour of {@link Timestamp}.
+	 * {@link #getHourFromTimestamp(Timestamp)} uses to return the hour of {@link Timestamp}.
 	 */
 	private static final DateTimeFormatter hourDateTimeFormatter;
 
 	/**
-	 * {@link #getMinuteFromTimestamp(Timestamp)} uses to return minute of {@link Timestamp}.
+	 * {@link #getMinuteFromTimestamp(Timestamp)} uses to return the minute of {@link Timestamp}.
 	 */
 	private static final DateTimeFormatter minuteDateTimeFormatter;
 
