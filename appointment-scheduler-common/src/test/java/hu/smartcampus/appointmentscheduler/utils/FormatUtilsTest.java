@@ -28,19 +28,19 @@ public class FormatUtilsTest {
 		int week = FormatUtils.getWeekFromTimestamp(timestamp);
 		assertEquals(14, week);
 	}
-	
+
 	@Test
 	public void testGetYearFromTimestamp() {
 		int year = FormatUtils.getYearFromTimestamp(timestamp);
 		assertEquals(2015, year);
 	}
-	
+
 	@Test
 	public void testGetHourFromTimestamp() {
 		int hour = FormatUtils.getHourFromTimestamp(timestamp);
 		assertEquals(14, hour);
 	}
-	
+
 	@Test
 	public void testMinuteFromTimestamp() {
 		int minute = FormatUtils.getMinuteFromTimestamp(timestamp);
