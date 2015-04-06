@@ -13,9 +13,9 @@ import org.optaplanner.core.api.domain.entity.PlanningEntity;
 import org.optaplanner.core.api.domain.variable.PlanningVariable;
 
 @PlanningEntity(difficultyComparatorClass = EventDifficultyComparator.class,
-				movableEntitySelectionFilter = MovableEventSelectionFilter.class)
+		movableEntitySelectionFilter = MovableEventSelectionFilter.class)
 public class Event implements Serializable, Comparable<Event>, Cloneable {
-	
+
 	private static final long serialVersionUID = 1L;
 	private String title;
 	private Period period;
@@ -41,9 +41,9 @@ public class Event implements Serializable, Comparable<Event>, Cloneable {
 	public void setTitle(String title) {
 		this.title = title;
 	}
-	
-	@PlanningVariable(valueRangeProviderRefs = {"periodRange"},
-					  strengthComparatorClass = PeriodStrengthComparator.class)
+
+	@PlanningVariable(valueRangeProviderRefs = { "periodRange" },
+			strengthComparatorClass = PeriodStrengthComparator.class)
 	public Period getPeriod() {
 		return this.period;
 	}
@@ -132,8 +132,9 @@ public class Event implements Serializable, Comparable<Event>, Cloneable {
 	}
 
 	/**
-	 * This method is only used during debugging. When {@link EventSchedule#createEventSchedule(String[], String[], int, int, DayOfWeek[])}
-	 * creates the events then we can print them out to the console.
+	 * This method is only used during debugging. When
+	 * {@link EventScheduleFactory#newEventSchedule(String[], String[], DayOfWeek[], int, int, int, int)} creates the
+	 * events then we can print them out to the console.
 	 */
 	@Override
 	public int compareTo(Event otherEvent) {
@@ -142,7 +143,7 @@ public class Event implements Serializable, Comparable<Event>, Cloneable {
 
 	@Override
 	protected Event clone() {
-		return new Event(this.title, this.period.clone(), this.users, this.locked); 
+		return new Event(this.title, this.period.clone(), this.users, this.locked);
 	}
-	
+
 }
