@@ -1,5 +1,5 @@
 /**
- * Contains such classes that has effects on the planning algorithm. 
+ * Contains classes which have effects on the planning algorithm. 
  * 
  * @author adam
  *
