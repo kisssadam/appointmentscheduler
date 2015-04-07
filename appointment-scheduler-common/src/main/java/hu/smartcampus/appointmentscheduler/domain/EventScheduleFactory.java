@@ -220,13 +220,14 @@ public class EventScheduleFactory {
 	/**
 	 * Converts {@link TEvent}s to {@link Event}s.
 	 * 
-	 * @param everyTEvent
-	 * @param possiblePeriods
-	 * @param year
-	 * @param weekOfYear
-	 * @param daysOfWeek
-	 * @param mergedLoginNames
-	 * @param users
+	 * @param everyTEvent the list to filter
+	 * @param possiblePeriods contains those {@link Period}s that can be used during planning
+	 * @param year only those events will be converted which year of timestamps are equal to this parameter
+	 * @param weekOfYear only those events will be converted which week of timestamps are equal to this parameter
+	 * @param daysOfWeek only those events will be converted which year of timestamps can be found in this parameter
+	 * @param mergedLoginNames only those events will be converted which users' loginName can be found in this
+	 *            parameter
+	 * @param users every user that is used during planning
 	 * @return the {@link List} of the created {@link Event}s.
 	 */
 	private List<Event> createEventsFromTEvents(List<TEvent> everyTEvent, List<Period> possiblePeriods, int year,
