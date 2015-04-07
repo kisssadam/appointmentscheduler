@@ -226,8 +226,8 @@ public class Event implements Serializable, Comparable<Event>, Cloneable {
 	}
 
 	/**
-	 * Returns a new {@link Event}. Creates a deep copy of {@link #period} and shallow copy of {@link #title}
-	 * {@link #users} {@code locked}.
+	 * Returns a copy of this {@link Event} instance. Creates a deep copy of {@link #period} and shallow copy of
+	 * {@link #title} {@link #users} {@code locked}.
 	 */
 	@Override
 	protected Event clone() {

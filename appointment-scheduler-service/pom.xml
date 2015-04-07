@@ -24,7 +24,7 @@
 		</dependency>
 	</dependencies>
 	<build>
-		<finalName>AppointmentSchedulerService</finalName>
+		<!-- <finalName>AppointmentSchedulerService</finalName> -->
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
