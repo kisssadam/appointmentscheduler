@@ -13,7 +13,8 @@ import org.optaplanner.core.api.domain.entity.PlanningEntity;
 import org.optaplanner.core.api.domain.variable.PlanningVariable;
 
 /**
- * Holds information about events.
+ * Describes an event. This is a {@link PlanningEntity}. The planning algorithm can change the periods of the
+ * instances of the {@link Event} .
  * 
  * @author adam
  */

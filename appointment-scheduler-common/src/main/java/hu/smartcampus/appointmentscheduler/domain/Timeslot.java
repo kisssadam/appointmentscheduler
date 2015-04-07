@@ -6,6 +6,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+/**
+ * Contains an int value which indicates the hour of the day.
+ * 
+ * @author adam
+ */
 public class Timeslot implements Comparable<Timeslot>, Cloneable {
 
 	/**
