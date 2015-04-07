@@ -149,7 +149,8 @@ public class Period implements Cloneable, Comparable<Period> {
 	}
 
 	/**
-	 * Returns {@code true} if {@code obj} is equal to this {@link Period}.
+	 * Returns {@code true} if {@code obj} is equal to this {@link Period}. Two {@link Period}s are considered equal
+	 * if they have the same {@link DayOfWeek} and {@link Timeslot} values.
 	 */
 	@Override
 	public boolean equals(Object obj) {
