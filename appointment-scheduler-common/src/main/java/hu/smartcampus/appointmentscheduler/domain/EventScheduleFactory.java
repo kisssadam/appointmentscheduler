@@ -21,17 +21,35 @@ import javax.persistence.TypedQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * This Factory is used to construct new {@link EventSchedule} instances.
+ * 
+ * @author adam
+ */
 public class EventScheduleFactory {
 
+	/**
+	 * The logger of the {@link EventScheduleFactory}.
+	 */
 	private static final Logger logger = LoggerFactory.getLogger(EventScheduleFactory.class);
+
+	/**
+	 * A static reference to the only one instance of {@link EntityManagerFactory}.
+	 */
 	private static final EntityManagerFactory entityManagerFactory;
 
+	/**
+	 * The {@link EntityManager} of {@link EventScheduleFactory}.
+	 */
 	private EntityManager entityManager;
 
 	static {
 		entityManagerFactory = Persistence.createEntityManagerFactory("SMARTCAMPUS");
 	}
 
+	/**
+	 * Constructs a new {@link EventScheduleFactory}.
+	 */
 	public EventScheduleFactory() {
 		super();
 		synchronized (EventScheduleFactory.class) {
@@ -40,6 +58,21 @@ public class EventScheduleFactory {
 		logger.trace("New EventScheduleFactory has been instantiated.");
 	}
 
+	/**
+	 * Constructs a new {@link EventSchedule} using the given parameters.
+	 * 
+	 * @param requiredLoginNames those users login name, who are necessary to attend on the {@link Event}
+	 * @param skippableLoginNames those users login name, who are not necessary to attend on the {@link Event}
+	 * @param daysOfWeek the possible days of week on which the planning algorithm can work
+	 * @param year the year in which the planning algorithm can work
+	 * @param weekOfYear the number of the week of the year on which the planning algorithm can work
+	 * @param minHour the minimum hour on which the planning algorithm can work
+	 * @param maxHour the maximum hour on which the planning algorithm can work
+	 * @return the constructed {@link EventSchedule}. Never {@code null}!
+	 * @throws IllegalArgumentException if {@code requiredLoginNames}, {@code daysOfWeek} is null or empty or if
+	 *             {@code minHour}, {@code maxHour} or {@code weekOfYear} are not in the valid range. For hours the
+	 *             valid range is [0, 23], for weekOfYear the valid range is [1, 52].
+	 */
 	public EventSchedule newEventSchedule(String[] requiredLoginNames, String[] skippableLoginNames,
 			DayOfWeek[] daysOfWeek, int year, int weekOfYear, int minHour, int maxHour) {
 		logger.trace("Checking arguments in newEventSchedule().");
@@ -142,6 +175,12 @@ public class EventScheduleFactory {
 		return eventSchedule;
 	}
 
+	/**
+	 * Queries those {@link TUser}s from the database which have the their login names in the give parameter.
+	 * 
+	 * @param loginNames the login names of the {@link TUser} to query
+	 * @return the {@link List} of the queried {@link TUser}s.
+	 */
 	private List<TUser> queryTUsers(List<String> loginNames) {
 		TypedQuery<TUser> query = entityManager.createNamedQuery("TUser.findByLoginName", TUser.class);
 		query.setParameter("loginNames", loginNames);
@@ -149,11 +188,25 @@ public class EventScheduleFactory {
 		return query.getResultList();
 	}
 
+	/**
+	 * Queries the {@link TEvent} from the given {@link TUser}s.
+	 * 
+	 * @param queriedTUsers the {@link TUser}s to query their {@link TEvent}s
+	 * @return the {@link List} of the queried {@link TEvent}s
+	 */
 	private List<TEvent> queryTEventsFromTUsers(List<TUser> queriedTUsers) {
 		return queriedTUsers.stream().flatMap(tUser -> new ArrayList<>(tUser.getTEvents()).stream())
 				.collect(Collectors.toList());
 	}
 
+	/**
+	 * Converts {@link TUser}s to {@link User}s.
+	 * 
+	 * @param queriedTUsers the {@link TUser} to convert
+	 * @param requiredLoginNames if a login name is in this {@link List}, then the {@link User#isSkippable()} must be
+	 *            false
+	 * @return the {@link List} of the created {@link User}s
+	 */
 	private List<User> createUsersFromTUsers(List<TUser> queriedTUsers, List<String> requiredLoginNames) {
 		return queriedTUsers.stream().map(tUser -> {
 			boolean isSkippable = !requiredLoginNames.contains(tUser.getLoginName());
@@ -164,6 +217,18 @@ public class EventScheduleFactory {
 		}).distinct().sorted().collect(Collectors.toList());
 	}
 
+	/**
+	 * Converts {@link TEvent}s to {@link Event}s.
+	 * 
+	 * @param everyTEvent
+	 * @param possiblePeriods
+	 * @param year
+	 * @param weekOfYear
+	 * @param daysOfWeek
+	 * @param mergedLoginNames
+	 * @param users
+	 * @return the {@link List} of the created {@link Event}s.
+	 */
 	private List<Event> createEventsFromTEvents(List<TEvent> everyTEvent, List<Period> possiblePeriods, int year,
 			int weekOfYear, List<DayOfWeek> daysOfWeek, List<String> mergedLoginNames, List<User> users) {
 		return everyTEvent.stream()
@@ -187,6 +252,16 @@ public class EventScheduleFactory {
 				.collect(Collectors.toList());
 	}
 
+	/**
+	 * An event in the database can contain more users then we need to use during planning. This method filters and
+	 * returns a {@link List} of {@link User}s which contains only those {@link User}s, which are required during
+	 * planning.
+	 * 
+	 * @param tEvent the entity to filter
+	 * @param mergedLoginNames the required login names during planning
+	 * @param users every {@link User} that will be used during planning
+	 * @return a {@link List} of {@link User}s
+	 */
 	private List<User> getRequiredUsersOfTEvent(TEvent tEvent, List<String> mergedLoginNames, List<User> users) {
 		return new ArrayList<>(tEvent.getTUsers()).stream()
 				.filter(tUser -> mergedLoginNames.contains(tUser.getLoginName()))
@@ -194,6 +269,13 @@ public class EventScheduleFactory {
 				.collect(Collectors.toList());
 	}
 
+	/**
+	 * Returns that {@link User} from the users parameter which has the loginName login name.
+	 * 
+	 * @param loginName the login name used during the searching in users
+	 * @param users the collection that must be used during searching
+	 * @return the {@link User} with the loginName.
+	 */
 	private User getUserByLoginName(String loginName, List<User> users) {
 		return users.stream().filter(user -> user.getLoginName().equals(loginName)).findFirst().orElse(null);
 	}
