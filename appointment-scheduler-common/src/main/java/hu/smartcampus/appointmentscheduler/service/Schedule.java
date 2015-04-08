@@ -1,19 +1,10 @@
 package hu.smartcampus.appointmentscheduler.service;
 
-import hu.smartcampus.appointmentscheduler.domain.Event;
-import hu.smartcampus.appointmentscheduler.domain.EventSchedule;
-import hu.smartcampus.appointmentscheduler.domain.Period;
 import hu.smartcampus.appointmentscheduler.domain.User;
 
 import java.io.Serializable;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.DayOfWeek;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class Schedule implements Serializable {
 
@@ -24,57 +15,6 @@ public class Schedule implements Serializable {
 
 	public Schedule() {
 		super();
-	}
-
-	public Schedule(EventSchedule solvedEventSchedule) {
-		List<Event> events = solvedEventSchedule.getEvents();
-		List<Event> lockedEvents = events.stream().filter(event -> event.isLocked()).collect(Collectors.toList());
-		List<Event> movableEvents = events.stream().filter(event -> !event.isLocked()).collect(Collectors.toList());
-
-		List<User> unavailableUsers = new ArrayList<>();
-		for (Event lockedEvent : lockedEvents) {
-			for (Event movableEvent : movableEvents) {
-				if (lockedEvent.getPeriod().equals(movableEvent.getPeriod())) {
-					for (User user : movableEvent.getUsers()) {
-						if (lockedEvent.getUsers().contains(user) && !unavailableUsers.contains(user)) {
-							unavailableUsers.add(user);
-						}
-					}
-				}
-			}
-		}
-		this.unavailableUsers = unavailableUsers.toArray(new User[unavailableUsers.size()]);
-		Arrays.sort(this.unavailableUsers);
-
-		List<User> availableUsers = new ArrayList<>(solvedEventSchedule.getUsers());
-		availableUsers.removeAll(unavailableUsers);
-		this.availableUsers = availableUsers.toArray(new User[availableUsers.size()]);
-		Arrays.sort(this.availableUsers);
-
-		int year = solvedEventSchedule.getYear();
-		int weekOfYear = solvedEventSchedule.getWeekOfYear();
-
-		Period period = movableEvents.get(0).getPeriod();
-		DayOfWeek dayOfWeek = period.getDay();
-		int hour = period.getTimeslot().getHour();
-
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-ww-EEEE-H");
-		StringBuilder sb = new StringBuilder();
-		sb.append(year);
-		sb.append("-");
-		sb.append(weekOfYear);
-		sb.append("-");
-		sb.append(dayOfWeek);
-		sb.append("-");
-		sb.append(hour);
-		Date date;
-		try {
-			date = simpleDateFormat.parse(sb.toString());
-		} catch (ParseException e) {
-			date = new Date();
-			e.printStackTrace();
-		}
-		this.date = date;
 	}
 
 	public Schedule(User[] availableUsers, User[] unavailableUsers, Date date) {

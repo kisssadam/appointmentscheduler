@@ -1,7 +1,14 @@
 package hu.smartcampus.appointmentscheduler.domain;
 
+import hu.smartcampus.appointmentscheduler.service.Schedule;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -305,6 +312,51 @@ public class EventSchedule implements Solution<HardMediumSoftScore>, PlanningClo
 		clone.setEvents(this.events.stream().map(event -> event.clone()).collect(Collectors.toList()));
 		clone.setScore(this.score);
 		return clone;
+	}
+
+	/**
+	 * Converts {@link EventSchedule} instance to a {@link Schedule} instance.
+	 * 
+	 * @return a {@link Schedule} instance
+	 * @throws ParseException if date conversion fails
+	 */
+	public Schedule toSchedule() throws ParseException {
+		List<Event> lockedEvents = events.stream().filter(event -> event.isLocked()).collect(Collectors.toList());
+		List<Event> movableEvents = events.stream().filter(event -> !event.isLocked()).collect(Collectors.toList());
+
+		List<User> unavailableUsers = new ArrayList<>();
+		for (Event lockedEvent : lockedEvents) {
+			for (Event movableEvent : movableEvents) {
+				if (lockedEvent.getPeriod().equals(movableEvent.getPeriod())) {
+					for (User user : movableEvent.getUsers()) {
+						if (lockedEvent.getUsers().contains(user) && !unavailableUsers.contains(user)) {
+							unavailableUsers.add(user);
+						}
+					}
+				}
+			}
+		}
+		Collections.sort(unavailableUsers);
+
+		Schedule schedule = new Schedule();
+		schedule.setUnavailableUsers(unavailableUsers.toArray(new User[unavailableUsers.size()]));
+
+		List<User> availableUsers = new ArrayList<>(this.users);
+		availableUsers.removeAll(unavailableUsers);
+		Collections.sort(availableUsers);
+		schedule.setAvailableUsers(availableUsers.toArray(new User[availableUsers.size()]));
+
+		Period period = movableEvents.get(0).getPeriod();
+		DayOfWeek dayOfWeek = period.getDay();
+		int hour = period.getTimeslot().getHour();
+
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-ww-EEEE-H");
+		String dateString = this.year + "-" + this.weekOfYear + "-" + dayOfWeek + "-" + hour;
+
+		Date date = simpleDateFormat.parse(dateString);
+		schedule.setDate(date);
+
+		return schedule;
 	}
 
 }

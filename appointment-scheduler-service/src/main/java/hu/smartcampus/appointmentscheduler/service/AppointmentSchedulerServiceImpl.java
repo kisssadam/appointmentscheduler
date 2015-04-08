@@ -3,6 +3,7 @@ package hu.smartcampus.appointmentscheduler.service;
 import hu.smartcampus.appointmentscheduler.domain.EventSchedule;
 import hu.smartcampus.appointmentscheduler.domain.EventScheduleFactory;
 
+import java.text.ParseException;
 import java.time.DayOfWeek;
 import java.util.Arrays;
 import java.util.UUID;
@@ -51,7 +52,14 @@ public class AppointmentSchedulerServiceImpl implements AppointmentSchedulerServ
 		EventSchedule solvedEventSchedule = (EventSchedule) solver.getBestSolution();
 		logger.info("Request {} has been solved: {}", requestId, solvedEventSchedule);
 
-		return new Schedule(solvedEventSchedule);
+		Schedule schedule = null;
+		try {
+			schedule = solvedEventSchedule.toSchedule();
+		} catch (ParseException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
+		return schedule;
 	}
 
 }

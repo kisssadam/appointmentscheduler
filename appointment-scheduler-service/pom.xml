@@ -18,6 +18,11 @@
 			<type>pom</type>
 		</dependency>
 		<dependency>
+			<groupId>org.optaplanner</groupId>
+			<artifactId>optaplanner-core</artifactId>
+			<version>6.2.0.Final</version>
+		</dependency>
+		<dependency>
 			<groupId>hu.smartcampus</groupId>
 			<artifactId>appointment-scheduler-common</artifactId>
 			<version>1.0</version>
