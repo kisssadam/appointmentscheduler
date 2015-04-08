@@ -22,6 +22,7 @@
 			<property name="javax.persistence.jdbc.user" value="${SCUSERNAME}" />
 			<property name="javax.persistence.jdbc.password" value="${SCPASSWORD}" />
 			<property name="eclipselink.logging.level" value="INFO" />
+			<property name="eclipselink.logging.file" value="/tmp/appointmentscheduler-jpa.log"/>
 			<!-- http://eclipse.org/eclipselink/documentation/2.5/jpa/extensions/p_logging_level.htm -->
 		</properties>
 	</persistence-unit>
