@@ -55,6 +55,7 @@ public class ControllerServlet extends HttpServlet {
 	private void prefetchUsers() {
 		logger.trace("Prefetching users.");
 		userQuery.getResultList();
+		logger.trace("Finished perefetching users.");
 	}
 
 	@Override
