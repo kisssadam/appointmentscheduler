@@ -75,7 +75,7 @@ public class EventScheduleFactory {
 	 */
 	public EventSchedule newEventSchedule(String[] requiredLoginNames, String[] skippableLoginNames,
 			DayOfWeek[] daysOfWeek, int year, int weekOfYear, int minHour, int maxHour) {
-		logger.trace("Checking arguments in newEventSchedule().");
+		logger.debug("Checking arguments in newEventSchedule().");
 		if (requiredLoginNames == null || requiredLoginNames.length == 0) {
 			throw new IllegalArgumentException("Illegal requiredLoginNames argument: "
 					+ Arrays.toString(requiredLoginNames) + ".");
@@ -99,7 +99,7 @@ public class EventScheduleFactory {
 			String message = "Argument minHour (" + minHour + ") is bigger than maxHour (" + maxHour + ")";
 			throw new IllegalArgumentException(message);
 		}
-		logger.trace("Finished checking arguments in newEventSchedule(). Creating EventSchedule.");
+		logger.debug("Finished checking arguments in newEventSchedule(). Creating EventSchedule.");
 
 		List<String> requiredLoginNameList = Arrays.stream(requiredLoginNames).distinct()
 				.collect(Collectors.toList());
@@ -113,47 +113,53 @@ public class EventScheduleFactory {
 		Arrays.sort(daysOfWeek);
 		List<DayOfWeek> dayOfWeekList = Arrays.asList(daysOfWeek);
 
-		logger.trace("Querying TUsers with following login names: {}.", mergedLoginNames);
+		logger.debug("Querying TUsers with following login names: {}.", mergedLoginNames);
 		List<TUser> queriedTUsers = queryTUsers(mergedLoginNames);
 		if (logger.isTraceEnabled()) {
 			logger.trace("Queried TUsers are:");
 			queriedTUsers.forEach(tUser -> logger.trace("{}", tUser));
 		}
+		logger.debug("Finished querying TUsers.");
 
-		logger.trace("Creating Users from TUsers.");
+		logger.debug("Creating Users from TUsers.");
 		List<User> userList = createUsersFromTUsers(queriedTUsers, requiredLoginNameList);
-		logger.trace("Users has been created from TUsers.");
+		logger.debug("Users has been created from TUsers.");
 
-		logger.trace("Querying TEvents from TUsers.");
+		logger.debug("Querying TEvents from TUsers.");
 		List<TEvent> everyTEvent = queryTEventsFromTUsers(queriedTUsers);
 		if (logger.isTraceEnabled()) {
 			logger.trace("The following TEvents has been queried:");
 			everyTEvent.forEach(tEvent -> logger.trace("{}", tEvent));
 		}
+		logger.debug("TEvents has been queried from TUsers.");
 
-		logger.trace("Creating possible timeslots between {} and {}.", minHour, maxHour);
+		logger.debug("Creating possible timeslots between {} and {}.", minHour, maxHour);
 		List<Timeslot> possibleTimeslots = Timeslot.createPossibleTimeslots(minHour, maxHour);
 		if (logger.isTraceEnabled()) {
 			logger.trace("Possible timeslots between {} and {} are:", minHour, maxHour);
 			possibleTimeslots.forEach(timeslot -> logger.trace("{}", timeslot));
 		}
-		logger.trace("Creating possible periods from timeslots: {} and days: {}.", possibleTimeslots, dayOfWeekList);
+		logger.debug("Possible timeslots has been created.");
+
+		logger.debug("Creating possible periods from timeslots: {} and days: {}.", possibleTimeslots, dayOfWeekList);
 		List<Period> possiblePeriods = Period.createPossiblePeriods(possibleTimeslots, dayOfWeekList);
 		if (logger.isTraceEnabled()) {
 			logger.trace("Possible periods are:");
 			possiblePeriods.forEach(possiblePeriod -> logger.trace("{}", possiblePeriod));
 		}
+		logger.debug("Possible periods has been created.");
 
-		logger.trace("Creating Events from TEvents.");
+		logger.debug("Creating Events from TEvents.");
 		List<Event> eventList = createEventsFromTEvents(everyTEvent, possiblePeriods, year, weekOfYear,
 				dayOfWeekList, mergedLoginNames, userList);
 		if (logger.isTraceEnabled()) {
 			logger.trace("The following events has been created:");
 			eventList.forEach(event -> logger.trace("{}", event));
 		}
+		logger.debug("Events has been created from TEvents.");
 
 		// Add conflicting event that should be moved by the algorithm
-		logger.trace("Adding an unlocked and conflicting event to the previously created event list.");
+		logger.debug("Adding an unlocked and conflicting event to the previously created event list.");
 		DayOfWeek conflictingDay = dayOfWeekList.get(0);
 		Timeslot conflictingTimeslot = eventList.isEmpty() ? new Timeslot(minHour) : eventList.get(0).getPeriod()
 				.getTimeslot();
@@ -161,7 +167,7 @@ public class EventScheduleFactory {
 		boolean isLocked = false;
 		Event unlockedEvent = new Event("Unlocked event", conflictingPeriod, userList, isLocked);
 		eventList.add(unlockedEvent);
-		logger.trace("The following unlocked event has been added to the event list: {}", unlockedEvent);
+		logger.debug("The following unlocked event has been added to the event list: {}", unlockedEvent);
 
 		EventSchedule eventSchedule = new EventSchedule();
 		eventSchedule.setPossiblePeriods(possiblePeriods);
