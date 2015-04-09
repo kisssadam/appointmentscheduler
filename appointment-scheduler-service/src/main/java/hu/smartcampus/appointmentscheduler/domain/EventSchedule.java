@@ -349,8 +349,24 @@ public class EventSchedule implements Solution<HardMediumSoftScore>, PlanningClo
 		DayOfWeek dayOfWeek = period.getDay();
 		int hour = period.getTimeslot().getHour();
 
+		Date date = createDateFrom(this.year, this.weekOfYear, dayOfWeek, hour);
+		schedule.setDate(date);
+
+		return schedule;
+	}
+
+	/**
+	 * Constructs a {@link Date} instance using the given arguments.
+	 * 
+	 * @param year the year of the date
+	 * @param weekOfYear the number of the week of the year
+	 * @param dayOfWeek the day of the week
+	 * @param hour the hour of the day
+	 * @return the constructed {@link Date} instance
+	 */
+	private Date createDateFrom(int year, int weekOfYear, DayOfWeek dayOfWeek, int hour) {
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-ww-EEEE-H");
-		String dateString = this.year + "-" + this.weekOfYear + "-" + dayOfWeek + "-" + hour;
+		String dateString = year + "-" + weekOfYear + "-" + dayOfWeek + "-" + hour;
 
 		Date date;
 		try {
@@ -359,9 +375,7 @@ public class EventSchedule implements Solution<HardMediumSoftScore>, PlanningClo
 			e.printStackTrace();
 			date = new Date(0);
 		}
-		schedule.setDate(date);
-
-		return schedule;
+		return date;
 	}
 
 }
