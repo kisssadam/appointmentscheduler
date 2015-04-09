@@ -82,6 +82,9 @@
 					<dependencySourceIncludes>
 						<dependencySourceInclude>org.optaplanner:*</dependencySourceInclude>
 					</dependencySourceIncludes>
+					<links>
+						<link>http://docs.jboss.org/optaplanner/release/6.2.0.Final/optaplanner-javadoc/</link>
+					</links>
 				</configuration>
 			</plugin>
 		</plugins>
