@@ -318,9 +318,8 @@ public class EventSchedule implements Solution<HardMediumSoftScore>, PlanningClo
 	 * Converts {@link EventSchedule} instance to a {@link Schedule} instance.
 	 * 
 	 * @return a {@link Schedule} instance
-	 * @throws ParseException if date conversion fails
 	 */
-	public Schedule toSchedule() throws ParseException {
+	public Schedule toSchedule() {
 		List<Event> lockedEvents = events.stream().filter(event -> event.isLocked()).collect(Collectors.toList());
 		List<Event> movableEvents = events.stream().filter(event -> !event.isLocked()).collect(Collectors.toList());
 
@@ -353,7 +352,13 @@ public class EventSchedule implements Solution<HardMediumSoftScore>, PlanningClo
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-ww-EEEE-H");
 		String dateString = this.year + "-" + this.weekOfYear + "-" + dayOfWeek + "-" + hour;
 
-		Date date = simpleDateFormat.parse(dateString);
+		Date date;
+		try {
+			date = simpleDateFormat.parse(dateString);
+		} catch (ParseException e) {
+			e.printStackTrace();
+			date = new Date(0);
+		}
 		schedule.setDate(date);
 
 		return schedule;
