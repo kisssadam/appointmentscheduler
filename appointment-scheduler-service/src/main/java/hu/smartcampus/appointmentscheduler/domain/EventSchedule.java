@@ -112,7 +112,7 @@ public class EventSchedule implements Solution<HardMediumSoftScore>, PlanningClo
 	 * Returns the possible {@link Period}s of the {@link EventSchedule}. Planning algorithm gets these values before
 	 * making a move.
 	 * 
-	 * @return
+	 * @return the possible periods of the {@link EventSchedule}
 	 */
 	@ValueRangeProvider(id = "periodRange")
 	public List<Period> getPossiblePeriods() {
@@ -240,7 +240,7 @@ public class EventSchedule implements Solution<HardMediumSoftScore>, PlanningClo
 	 * Returns the {@link Event}s of the {@link EventSchedule}. This is a {@link PlanningEntityCollectionProperty}
 	 * which means that the planning algorithm can change (moves) the instances of this list.
 	 * 
-	 * @return
+	 * @return the events of the {@link EventSchedule}
 	 */
 	@PlanningEntityCollectionProperty
 	public List<Event> getEvents() {
