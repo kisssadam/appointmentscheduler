@@ -52,7 +52,7 @@ public class EventScheduleFactory {
 	 */
 	public EventScheduleFactory() {
 		super();
-		synchronized (EventScheduleFactory.class) {
+		synchronized (entityManagerFactory) {
 			this.entityManager = entityManagerFactory.createEntityManager();
 		}
 		logger.trace("New EventScheduleFactory has been instantiated.");

@@ -29,6 +29,7 @@ public class AppointmentSchedulerServiceImpl implements AppointmentSchedulerServ
 			int year, int weekOfYear, int minHour, int maxHour) {
 		UUID requestId = UUID.randomUUID();
 		logger.info("Creating new request: {}", requestId);
+		
 		SolverFactory solverFactory = SolverFactory.createFromXmlResource(SOLVER_CONFIG);
 		Solver solver = solverFactory.buildSolver();
 
@@ -42,7 +43,7 @@ public class AppointmentSchedulerServiceImpl implements AppointmentSchedulerServ
 					daysOfWeek, year, weekOfYear, minHour, maxHour);
 			logger.trace("Finished creating unsolvedEventSchedule on request {}.", requestId);
 		} catch (IllegalArgumentException ex) {
-			logger.error(ex.getMessage());
+			logger.error("Exception on request {}: {}.", requestId, ex.getMessage());
 			return null;
 		}
 		logger.info("Start solving on request: {}", requestId);
