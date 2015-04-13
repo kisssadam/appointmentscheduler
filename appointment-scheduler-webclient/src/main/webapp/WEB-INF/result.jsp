@@ -25,7 +25,7 @@ td {
 }
 </style>
 </head>
-<fmt:setLocale value="hu_HU" />
+<%-- <fmt:setLocale value="hu_HU" /> --%>
 <body>
 	<table class="center">
 		<thead>
