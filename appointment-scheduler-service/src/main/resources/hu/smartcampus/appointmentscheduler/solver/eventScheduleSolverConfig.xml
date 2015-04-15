@@ -9,7 +9,7 @@
 
 	<scoreDirectorFactory>
 		<scoreDefinitionType>HARD_MEDIUM_SOFT</scoreDefinitionType>
-		<easyScoreCalculatorClass>hu.smartcampus.appointmentscheduler.domain.solver.EventScheduleSimpleScoreCalculator</easyScoreCalculatorClass>
+		<easyScoreCalculatorClass>hu.smartcampus.appointmentscheduler.domain.solver.EventScheduleEasyScoreCalculator</easyScoreCalculatorClass>
 	</scoreDirectorFactory>
 
 	<termination>

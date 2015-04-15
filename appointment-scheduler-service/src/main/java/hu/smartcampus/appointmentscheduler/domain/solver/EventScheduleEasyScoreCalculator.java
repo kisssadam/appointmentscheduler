@@ -13,7 +13,7 @@ import org.optaplanner.core.api.score.Score;
 import org.optaplanner.core.api.score.buildin.hardmediumsoft.HardMediumSoftScore;
 import org.optaplanner.core.impl.score.director.easy.EasyScoreCalculator;
 
-public class EventScheduleSimpleScoreCalculator implements EasyScoreCalculator<EventSchedule> {
+public class EventScheduleEasyScoreCalculator implements EasyScoreCalculator<EventSchedule> {
 
 	@Override
 	public Score<HardMediumSoftScore> calculateScore(EventSchedule solution) {
