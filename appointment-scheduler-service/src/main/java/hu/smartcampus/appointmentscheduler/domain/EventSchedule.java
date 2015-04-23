@@ -365,8 +365,8 @@ public class EventSchedule implements Solution<HardMediumSoftScore>, PlanningClo
 	 * @return the constructed {@link Date} instance
 	 */
 	private Date createDateFrom(int year, int weekOfYear, DayOfWeek dayOfWeek, int hour) {
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-ww-EEEE-H");
-		String dateString = year + "-" + weekOfYear + "-" + dayOfWeek + "-" + hour;
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-ww-u-H");
+		String dateString = year + "-" + weekOfYear + "-" + dayOfWeek.getValue() + "-" + hour;
 
 		Date date;
 		try {
