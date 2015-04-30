@@ -77,7 +77,7 @@ table {
 				<tfoot>
 					<tr>
 						<td>Note: Use "CTRL + Left Mouse Button" to select multiple items.</td>
-						<td colspan="2" align="right"><input type="reset" /> <input type="submit" value="Schedule" /></td>
+						<td colspan="2" align="right"><input type="reset" value="Reset"/> <input type="submit" value="Schedule" /></td>
 					</tr>
 				</tfoot>
 			</table>
