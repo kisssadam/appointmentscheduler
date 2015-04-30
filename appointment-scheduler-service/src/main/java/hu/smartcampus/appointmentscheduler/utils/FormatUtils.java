@@ -5,6 +5,7 @@ import java.time.DayOfWeek;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 /**
  * Contains method to format {@link Timestamp} objects.
@@ -47,11 +48,12 @@ public abstract class FormatUtils {
 	static {
 		budapestZoneId = ZoneId.of("Europe/Budapest");
 
-		dayOfWeekDateTimeFormatter = DateTimeFormatter.ofPattern("EEEE");
-		weekDateTimeFormatter = DateTimeFormatter.ofPattern("w");
-		yearDateTimeFormatter = DateTimeFormatter.ofPattern("yyyy");
-		hourDateTimeFormatter = DateTimeFormatter.ofPattern("H");
-		minuteDateTimeFormatter = DateTimeFormatter.ofPattern("m");
+		Locale locale = Locale.US;
+		dayOfWeekDateTimeFormatter = DateTimeFormatter.ofPattern("EEEE", locale);
+		weekDateTimeFormatter = DateTimeFormatter.ofPattern("w", locale);
+		yearDateTimeFormatter = DateTimeFormatter.ofPattern("yyyy", locale);
+		hourDateTimeFormatter = DateTimeFormatter.ofPattern("H", locale);
+		minuteDateTimeFormatter = DateTimeFormatter.ofPattern("m", locale);
 	}
 
 	/**
